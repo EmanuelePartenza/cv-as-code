@@ -236,6 +236,9 @@ def resolve(root: DataRoot, spec_arg: str | Path, mode: str) -> ResolveResult:
         "languages": languages,
     }
 
+    if spec.get("footer"):
+        resolved["meta"]["footer"] = spec["footer"]
+
     schema = json.loads(root.schema_path("cv-resolved").read_text("utf-8"))
     schema_errors = sorted(
         Draft202012Validator(schema).iter_errors(resolved), key=lambda e: list(e.absolute_path)

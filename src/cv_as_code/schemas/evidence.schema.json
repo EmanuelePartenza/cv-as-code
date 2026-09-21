@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "evidence.schema.json",
+  "title": "Evidence note frontmatter (users/<slug>/notes/<name>.md)",
+  "description": "Output of stage 03_extract: the facts one document supports, each with the verbatim passage it rests on. Proposed facts are not in the profile yet; they enter it as draft with this note as evidence, and the user verifies them. The body of the note holds the quotes under headings that the facts' anchors point at.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kind", "user", "source", "extracted_on", "status", "facts"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "kind": { "const": "evidence" },
+    "user": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "source": { "type": "string", "minLength": 1, "description": "The document's path relative to the user's directory (interviews/…, sources/…, inbox/…), or a description when it is not a file" },
+    "document_date": { "type": ["string", "null"], "pattern": "^\\d{4}(-\\d{2})?(-\\d{2})?$" },
+    "extracted_on": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "language": { "type": "string", "pattern": "^[a-z]{2}$", "description": "Language of the document" },
+    "status": { "enum": ["proposed", "applied"], "description": "applied once the facts have been added to the profile as draft" },
+    "new_parents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "role", "company", "start", "end"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^(exp|prj)-[a-z0-9-]+$" },
+          "role": { "type": "string" },
+          "company": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name"],
+            "properties": {
+              "name": { "type": ["string", "null"] },
+              "location": { "type": ["string", "null"] },
+              "industry": { "type": ["string", "null"] }
+            }
+          },
+          "start": { "type": ["string", "null"], "pattern": "^\\d{4}(-\\d{2})?(-\\d{2})?$" },
+          "end": { "type": ["string", "null"], "pattern": "^\\d{4}(-\\d{2})?(-\\d{2})?$" }
+        }
+      }
+    },
+    "facts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["parent", "claim", "quote", "anchor"],
+        "properties": {
+          "parent": { "type": "string", "pattern": "^(exp|prj)-[a-z0-9-]+$", "description": "An experience or project id in the profile, or one of new_parents" },
+          "claim": { "type": "string", "minLength": 1, "description": "One fact-sized sentence in the user's pivot language" },
+          "metrics": { "type": "object", "description": "Real numbers the document gives, nothing rounded or inferred" },
+          "tags": { "type": "array", "items": { "type": "string" } },
+          "quote": { "type": "string", "minLength": 1, "description": "The passage of the document the fact rests on, verbatim" },
+          "anchor": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$", "description": "Heading anchor in the note body where the quote is repeated" }
+        }
+      }
+    }
+  }
+}

@@ -169,7 +169,14 @@ def cmd_letter(args: argparse.Namespace) -> int:
 
 
 def _stage_params(args: argparse.Namespace) -> dict[str, str]:
-    params = {"user": args.user, "job_id": args.job_id, "master": args.master, "mode": args.mode}
+    params = {
+        "user": args.user,
+        "job_id": args.job_id,
+        "master": args.master,
+        "mode": args.mode,
+        "document": args.document,
+        "name": args.name,
+    }
     for kv in args.param:
         if "=" not in kv:
             raise CvacError(f"--param expects KEY=VALUE, got {kv!r}")
@@ -268,6 +275,8 @@ def build_parser() -> argparse.ArgumentParser:
         q.add_argument("--job", dest="job_id", metavar="JOB_ID")
         q.add_argument("--master", help="master name under users/<user>/masters/")
         q.add_argument("--mode")
+        q.add_argument("--document", help="a document path relative to users/<user>/")
+        q.add_argument("--name", help="output file name without extension")
         q.add_argument("-p", "--param", action="append", default=[], metavar="KEY=VALUE")
         q.set_defaults(func=func)
     return parser

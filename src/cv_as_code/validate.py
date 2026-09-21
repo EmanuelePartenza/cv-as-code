@@ -18,7 +18,7 @@ from typing import Any
 from jsonschema import Draft202012Validator
 
 from .dataroot import MARKER, DataRoot, package_dir
-from .documents import load_document
+from .documents import has_front_matter, load_document
 from .errors import CvacError
 
 
@@ -289,6 +289,32 @@ def check_letter(root: DataRoot, doc: dict, path: Path, where: str, rep: Report)
             rep.warn(where, "status is `approved` but approved_on is not set")
 
 
+def check_evidence(root: DataRoot, doc: dict, path: Path, where: str, rep: Report) -> None:
+    user_dir = path.parent.parent
+    source = str(doc.get("source") or "")
+    if "/" in source and "://" not in source and not (user_dir / source).exists():
+        rep.error(where, f"source `{source}` does not exist under {root.rel(user_dir)}")
+    new_parents = {np.get("id") for np in doc.get("new_parents") or []}
+    profile_path = root.profile_path(str(doc.get("user")))
+    known: set[str] = set()
+    if profile_path.exists():
+        profile = _load(profile_path, root.rel(profile_path), rep)
+        if profile is not None:
+            known, _ = citable_ids(profile)
+    for i, fact in enumerate(doc.get("facts") or []):
+        parent = fact.get("parent")
+        if parent not in known and parent not in new_parents:
+            rep.error(
+                where, f"facts[{i}] parent `{parent}` is neither in the profile nor in new_parents"
+            )
+
+
+def check_questionnaire(root: DataRoot, doc: dict, path: Path, where: str, rep: Report) -> None:
+    user = doc.get("user")
+    if user and not root.user_dir(str(user)).is_dir():
+        rep.error(where, f"user `{user}` has no users/{user}/ directory")
+
+
 CHECKS = {
     "profile": check_profile,
     "cv-spec": check_cvspec,
@@ -298,6 +324,8 @@ CHECKS = {
     "job": check_job,
     "match": check_match,
     "cover-letter": check_letter,
+    "evidence": check_evidence,
+    "questionnaire": check_questionnaire,
 }
 
 
@@ -306,6 +334,11 @@ def validate_file(root: DataRoot, path: Path, rep: Report) -> None:
     if not path.exists():
         rep.error(where, "file not found")
         return
+    if path.suffix == ".md" and not has_front_matter(path.read_text("utf-8")):
+        # Free-form notes are legitimate; a letter without a frontmatter is not.
+        if path.name == "letter.md":
+            rep.error(where, "has no YAML frontmatter")
+        return
     doc = _load(path, where, rep)
     if doc is None:
         return
@@ -313,11 +346,13 @@ def validate_file(root: DataRoot, path: Path, rep: Report) -> None:
         rep.error(where, "top-level document is not a mapping")
         return
     if path.suffix == ".md" and "kind" not in doc:
-        rep.warn(
-            where,
-            "no `kind` in the frontmatter: not validated "
-            "(add `kind: cover-letter` to enable the gate)",
-        )
+        # Notes and questionnaires may be free-form documents; a letter may not.
+        if path.name == "letter.md":
+            rep.warn(
+                where,
+                "no `kind` in the frontmatter: not validated "
+                "(add `kind: cover-letter` to enable the gate)",
+            )
         return
     if validate_form(root, doc, where, rep):
         check = CHECKS.get(doc.get("kind"))
@@ -333,6 +368,8 @@ def discover_all(root: DataRoot) -> list[Path]:
         "users/*/masters/*/cv-spec.yaml",
         "users/*/applications/*/cv-spec.yaml",
         "users/*/applications/*/letter.md",
+        "users/*/notes/*.md",
+        "users/*/interviews/*.md",
         "users/*/matches/*.yaml",
         "jobs/*/job.yaml",
         "i18n/labels.*.yaml",

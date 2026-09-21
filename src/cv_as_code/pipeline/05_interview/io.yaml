@@ -1,0 +1,16 @@
+stage: 05_interview
+version: 1
+engine: llm
+gate: none
+output_language: pivot
+params: [user, name]
+inputs:
+  - path: users/{user}/profile.yaml
+    optional: true
+  - path: users/{user}/search.yaml
+    optional: true
+attachments: [questionnaire.skeleton.md]
+output:
+  path: users/{user}/interviews/{name}.md
+  format: markdown-frontmatter
+  schema: questionnaire.schema.json

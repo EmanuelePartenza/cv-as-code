@@ -11,8 +11,15 @@ from cv_as_code.errors import CvacError
 from cv_as_code.stages import describe, fill, list_stages, load_stage, pack, resolve_stage
 
 
-def test_the_four_production_stages_ship() -> None:
-    assert list_stages() == ["10_normalize", "20_match", "30_tailor", "60_letter"]
+def test_the_six_stages_ship() -> None:
+    assert list_stages() == [
+        "03_extract",
+        "05_interview",
+        "10_normalize",
+        "20_match",
+        "30_tailor",
+        "60_letter",
+    ]
 
 
 def test_every_contract_validates_and_points_to_a_shipped_schema() -> None:
@@ -86,3 +93,24 @@ def test_cli_stage_commands(data_root: DataRoot, capsys: pytest.CaptureFixture[s
     assert capsys.readouterr().out.startswith("# Stage 20_match")
     assert main(["stage", "show", "20_match", "--data-root", str(data_root.path)]) == 1
     assert "needs --job" in capsys.readouterr().err
+
+
+def test_interview_pack_carries_the_skeleton_and_tolerates_a_new_user(data_root: DataRoot) -> None:
+    rs = resolve_stage(data_root, "05_interview", {"user": "newcomer", "name": "01-onboarding"})
+    text = pack(data_root, rs)
+    assert "# Attachment questionnaire.skeleton.md" in text
+    assert "## A — Who you are" in text
+    assert "_(absent; this input is optional)_" in text
+    assert rs.output == data_root.path / "users" / "newcomer" / "interviews" / "01-onboarding.md"
+
+
+def test_extract_pack_needs_document_and_name(data_root: DataRoot) -> None:
+    with pytest.raises(CvacError, match="needs --document"):
+        resolve_stage(data_root, "03_extract", {"name": "x"})
+    doc = data_root.path / "users" / "test" / "inbox" / "old-cv.md"
+    doc.parent.mkdir(parents=True)
+    doc.write_text("I built widgets.\n")
+    rs = resolve_stage(data_root, "03_extract", {"document": "inbox/old-cv.md", "name": "old-cv"})
+    text = pack(data_root, rs)
+    assert "## Input users/test/inbox/old-cv.md" in text and "I built widgets." in text
+    assert rs.output == data_root.path / "users" / "test" / "notes" / "old-cv.md"

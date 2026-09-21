@@ -5,39 +5,101 @@
   "description": "A master CV is a cv-spec with job_id: null. Anti-invention core: every rendered claim must cite source_facts that exist in the user's profile; the final (non-draft) render additionally requires status: approved and all cited facts verified.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "kind", "user", "job_id", "language", "template", "max_pages", "output_name", "status", "headline", "sections", "experience"],
+  "required": [
+    "schema_version",
+    "kind",
+    "user",
+    "job_id",
+    "language",
+    "template",
+    "max_pages",
+    "output_name",
+    "status",
+    "headline",
+    "sections",
+    "experience"
+  ],
   "properties": {
-    "schema_version": { "const": 1 },
-    "kind": { "const": "cv-spec" },
-    "user": { "type": "string", "pattern": "^[a-z0-9-]+$" },
-    "job_id": { "type": ["string", "null"], "description": "null ⇒ this spec is a master" },
+    "schema_version": {
+      "const": 1
+    },
+    "kind": {
+      "const": "cv-spec"
+    },
+    "user": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "job_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "null ⇒ this spec is a master"
+    },
     "based_on": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "PROVENANCE ONLY: the spec this one was copied from (e.g. masters/data-engineer-it). Tooling never merges specs; tailoring copies then edits."
     },
-    "language": { "type": "string", "pattern": "^[a-z]{2}$" },
-    "template": { "type": "string", "description": "Must match a templates/<template>/ directory" },
-    "max_pages": { "type": "integer", "minimum": 1 },
-    "output_name": { "type": "string", "pattern": "\\.pdf$" },
+    "language": {
+      "type": "string",
+      "pattern": "^[a-z]{2}$"
+    },
+    "template": {
+      "type": "string",
+      "description": "Must match a templates/<template>/ directory"
+    },
+    "max_pages": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "output_name": {
+      "type": "string",
+      "pattern": "\\.pdf$"
+    },
     "status": {
-      "enum": ["draft", "approved"],
+      "enum": [
+        "draft",
+        "approved"
+      ],
       "description": "approved ONLY on the user's explicit sign-off in session — the human gate, forever"
     },
-    "approved_on": { "type": ["string", "null"], "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
-    "headline": { "type": "string" },
+    "approved_on": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "headline": {
+      "type": "string"
+    },
     "summary": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["text", "source_facts"],
+      "required": [
+        "text",
+        "source_facts"
+      ],
       "properties": {
-        "text": { "type": "string", "minLength": 1 },
-        "source_facts": { "$ref": "#/$defs/refs" }
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_facts": {
+          "$ref": "#/$defs/refs"
+        }
       }
     },
     "sections": {
       "type": "array",
       "minItems": 1,
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Render order of the CV sections"
     },
     "experience": {
@@ -45,21 +107,42 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["ref", "bullets"],
+        "required": [
+          "ref",
+          "bullets"
+        ],
         "properties": {
-          "ref": { "type": "string", "description": "Experience id in the profile; company/dates/role are resolved from there, never copied here" },
-          "title": { "type": "string", "description": "Optional target-language override for the entry title (default: profile role). Use for projects (project name)." },
-          "subtitle": { "type": "string", "description": "Optional target-language override for the org/company line (default: profile company + location). Use for projects (one-line descriptor)." },
+          "ref": {
+            "type": "string",
+            "description": "Experience id in the profile; company/dates/role are resolved from there, never copied here"
+          },
+          "title": {
+            "type": "string",
+            "description": "Optional target-language override for the entry title (default: profile role). Use for projects (project name)."
+          },
+          "subtitle": {
+            "type": "string",
+            "description": "Optional target-language override for the org/company line (default: profile company + location). Use for projects (one-line descriptor)."
+          },
           "bullets": {
             "type": "array",
             "minItems": 1,
             "items": {
               "type": "object",
               "additionalProperties": false,
-              "required": ["text", "source_facts"],
+              "required": [
+                "text",
+                "source_facts"
+              ],
               "properties": {
-                "text": { "type": "string", "minLength": 1, "description": "Rewritten in the target language for this CV" },
-                "source_facts": { "$ref": "#/$defs/refs" }
+                "text": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Rewritten in the target language for this CV"
+                },
+                "source_facts": {
+                  "$ref": "#/$defs/refs"
+                }
               }
             }
           }
@@ -75,14 +158,29 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["label", "items"],
+            "required": [
+              "label",
+              "items"
+            ],
             "properties": {
-              "label": { "type": "string" },
-              "items": { "type": "array", "items": { "type": "string" } }
+              "label": {
+                "type": "string"
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
             }
           }
         },
-        "emphasis": { "type": "array", "items": { "type": "string" } }
+        "emphasis": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
     },
     "education": {
@@ -91,11 +189,23 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["ref", "degree"],
+        "required": [
+          "ref",
+          "degree"
+        ],
         "properties": {
-          "ref": { "type": "string", "description": "Education id in the profile" },
-          "degree": { "type": "string", "description": "Degree name in the target language (overrides the profile's pivot-language degree)" },
-          "notes": { "type": "string", "description": "Optional note in the target language" }
+          "ref": {
+            "type": "string",
+            "description": "Education id in the profile"
+          },
+          "degree": {
+            "type": "string",
+            "description": "Degree name in the target language (overrides the profile's pivot-language degree)"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Optional note in the target language"
+          }
         }
       }
     },
@@ -105,10 +215,17 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["ref", "reason"],
+        "required": [
+          "ref",
+          "reason"
+        ],
         "properties": {
-          "ref": { "type": "string" },
-          "reason": { "type": "string" }
+          "ref": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
         }
       }
     },
@@ -116,16 +233,33 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "covered": { "type": "array", "items": { "type": "string" } },
-        "missing": { "type": "array", "items": { "type": "string" } }
+        "covered": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "missing": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
+    },
+    "footer": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional one-line footer printed at the bottom of every page, e.g. a link to the tool that generated the CV"
     }
   },
   "$defs": {
     "refs": {
       "type": "array",
       "minItems": 1,
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Fact ids (exp-x.fNN) or entity ids (exp-x, edu-x, skill-x) existing in the user's profile"
     }
   }

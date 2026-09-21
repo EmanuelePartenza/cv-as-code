@@ -115,3 +115,18 @@ def test_missing_template_is_a_render_error(data_root: DataRoot) -> None:
     dump(d / "cv-spec.yaml", doc)
     with pytest.raises(RenderError, match="template `nope` not found"):
         render(data_root, d)
+
+
+def test_footer_is_rendered_only_when_the_spec_sets_it(data_root: DataRoot) -> None:
+    d = write_spec(data_root, footer="Generated with cv-as-code")
+    resolve(data_root, d, "draft")
+    import json
+
+    assert (
+        json.loads((d / "cv.resolved.json").read_text())["meta"]["footer"]
+        == "Generated with cv-as-code"
+    )
+    assert "Generated with cv-as-code" in pdf_text(render(data_root, d).out_path)
+    d2 = write_spec(data_root, name="plain")
+    resolve(data_root, d2, "draft")
+    assert "footer" not in json.loads((d2 / "cv.resolved.json").read_text())["meta"]

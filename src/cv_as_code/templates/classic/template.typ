@@ -13,6 +13,9 @@
   set page(
     paper: "a4",
     margin: (x: 1.5cm, top: 1.3cm, bottom: 1.1cm),
+    footer: if data.meta.at("footer", default: none) != none {
+      align(center, text(size: 7.5pt, fill: luma(130), data.meta.footer))
+    },
     background: if data.meta.draft {
       place(center + horizon,
         rotate(-28deg, text(size: 100pt, weight: "bold", fill: rgb(32, 69, 107, 18))[DRAFT]))

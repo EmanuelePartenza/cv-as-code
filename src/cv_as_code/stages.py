@@ -20,7 +20,14 @@ from .dataroot import DataRoot, load_yaml, package_dir
 from .errors import CvacError
 
 PLACEHOLDER_RE = re.compile(r"\{([a-z_]+)\}")
-FLAGS = {"user": "--user", "job_id": "--job", "master": "--master", "mode": "--mode"}
+FLAGS = {
+    "user": "--user",
+    "job_id": "--job",
+    "master": "--master",
+    "mode": "--mode",
+    "document": "--document",
+    "name": "--name",
+}
 
 
 def pipeline_dir() -> Path:
@@ -155,10 +162,11 @@ def pack(root: DataRoot, rs: ResolvedStage) -> str:
         "",
         rs.stage.instructions.strip(),
         "",
-        "---",
-        "",
-        "# Inputs",
     ]
+    for attachment in c.get("attachments") or []:
+        body = (pipeline_dir() / rs.stage.name / attachment).read_text("utf-8").rstrip()
+        parts += ["", "---", "", f"# Attachment {attachment}", "", "```markdown", body, "```"]
+    parts += ["", "---", "", "# Inputs"]
     for template, path, optional in rs.inputs:
         rel = root.rel(path)
         if not path.is_file():

@@ -325,3 +325,81 @@ def test_discover_all_includes_jobs_matches_and_letters(data_root: DataRoot) -> 
     write_letter_md(data_root)
     names = [p.name for p in discover_all(data_root)]
     assert "job.yaml" in names and f"{JOB_ID}.yaml" in names and "letter.md" in names
+
+
+# --- evidence notes and questionnaires ---------------------------------------------------
+
+
+def _evidence(user_dir: Path, **over: object) -> Path:
+    fm = {
+        "schema_version": 1,
+        "kind": "evidence",
+        "user": "test",
+        "source": "interviews/01-onboarding.md",
+        "document_date": None,
+        "extracted_on": "2026-01-03",
+        "language": "en",
+        "status": "proposed",
+        "new_parents": [],
+        "facts": [
+            {
+                "parent": "exp-acme",
+                "claim": "Ran the widget line",
+                "metrics": {},
+                "tags": [],
+                "quote": "I ran the widget line",
+                "anchor": "widget-line",
+            }
+        ],
+    }
+    fm.update(over)
+    (user_dir / "interviews").mkdir(exist_ok=True)
+    (user_dir / "interviews" / "01-onboarding.md").write_text(
+        "---\nschema_version: 1\nkind: questionnaire\nuser: test\nlanguage: en\n"
+        "status: filled\ncreated: 2026-01-02\nmode: full\n---\n\n## C\n\nI ran the widget line\n"
+    )
+    p = user_dir / "notes" / "01-onboarding.md"
+    p.write_text(
+        "---\n"
+        + yaml.safe_dump(fm, sort_keys=False)
+        + "---\n\n## widget-line\n\n> I ran the widget line\n"
+    )
+    return p
+
+
+def test_evidence_note_validates_and_checks_parents_and_source(data_root: DataRoot) -> None:
+    user_dir = data_root.path / "users" / "test"
+    assert errors_of(data_root, _evidence(user_dir)) == []
+    p = _evidence(
+        user_dir, facts=[{"parent": "exp-ghost", "claim": "x", "quote": "x", "anchor": "x"}]
+    )
+    assert any(
+        "parent `exp-ghost` is neither in the profile nor in new_parents" in e
+        for e in errors_of(data_root, p)
+    )
+    p = _evidence(
+        user_dir,
+        facts=[{"parent": "exp-new", "claim": "x", "quote": "x", "anchor": "x"}],
+        new_parents=[
+            {"id": "exp-new", "role": "r", "company": {"name": "c"}, "start": "2020", "end": None}
+        ],
+    )
+    assert errors_of(data_root, p) == []
+    p = _evidence(user_dir, source="inbox/missing.pdf")
+    assert any("source `inbox/missing.pdf` does not exist" in e for e in errors_of(data_root, p))
+
+
+def test_questionnaire_frontmatter_validates(data_root: DataRoot) -> None:
+    user_dir = data_root.path / "users" / "test"
+    _evidence(user_dir)
+    q = user_dir / "interviews" / "01-onboarding.md"
+    assert errors_of(data_root, q) == []
+    q.write_text(q.read_text().replace("status: filled", "status: done"))
+    assert any("'done' is not one of" in e for e in errors_of(data_root, q))
+
+
+def test_free_form_notes_without_kind_are_skipped_silently(data_root: DataRoot) -> None:
+    p = data_root.path / "users" / "test" / "notes" / "scratch.md"
+    p.write_text("---\ntype: evidence\n---\nfree text\n")
+    rep = validate_files(data_root, [p])
+    assert rep.errors == [] and rep.warnings == []

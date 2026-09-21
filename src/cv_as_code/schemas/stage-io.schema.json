@@ -5,22 +5,59 @@
   "description": "The machine-readable half of an LLM stage (ADR-0002). INSTRUCTIONS.md next to it is the prompt. Placeholders in paths ({user}, {job_id}, {master}) are filled from params; every engine (a Claude Code skill, `cvac stage pack` for any chat, an API runner) reads the same contract.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["stage", "version", "engine", "gate", "output_language", "params", "inputs", "output"],
+  "required": [
+    "stage",
+    "version",
+    "engine",
+    "gate",
+    "output_language",
+    "params",
+    "inputs",
+    "output"
+  ],
   "properties": {
-    "stage": { "type": "string", "pattern": "^\\d{2}_[a-z][a-z_]*$", "description": "Directory name; the number orders the pipeline" },
-    "version": { "const": 1 },
-    "engine": { "enum": ["llm", "deterministic"] },
+    "stage": {
+      "type": "string",
+      "pattern": "^\\d{2}_[a-z][a-z_]*$",
+      "description": "Directory name; the number orders the pipeline"
+    },
+    "version": {
+      "const": 1
+    },
+    "engine": {
+      "enum": [
+        "llm",
+        "deterministic"
+      ]
+    },
     "gate": {
-      "enum": ["none", "human"],
+      "enum": [
+        "none",
+        "human"
+      ],
       "description": "human: the output carries a status and only a person may set it to approved"
     },
     "output_language": {
-      "enum": ["pivot", "target", "posting", "english"],
+      "enum": [
+        "pivot",
+        "target",
+        "posting",
+        "english"
+      ],
       "description": "pivot: the profile's pivot_language · target: the CV/letter language · posting: the language of the job posting · english: the framework's own"
     },
     "params": {
       "type": "array",
-      "items": { "enum": ["user", "job_id", "master", "mode"] },
+      "items": {
+        "enum": [
+          "user",
+          "job_id",
+          "master",
+          "mode",
+          "document",
+          "name"
+        ]
+      },
       "description": "Placeholders the paths need; the engine must provide them"
     },
     "inputs": {
@@ -29,22 +66,56 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["path"],
+        "required": [
+          "path"
+        ],
         "properties": {
-          "path": { "type": "string", "description": "Data-root-relative path with placeholders" },
-          "optional": { "type": "boolean", "default": false, "description": "true: may be absent (the pack says so instead of failing)" }
+          "path": {
+            "type": "string",
+            "description": "Data-root-relative path with placeholders"
+          },
+          "optional": {
+            "type": "boolean",
+            "default": false,
+            "description": "true: may be absent (the pack says so instead of failing)"
+          }
         }
       }
     },
     "output": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["path", "format", "schema"],
+      "required": [
+        "path",
+        "format",
+        "schema"
+      ],
       "properties": {
-        "path": { "type": "string" },
-        "format": { "enum": ["yaml", "markdown-frontmatter", "markdown"] },
-        "schema": { "type": ["string", "null"], "description": "Schema file in the package validating the output (the frontmatter, for markdown-frontmatter)" }
+        "path": {
+          "type": "string"
+        },
+        "format": {
+          "enum": [
+            "yaml",
+            "markdown-frontmatter",
+            "markdown"
+          ]
+        },
+        "schema": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Schema file in the package validating the output (the frontmatter, for markdown-frontmatter)"
+        }
       }
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Files in the stage directory that the engine needs besides INSTRUCTIONS.md (a questionnaire skeleton); included in the pack"
     }
   }
 }

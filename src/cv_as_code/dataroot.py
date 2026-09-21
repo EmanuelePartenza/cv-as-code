@@ -32,9 +32,11 @@ def load_yaml(path: Path) -> Any:
     """Parse a YAML file, turning a missing or malformed file into a CvacError."""
     if not path.is_file():
         raise CvacError(f"file not found: {path}")
+    from .documents import normalise_dates  # local import: documents depends on errors only
+
     try:
         with open(path, encoding="utf-8") as f:
-            return yaml.safe_load(f)
+            return normalise_dates(yaml.safe_load(f))
     except yaml.YAMLError as e:
         raise CvacError(f"{path}: YAML parse error: {e}") from e
 
