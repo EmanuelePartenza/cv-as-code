@@ -1,0 +1,22 @@
+# Section headings and display strings for Italian CVs.
+# Read by resolve/letter; injected resolved into the render input so templates
+# carry zero language strings. New language = new file here (or in a data root's i18n/).
+schema_version: 1
+kind: labels
+language: it
+sections:
+  summary: Profilo
+  experience: Esperienza professionale
+  projects: Progetti
+  skills: Competenze tecniche
+  education: Formazione
+  languages: Lingue
+present: Presente
+date_format: MM/YYYY
+months: [gennaio, febbraio, marzo, aprile, maggio, giugno, luglio, agosto, settembre, ottobre, novembre, dicembre]
+language_names:
+  it: Italiano
+  fr: Francese
+  en: Inglese
+levels:
+  native: Madrelingua

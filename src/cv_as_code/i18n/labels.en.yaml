@@ -1,0 +1,21 @@
+# Section headings and display strings for English CVs.
+# Read by resolve/letter; injected resolved into the render input.
+schema_version: 1
+kind: labels
+language: en
+sections:
+  summary: Profile
+  experience: Professional experience
+  projects: Projects
+  skills: Technical skills
+  education: Education
+  languages: Languages
+present: Present
+date_format: MM/YYYY
+months: [January, February, March, April, May, June, July, August, September, October, November, December]
+language_names:
+  it: Italian
+  fr: French
+  en: English
+levels:
+  native: Native

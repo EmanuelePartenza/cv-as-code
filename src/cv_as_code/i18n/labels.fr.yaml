@@ -1,0 +1,21 @@
+# Section headings and display strings for French CVs.
+# Read by resolve/letter; injected resolved into the render input.
+schema_version: 1
+kind: labels
+language: fr
+sections:
+  summary: Profil
+  experience: Expérience professionnelle
+  projects: Projets
+  skills: Compétences techniques
+  education: Formation
+  languages: Langues
+present: Présent
+date_format: MM/YYYY
+months: [janvier, février, mars, avril, mai, juin, juillet, août, septembre, octobre, novembre, décembre]
+language_names:
+  it: Italien
+  fr: Français
+  en: Anglais
+levels:
+  native: Langue maternelle

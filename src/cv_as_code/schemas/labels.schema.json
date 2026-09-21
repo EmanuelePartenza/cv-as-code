@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "labels.schema.json",
+  "title": "Display labels and conventions for one CV language",
+  "description": "Everything language-specific that a rendered CV or letter needs, so that templates carry zero language strings. One file per language: i18n/labels.<lang>.yaml, in the package or overriding it from a data root. A missing key fails validation instead of rendering blank.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kind", "language", "sections", "present", "date_format", "months", "language_names", "levels"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "kind": { "const": "labels" },
+    "language": { "type": "string", "pattern": "^[a-z]{2}$", "description": "Must match the file name labels.<language>.yaml" },
+    "sections": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary", "experience", "projects", "skills", "education", "languages"],
+      "properties": {
+        "summary": { "type": "string", "minLength": 1 },
+        "experience": { "type": "string", "minLength": 1 },
+        "projects": { "type": "string", "minLength": 1 },
+        "skills": { "type": "string", "minLength": 1 },
+        "education": { "type": "string", "minLength": 1 },
+        "languages": { "type": "string", "minLength": 1 }
+      }
+    },
+    "present": { "type": "string", "minLength": 1, "description": "Shown as the end of an ongoing date range" },
+    "date_format": {
+      "enum": ["MM/YYYY", "YYYY-MM", "MM.YYYY"],
+      "description": "How month-precision dates are displayed in this language"
+    },
+    "months": {
+      "type": "array",
+      "minItems": 12,
+      "maxItems": 12,
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Month names, January first; used for the cover-letter date"
+    },
+    "language_names": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "description": "ISO 639-1 code -> language name in this language"
+    },
+    "levels": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "description": "Profile language level keys (e.g. native) -> display text; unknown keys pass through"
+    }
+  }
+}

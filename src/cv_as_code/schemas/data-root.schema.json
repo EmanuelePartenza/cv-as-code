@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "data-root.schema.json",
+  "title": "Data root marker (cvac.yaml)",
+  "description": "Marks a directory as a cv-as-code data root. Everything the framework reads or writes for a user lives under it: users/<slug>/, jobs/, and optional i18n/ and templates/ overrides. See ADR-0006.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kind"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "kind": { "const": "data-root" },
+    "default_user": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Slug of the user commands act on when --user is omitted; must be a users/<slug>/ directory"
+    }
+  }
+}

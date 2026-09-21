@@ -1,0 +1,363 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "profile.schema.json",
+  "title": "User profile — single source of truth for career facts",
+  "description": "Every CV line must trace back to a fact in this file. Facts are atomic, citable (by id), and carry a verification status. Dates are quoted ISO strings; null means 'ongoing' or 'unknown', never inferred.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "user",
+    "pivot_language",
+    "identity",
+    "languages",
+    "experiences",
+    "education",
+    "skills"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "kind": {
+      "const": "profile"
+    },
+    "user": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Slug, must equal the users/<slug>/ directory name"
+    },
+    "pivot_language": {
+      "$ref": "#/$defs/lang",
+      "description": "Language the facts are written in; translations live in cv-specs, never here"
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "full_name",
+        "location",
+        "email"
+      ],
+      "properties": {
+        "full_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "born": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "location": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "city"
+          ],
+          "properties": {
+            "city": {
+              "type": "string"
+            },
+            "country": {
+              "type": "string"
+            }
+          }
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "phone": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "label",
+              "url"
+            ],
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "languages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "level"
+        ],
+        "properties": {
+          "code": {
+            "$ref": "#/$defs/lang"
+          },
+          "level": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "experiences": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/experience"
+      }
+    },
+    "projects": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/experience"
+      }
+    },
+    "education": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "degree",
+          "institution"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^edu-[a-z0-9-]+$"
+          },
+          "degree": {
+            "type": "string"
+          },
+          "institution": {
+            "type": "string"
+          },
+          "location": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "start": {
+            "$ref": "#/$defs/fuzzydate"
+          },
+          "end": {
+            "$ref": "#/$defs/fuzzydate"
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "category"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^skill-[a-z0-9-]+$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "description": "Free-form (language, library, cloud, ...). No controlled vocabulary: matching is semantic, LLM-side."
+          },
+          "evidence_facts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Fact ids proving this skill was used for real. Empty ⇒ validator warning."
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "interests": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "$defs": {
+    "lang": {
+      "type": "string",
+      "pattern": "^[a-z]{2}$"
+    },
+    "fuzzydate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^\\d{4}(-\\d{2})?(-\\d{2})?$",
+      "description": "Quoted ISO string: '2024', '2024-07' or '2024-07-01'. null = ongoing or unknown."
+    },
+    "experience": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "role",
+        "company",
+        "start",
+        "end",
+        "facts"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^(exp|prj)-[a-z0-9-]+$"
+        },
+        "role": {
+          "type": "string"
+        },
+        "company": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "location": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "industry": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "start": {
+          "$ref": "#/$defs/fuzzydate"
+        },
+        "end": {
+          "$ref": "#/$defs/fuzzydate"
+        },
+        "stack": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "note": {
+          "type": "string"
+        },
+        "facts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/fact"
+          }
+        }
+      }
+    },
+    "fact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "claim",
+        "status"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^(exp|prj)-[a-z0-9-]+\\.f\\d{2}$",
+          "description": "<parent-experience-id>.fNN — the dot makes the parent derivable"
+        },
+        "claim": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Factual sentence in the pivot language. What actually happened — not marketing copy."
+        },
+        "metrics": {
+          "type": "object",
+          "description": "Real numbers only, e.g. {volume: '3 TB/day'}. Extensible node."
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Free-form; matching is semantic, LLM-side"
+        },
+        "status": {
+          "enum": [
+            "draft",
+            "verified",
+            "rejected"
+          ],
+          "description": "verified only after the user's explicit confirmation; never delete a fact, reject it"
+        },
+        "verified_on": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "evidence": {
+          "type": [
+            "string",
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "description": "Path(s) relative to the user dir of the note/source backing this fact; an optional #anchor may follow the path. The validator fails on a path that does not exist."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cv-resolved.schema.json",
+  "title": "Resolved CV — the generator↔template contract",
+  "description": "Output of tools/resolve.py: profile × cv-spec × i18n labels, fully denormalized. Consumed by the Typst template (cv(data)). No fact ids, no refs — every value is final display text in the target language. Labels arrive resolved so templates carry zero language strings.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "labels", "identity", "sections", "experience", "projects", "skills", "education", "languages"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["draft", "language", "source"],
+      "properties": {
+        "draft": { "type": "boolean", "description": "true ⇒ template renders a DRAFT watermark; set by resolve --mode draft" },
+        "language": { "type": "string", "pattern": "^[a-z]{2}$" },
+        "source": { "type": "string", "description": "Spec directory this was generated from (audit trail)" }
+      }
+    },
+    "labels": {
+      "type": "object",
+      "required": ["summary", "experience", "projects", "skills", "education", "languages", "present"],
+      "additionalProperties": { "type": "string" },
+      "properties": {
+        "summary": { "type": "string" },
+        "experience": { "type": "string" },
+        "projects": { "type": "string" },
+        "skills": { "type": "string" },
+        "education": { "type": "string" },
+        "languages": { "type": "string" },
+        "present": { "type": "string" }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["full_name", "headline", "location", "email"],
+      "properties": {
+        "full_name": { "type": "string" },
+        "headline": { "type": "string" },
+        "location": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": ["string", "null"] },
+        "born": { "type": ["string", "null"] },
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "url"],
+            "properties": { "label": { "type": "string" }, "url": { "type": "string" } }
+          }
+        },
+        "photo": { "type": ["string", "null"], "description": "Path to a photo asset, or null" }
+      }
+    },
+    "summary": { "type": ["string", "null"] },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "enum": ["summary", "experience", "projects", "skills", "education", "languages"] },
+      "description": "Render order; sections with no content are skipped by the template"
+    },
+    "experience": { "type": "array", "items": { "$ref": "#/$defs/entry" } },
+    "projects": { "type": "array", "items": { "$ref": "#/$defs/entry" } },
+    "skills": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["groups", "emphasis"],
+      "properties": {
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "items"],
+            "properties": {
+              "label": { "type": "string" },
+              "items": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "emphasis": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "education": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["degree", "institution", "dates"],
+        "properties": {
+          "degree": { "type": "string" },
+          "institution": { "type": "string" },
+          "location": { "type": ["string", "null"] },
+          "dates": { "type": "string" },
+          "notes": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "level"],
+        "properties": { "name": { "type": "string" }, "level": { "type": "string" } }
+      }
+    }
+  },
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "org", "dates", "bullets"],
+      "properties": {
+        "role": { "type": "string", "description": "Entry title (job role, or project name)" },
+        "org": { "type": ["string", "null"], "description": "Company + location, or a project one-line descriptor" },
+        "dates": { "type": "string" },
+        "bullets": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

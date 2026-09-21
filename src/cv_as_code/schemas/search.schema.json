@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "search.schema.json",
+  "title": "Job-search parameters for one user",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kind", "user", "target_roles", "markets", "cv_languages", "confidential"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "kind": { "const": "search" },
+    "user": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "target_roles": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "adjacent_roles": {
+      "type": ["array", "null"],
+      "items": { "type": "string" },
+      "description": "null = not decided yet (distinct from [] = decided: none)"
+    },
+    "markets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["area", "modes"],
+        "properties": {
+          "area": { "type": "string" },
+          "country": { "type": "string" },
+          "modes": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "enum": ["onsite", "hybrid", "remote"] }
+          },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "cv_languages": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^[a-z]{2}$" } },
+    "salary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "min": { "type": ["number", "null"] },
+        "currency": { "type": "string" },
+        "period": { "enum": ["year", "month", "day"] }
+      }
+    },
+    "red_flags": { "type": "array", "items": { "type": "string" } },
+    "confidential": {
+      "type": "boolean",
+      "description": "true = the user is currently employed and the search must not be visible to their employer; excludes channels that expose the search"
+    }
+  }
+}
