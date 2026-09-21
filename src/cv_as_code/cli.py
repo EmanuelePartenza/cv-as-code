@@ -16,6 +16,7 @@ from .errors import CvacError
 from .letter import render_letter
 from .render import render
 from .resolve import resolve
+from .skills import install, list_skills
 from .stages import describe, list_stages, load_stage, pack, resolve_stage
 from .validate import discover_all, validate_files
 
@@ -207,6 +208,24 @@ def cmd_stage_pack(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_skills_install(args: argparse.Namespace) -> int:
+    if args.to:
+        target = Path(args.to).expanduser().resolve()
+    else:
+        target = DataRoot.locate(args.data_root).path / ".claude" / "skills"
+    written = install(target)
+    for path in written:
+        print(f"installed {path}")
+    print(f"{len(written)} skill(s) installed into {target}")
+    return 0
+
+
+def cmd_skills_list(args: argparse.Namespace) -> int:
+    for name in list_skills():
+        print(name)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="cvac",
@@ -279,6 +298,17 @@ def build_parser() -> argparse.ArgumentParser:
         q.add_argument("--name", help="output file name without extension")
         q.add_argument("-p", "--param", action="append", default=[], metavar="KEY=VALUE")
         q.set_defaults(func=func)
+    p = sub.add_parser("skills", parents=[common], help="the domain skills for Claude Code")
+    ksub = p.add_subparsers(dest="skills_command", required=True, metavar="<list|install>")
+    q = ksub.add_parser("list", parents=[common], help="the skills shipped in the package")
+    q.set_defaults(func=cmd_skills_list)
+    q = ksub.add_parser(
+        "install", parents=[common], help="copy them into a data root's .claude/skills/"
+    )
+    q.add_argument(
+        "--to", metavar="DIR", help="target directory (default: <data root>/.claude/skills)"
+    )
+    q.set_defaults(func=cmd_skills_install)
     return parser
 
 

@@ -22,9 +22,10 @@ The example user Robin Ashcombe exists as a complete data root produced
 through the stages, with the questionnaire and extraction contracts; CI
 renders it and proves the PDFs identical across Python versions.
 
-Next block: the domain skills (`cv-master`, `job-ingest`, `cv-tailor`,
-`cover-letter`, placeholders `onboard` and `interview-prep`) and
-`cvac skills install`.
+The six domain skills ship in the package and install into any data root.
+
+Next block: the README that earns the positioning, CONTRIBUTING, then the
+publication checklist (history check, tag, visibility).
 
 ## Blockers
 
@@ -60,9 +61,9 @@ Details in [DEVLOG.md](DEVLOG.md), which is the source of truth.
 <!-- AUTO:COMMITS -->
 | Hash | Date | Message |
 |---|---|---|
+| `2b3ad32` | 2026-09-22 | feat(example): Robin Ashcombe, a complete data root through the stages |
 | `c04bdef` | 2026-09-22 | feat(stages): data-in contracts, evidence notes, questionnaires, footer |
 | `949b5b5` | 2026-09-22 | feat(stages): stage contracts, job/match/letter schemas, cvac stage |
 | `d1f7b9b` | 2026-09-22 | docs: navigator, status, conventions, process, decision queues, ADRs |
 | `a467fee` | 2026-09-22 | chore(process): verification engine, git hooks, settings, skills |
-| `956e0e9` | 2026-09-22 | feat(boundary): keyed denylist, pre-commit hook, history check |
 <!-- /AUTO:COMMITS -->

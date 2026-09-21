@@ -176,11 +176,12 @@ Defined in `.claude/skills/<name>/SKILL.md`:
 | `/adr` | Create a new numbered ADR from the template | only you |
 
 "Only you" is `disable-model-invocation: true`: they have side effects — they write
-documents, propose commits — so they never start on Claude's initiative. The
-domain skills (`cv-master`, `job-ingest`, `cv-tailor`, `cover-letter`, and the
-placeholders `onboard`, `interview-prep`) are installed into a data root by
-`cvac skills install` once the stage contracts exist; see STATUS.md for where
-that stands.
+documents, propose commits — so they never start on Claude's initiative. The domain
+skills — `/cv-master`, `/job-ingest`, `/cv-tailor`, `/cover-letter`, and the
+written procedures `/onboard` and `/interview-prep` — ship in
+`src/cv_as_code/skills/` and are installed into a data root (and into this
+repository's `.claude/skills/`) by `cvac skills install`; they sequence the
+stage contracts and never restate their rules.
 
 Built-in skills this project uses: **`/code-review`** for the adversarial re-read
 (fresh context: the author is not the judge), **`/context`** to see what is really

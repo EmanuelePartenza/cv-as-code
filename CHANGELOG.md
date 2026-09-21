@@ -13,6 +13,16 @@ Tags: `arch`, `perf`, `ui`, `test`, `docs`, `fix`, `cleanup`, `sec`.
 
 ## 2026-09-22
 
+### feat(skills): domain skills for Claude Code and cvac skills install [arch]
+
+- Six skills shipped in the package: `cv-master`, `job-ingest`, `cv-tailor`,
+  `cover-letter` as thin orchestrators over `cvac stage show` and the gates;
+  `onboard` and `interview-prep` as written procedures.
+- `cvac skills list|install [--to DIR]` copies them into a data root's
+  `.claude/skills/` with a generated-file notice; the repository's own copies
+  are kept identical to the sources by a test.
+- Files: `src/cv_as_code/skills/`, `skills.py`, `.claude/skills/`, `tests/test_skills.py`.
+
 ### feat(example): Robin Ashcombe, a complete data root through the stages [arch, test]
 
 - `example/`: a fictional lighthouse keeper applying for a port role; questionnaire

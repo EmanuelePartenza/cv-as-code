@@ -33,19 +33,21 @@ The package:
 
 ```
 src/cv_as_code/
-├── cli.py          cvac: init · validate · resolve · render · cv · letter · stage list|show|pack
+├── cli.py          cvac: init · validate · resolve · render · cv · letter · stage · skills
 ├── dataroot.py     the data-root contract: location, user paths, asset lookup with overrides
 ├── validate.py     form (JSON Schema) + references + evidence paths + the approval gate
 ├── resolve.py      profile × cv-spec × labels → cv.resolved.json (draft/final modes)
 ├── render.py       resolved JSON → PDF via Typst in a transient build/ directory
 ├── letter.py       letter.md × profile × labels → PDF in the CV's style
 ├── stages.py       stage contracts: list, resolve against a data root, pack for any engine
+├── skills.py       the Claude Code adapter: `cvac skills install` copies skills/ into a data root
 ├── documents.py    YAML and markdown-with-frontmatter documents; dates normalised to strings
 ├── errors.py       CvacError > ValidationError, RenderError
 ├── schemas/        profile · search · cv-spec · cv-resolved · labels · data-root · job · match ·
 │                   cover-letter · evidence · questionnaire · stage-io
 ├── pipeline/       03_extract · 05_interview · 10_normalize · 20_match · 30_tailor · 60_letter
 │                   (INSTRUCTIONS.md + io.yaml each; 05 also ships the questionnaire skeleton)
+├── skills/         cv-master · job-ingest · cv-tailor · cover-letter · onboard · interview-prep
 ├── i18n/           labels.it.yaml · labels.fr.yaml · labels.en.yaml
 └── templates/      classic/{template,letter}.typ · lib/common.typ · fonts/ (Lato, OFL)
 ```
@@ -152,11 +154,13 @@ contracts, they never duplicate a stage's rules.
 | Skill | Status | What it does |
 |---|---|---|
 | `/verify`, `/wrap`, `/decide`, `/adr` | built | the working method (gates, session close, decision queue, ADRs) |
-| `cv-master`, `job-ingest`, `cv-tailor`, `cover-letter` | next, with the stage contracts | run a stage through `cvac stage show`, preview, ask for the gate, render |
-| `onboard`, `interview-prep` | next, as written manual procedures | scaffold + interview; the preparation document (ADR-0005) |
+| `cv-master`, `job-ingest`, `cv-tailor`, `cover-letter` | built | run a stage through `cvac stage show`, preview, ask for the gate, render |
+| `onboard`, `interview-prep` | built as written procedures | scaffold + interview + extraction + verification; the preparation document (ADR-0005) by hand until stage 70 exists |
 
-Domain skills are installed into a data root by `cvac skills install`, because
-Claude Code loads skills from the project it is opened in.
+Domain skills ship in the package (`src/cv_as_code/skills/`) and are installed
+into a data root by `cvac skills install`, because Claude Code loads skills from
+the project it is opened in; the copies under this repository's `.claude/skills/`
+are kept identical to the sources by a test.
 
 ## 6. Templates and rendering
 
