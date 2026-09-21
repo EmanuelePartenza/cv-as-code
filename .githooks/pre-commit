@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Publication boundary on every commit (ADR-0009). Activation:
+#   git config core.hooksPath .githooks && chmod +x .githooks/*
+# The wider gate set (format, lint, tests) is run by .claude/scripts/verify.sh.
+
+set -u
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT" || exit 1
+
+PY="$ROOT/.venv/bin/python"
+[ -x "$PY" ] || PY="$(command -v python3 || command -v python)"
+
+if ! "$PY" -m pytest -q tests/test_publication_boundary.py; then
+  echo ""
+  echo "pre-commit: publication boundary violated. Nothing personal enters this repository."
+  echo "            Fix the content; do not bypass the hook."
+  exit 1
+fi
+
+# Staged-but-not-yet-tracked files are in the index and therefore already covered above.
+exit 0

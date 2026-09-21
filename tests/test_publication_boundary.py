@@ -4,11 +4,13 @@ Structural rules need no secret and run everywhere: no user data outside the
 example data root, no PDF or office documents, no private directories, no
 e-mail, phone or date-of-birth shaped strings outside the example's reserved
 fake values. The keyed denylist (the maintainer's own private strings, matched
-through an HMAC so they never appear here) is added by WP-03.
+through an HMAC so they never appear here) runs wherever the key is available:
+locally from ~/.config/cvac/denylist.key, in CI from the CVAC_DENYLIST_KEY secret.
 """
 
 from __future__ import annotations
 
+import importlib.util
 import re
 import subprocess
 from collections.abc import Callable
@@ -152,3 +154,46 @@ def test_date_of_birth_is_rejected_outside_example() -> None:
 def test_binary_and_exempt_files_are_not_content_checked() -> None:
     assert not _rules({"src/cv_as_code/templates/fonts/Lato-Regular.ttf": "someone@gmail.com"})
     assert not _rules({"LICENSE": "someone@gmail.com"})
+
+
+# --- keyed denylist (scripts/denylist.py) -----------------------------------------------
+
+
+def _denylist():
+    spec = importlib.util.spec_from_file_location("denylist", REPO / "scripts" / "denylist.py")
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+@pytest.mark.skipif(not (REPO / ".git").exists(), reason="not a git checkout")
+def test_tracked_files_contain_nothing_from_the_keyed_denylist() -> None:
+    dl = _denylist()
+    key = dl.load_key()
+    if key is None:
+        pytest.skip("no denylist key (CVAC_DENYLIST_KEY or ~/.config/cvac/denylist.key)")
+    digests = dl.load_digests()
+    assert digests, "tests/data/denylist.hmac is empty: run scripts/denylist.py build"
+    hits = dl.scan_files(dl.tracked_text_files(REPO), key, digests, REPO)
+    assert not hits, "\n".join(hits)
+
+
+def test_keyed_rules_match_phrases_and_digit_runs_regardless_of_spacing() -> None:
+    dl = _denylist()
+    key = b"test-key"
+    forms = dl.entry_forms("Acme Secret Client") | dl.entry_forms("+44 20 7946 0958")
+    digests = {dl.digest(key, f) for f in forms}
+    assert dl.scan_lines([("x.md", 1, "we worked for ACME secret-client last year")], key, digests)
+    assert dl.scan_lines([("x.md", 2, "call 0044 20 79460958? no: +44 20 7946 0958")], key, digests)
+    assert dl.scan_lines([("x.md", 3, "tel. 442079460958")], key, digests)
+    assert not dl.scan_lines([("x.md", 4, "nothing to see, +44 20 7946 0000")], key, digests)
+    assert not dl.scan_lines([("x.md", 5, "acme client without the middle word")], key, digests)
+
+
+def test_keyed_hits_never_print_the_matched_text() -> None:
+    dl = _denylist()
+    key = b"test-key"
+    digests = {dl.digest(key, f) for f in dl.entry_forms("Acme Secret Client")}
+    hits = dl.scan_lines([("x.md", 1, "Acme Secret Client")], key, digests)
+    assert hits == ["x.md:1: denylisted content"]
