@@ -79,12 +79,12 @@ Tags and categories are free-form: matching is semantic, on the LLM side.
 | `cv-resolved` | `cv.resolved.json` | built | the generator ↔ template contract: no ids, no refs, final display text |
 | `labels` | `i18n/labels.<lang>.yaml` | built | headings, "present", date format, month names, language and level names |
 | `data-root` | `cvac.yaml` | built | the marker and contract of a data root |
-| `job` | `jobs/<id>/job.yaml` | next | normalised posting; requirements quoted verbatim, never paraphrased |
-| `match` | `users/<u>/matches/<id>.yaml` | next | `verdict: apply \| stretch \| skip`, strengths with fact refs, gaps, angle; no numeric score |
-| `cover-letter` | frontmatter of `letter.md` | next | `source_facts`, status, approval date |
+| `job` | `jobs/<id>/job.yaml` | built | normalised posting; requirements quoted verbatim, never paraphrased |
+| `match` | `users/<u>/matches/<id>.yaml` | built | `verdict: apply \| stretch \| skip`, strengths with fact refs, gaps, angle; no numeric score |
+| `cover-letter` | frontmatter of `letter.md` | built | `source_facts`, status, approval date |
 
-"next" = the schema is designed and lands with the stage that writes it (see
-§4); until then `cvac validate` does not know the kind.
+Every kind above is validated by `cvac validate`; a markdown document
+(`letter.md`) is validated through its YAML frontmatter.
 
 ## 4. Pipeline
 
@@ -112,16 +112,18 @@ prompt: inputs, outputs, rules; it never names an engine) and `io.yaml` (the
 contract: inputs with placeholders, output path and schema, `gate`, output
 language). Three engines consume the same files: a Claude Code skill in
 session, `cvac stage pack` for any chat (paste the bundle, paste the answer
-back, validate), and an API runner (roadmap).
+back, validate — see [manual-path.md](manual-path.md)), and an API runner
+(roadmap). `cvac stage list` and `cvac stage show` print the contracts
+resolved against a data root.
 
 | Stage | Gate | Status |
 |---|---|---|
 | `03_extract` | none (facts land as draft) | next, with the example user |
 | `05_interview` | none | next, with the example user |
-| `10_normalize` | none | next |
-| `20_match` | none | next |
-| `30_tailor` | human | next |
-| `60_letter` | human | next |
+| `10_normalize` | none | built |
+| `20_match` | none | built |
+| `30_tailor` | human | built |
+| `60_letter` | human | built |
 | `70_interview_prep` | none (internal) | roadmap, at a user's first interview |
 
 Deterministic today: `resolve` (draft: any facts, stamps `meta.draft`; final:

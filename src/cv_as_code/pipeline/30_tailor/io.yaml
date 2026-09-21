@@ -1,0 +1,16 @@
+stage: 30_tailor
+version: 1
+engine: llm
+gate: human
+output_language: target
+params: [user, job_id, master]
+inputs:
+  - path: users/{user}/masters/{master}/cv-spec.yaml
+  - path: users/{user}/matches/{job_id}.yaml
+  - path: jobs/{job_id}/job.yaml
+  - path: users/{user}/profile.yaml
+  - path: users/{user}/search.yaml
+output:
+  path: users/{user}/applications/{job_id}/cv-spec.yaml
+  format: yaml
+  schema: cv-spec.schema.json

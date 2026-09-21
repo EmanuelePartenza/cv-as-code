@@ -13,6 +13,19 @@ Tags: `arch`, `perf`, `ui`, `test`, `docs`, `fix`, `cleanup`, `sec`.
 
 ## 2026-09-22
 
+### feat(stages): stage contracts, job/match/letter schemas, cvac stage [arch]
+
+- `pipeline/10_normalize`, `20_match`, `30_tailor`, `60_letter`: `INSTRUCTIONS.md`
+  + `io.yaml`, validated by `stage-io.schema.json`; gates declared.
+- Schemas `job`, `match`, `cover-letter`; the validator checks postings
+  (id = directory, `raw.txt` present), matches (strengths cite facts, job
+  exists) and letters (frontmatter, source facts, approved ⇒ verified).
+- `cvac stage list|show|pack`: the manual path for any chat, documented in
+  `docs/manual-path.md`; `pack` states the output language from the profile.
+- `documents.py` reads YAML and markdown-with-frontmatter documents.
+- Files: `src/cv_as_code/pipeline/`, `schemas/`, `stages.py`, `validate.py`,
+  `tests/test_stages.py`.
+
 ### docs: navigator, status, conventions, process, decision queues and ADRs [docs]
 
 - `CLAUDE.md` rewritten as a navigator with the sixteen non-negotiable rules;

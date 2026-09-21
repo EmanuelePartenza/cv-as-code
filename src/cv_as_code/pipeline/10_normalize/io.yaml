@@ -1,0 +1,12 @@
+stage: 10_normalize
+version: 1
+engine: llm
+gate: none
+output_language: posting
+params: [job_id]
+inputs:
+  - path: jobs/{job_id}/raw.txt
+output:
+  path: jobs/{job_id}/job.yaml
+  format: yaml
+  schema: job.schema.json

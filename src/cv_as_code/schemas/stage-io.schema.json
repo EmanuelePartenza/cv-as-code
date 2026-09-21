@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stage-io.schema.json",
+  "title": "Stage contract (pipeline/<stage>/io.yaml)",
+  "description": "The machine-readable half of an LLM stage (ADR-0002). INSTRUCTIONS.md next to it is the prompt. Placeholders in paths ({user}, {job_id}, {master}) are filled from params; every engine (a Claude Code skill, `cvac stage pack` for any chat, an API runner) reads the same contract.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["stage", "version", "engine", "gate", "output_language", "params", "inputs", "output"],
+  "properties": {
+    "stage": { "type": "string", "pattern": "^\\d{2}_[a-z][a-z_]*$", "description": "Directory name; the number orders the pipeline" },
+    "version": { "const": 1 },
+    "engine": { "enum": ["llm", "deterministic"] },
+    "gate": {
+      "enum": ["none", "human"],
+      "description": "human: the output carries a status and only a person may set it to approved"
+    },
+    "output_language": {
+      "enum": ["pivot", "target", "posting", "english"],
+      "description": "pivot: the profile's pivot_language · target: the CV/letter language · posting: the language of the job posting · english: the framework's own"
+    },
+    "params": {
+      "type": "array",
+      "items": { "enum": ["user", "job_id", "master", "mode"] },
+      "description": "Placeholders the paths need; the engine must provide them"
+    },
+    "inputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path"],
+        "properties": {
+          "path": { "type": "string", "description": "Data-root-relative path with placeholders" },
+          "optional": { "type": "boolean", "default": false, "description": "true: may be absent (the pack says so instead of failing)" }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "format", "schema"],
+      "properties": {
+        "path": { "type": "string" },
+        "format": { "enum": ["yaml", "markdown-frontmatter", "markdown"] },
+        "schema": { "type": ["string", "null"], "description": "Schema file in the package validating the output (the frontmatter, for markdown-frontmatter)" }
+      }
+    }
+  }
+}

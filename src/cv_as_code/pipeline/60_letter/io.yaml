@@ -1,0 +1,15 @@
+stage: 60_letter
+version: 1
+engine: llm
+gate: human
+output_language: target
+params: [user, job_id]
+inputs:
+  - path: jobs/{job_id}/job.yaml
+  - path: users/{user}/matches/{job_id}.yaml
+  - path: users/{user}/applications/{job_id}/cv-spec.yaml
+  - path: users/{user}/profile.yaml
+output:
+  path: users/{user}/applications/{job_id}/letter.md
+  format: markdown-frontmatter
+  schema: cover-letter.schema.json

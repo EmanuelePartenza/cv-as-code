@@ -16,6 +16,7 @@ from .errors import CvacError
 from .letter import render_letter
 from .render import render
 from .resolve import resolve
+from .stages import describe, list_stages, load_stage, pack, resolve_stage
 from .validate import discover_all, validate_files
 
 INIT_GITIGNORE = """\
@@ -167,6 +168,38 @@ def cmd_letter(args: argparse.Namespace) -> int:
     return 0
 
 
+def _stage_params(args: argparse.Namespace) -> dict[str, str]:
+    params = {"user": args.user, "job_id": args.job_id, "master": args.master, "mode": args.mode}
+    for kv in args.param:
+        if "=" not in kv:
+            raise CvacError(f"--param expects KEY=VALUE, got {kv!r}")
+        key, value = kv.split("=", 1)
+        params[key] = value
+    return {k: v for k, v in params.items() if v}
+
+
+def cmd_stage_list(args: argparse.Namespace) -> int:
+    for name in list_stages():
+        c = load_stage(name).contract
+        print(
+            f"{name:16} gate={c['gate']:6} language={c['output_language']:8} "
+            f"params={','.join(c['params'])}"
+        )
+    return 0
+
+
+def cmd_stage_show(args: argparse.Namespace) -> int:
+    root = DataRoot.locate(args.data_root)
+    print(describe(root, resolve_stage(root, args.stage, _stage_params(args))))
+    return 0
+
+
+def cmd_stage_pack(args: argparse.Namespace) -> int:
+    root = DataRoot.locate(args.data_root)
+    sys.stdout.write(pack(root, resolve_stage(root, args.stage, _stage_params(args))))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="cvac",
@@ -221,6 +254,22 @@ def build_parser() -> argparse.ArgumentParser:
         help="default: final when the letter is approved, draft otherwise",
     )
     p.set_defaults(func=cmd_letter)
+    p = sub.add_parser("stage", parents=[common], help="stage contracts: list, show, pack")
+    ssub = p.add_subparsers(dest="stage_command", required=True, metavar="<list|show|pack>")
+    q = ssub.add_parser("list", parents=[common], help="the stages shipped in the package")
+    q.set_defaults(func=cmd_stage_list)
+    for name, func, doc in (
+        ("show", cmd_stage_show, "resolved inputs, output and gate for a data root"),
+        ("pack", cmd_stage_pack, "one markdown bundle for any chat engine, on stdout"),
+    ):
+        q = ssub.add_parser(name, parents=[common], help=doc)
+        q.add_argument("stage")
+        q.add_argument("--user", help="default: the data root's default_user")
+        q.add_argument("--job", dest="job_id", metavar="JOB_ID")
+        q.add_argument("--master", help="master name under users/<user>/masters/")
+        q.add_argument("--mode")
+        q.add_argument("-p", "--param", action="append", default=[], metavar="KEY=VALUE")
+        q.set_defaults(func=func)
     return parser
 
 

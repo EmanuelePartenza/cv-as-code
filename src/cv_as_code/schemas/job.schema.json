@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "job.schema.json",
+  "title": "Normalised job posting (jobs/<id>/job.yaml)",
+  "description": "Output of stage 10_normalize from the verbatim raw.txt next to it. Requirements quote the posting, they never paraphrase it; nothing is inferred that the posting does not state. Postings are shared reference data: no application state lives here.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kind", "id", "source", "company", "title", "language", "modes", "requirements", "raw"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "kind": { "const": "job" },
+    "id": { "type": "string", "pattern": "^\\d{8}-[a-z0-9]+(-[a-z0-9]+)*$", "description": "YYYYMMDD-<company-slug>-<role-slug>; must equal the directory name" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["channel", "captured_on"],
+      "properties": {
+        "channel": { "type": "string", "description": "Free-form: where the posting was found (a job board, a company site, a referral)" },
+        "url": { "type": ["string", "null"] },
+        "captured_on": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+      }
+    },
+    "company": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "location": { "type": ["string", "null"] },
+        "industry": { "type": ["string", "null"] }
+      }
+    },
+    "title": { "type": "string", "minLength": 1 },
+    "language": { "type": "string", "pattern": "^[a-z]{2}$", "description": "Language of the posting" },
+    "modes": { "type": "array", "items": { "enum": ["onsite", "hybrid", "remote"] }, "description": "Empty when the posting does not say" },
+    "location": { "type": ["string", "null"] },
+    "salary": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "min": { "type": ["number", "null"] },
+        "max": { "type": ["number", "null"] },
+        "currency": { "type": "string" },
+        "period": { "enum": ["year", "month", "day", "hour"] }
+      }
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["text", "kind"],
+        "properties": {
+          "text": { "type": "string", "minLength": 1, "description": "Quoted verbatim from the posting" },
+          "kind": { "enum": ["must", "nice"], "description": "As the posting frames it; must when it does not say" }
+        }
+      }
+    },
+    "responsibilities": { "type": "array", "items": { "type": "string" } },
+    "keywords": { "type": "array", "items": { "type": "string" }, "description": "Technologies, methods and role words named by the posting; for ATS coverage" },
+    "raw": { "const": "raw.txt", "description": "The verbatim posting next to this file, immutable by convention" },
+    "dedup_key": { "type": ["string", "null"], "description": "Reserved for connectors; null until one exists" }
+  }
+}

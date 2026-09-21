@@ -5,7 +5,17 @@ from __future__ import annotations
 import copy
 from pathlib import Path
 
-from conftest import PROFILE, dump, spec_doc, write_spec
+import yaml
+from conftest import (
+    JOB_ID,
+    PROFILE,
+    dump,
+    spec_doc,
+    write_job,
+    write_letter_md,
+    write_match,
+    write_spec,
+)
 
 from cv_as_code.dataroot import DataRoot
 from cv_as_code.validate import Report, discover_all, validate_files
@@ -239,3 +249,79 @@ def test_data_root_default_user_must_exist(data_root: DataRoot) -> None:
     assert any(
         "default_user `ghost` has no users/ghost/ directory" in e for e in errors_of(data_root, p)
     )
+
+
+# --- postings, matches, letters ----------------------------------------------------------
+
+
+def test_job_validates_and_needs_its_raw_text_and_directory(data_root: DataRoot) -> None:
+    d = write_job(data_root)
+    assert errors_of(data_root, d / "job.yaml") == []
+    (d / "raw.txt").unlink()
+    assert any("raw.txt is missing" in e for e in errors_of(data_root, d / "job.yaml"))
+    d2 = write_job(data_root, "20260102-other-role")
+    doc = yaml.safe_load((d2 / "job.yaml").read_text("utf-8"))
+    doc["id"] = JOB_ID
+    dump(d2 / "job.yaml", doc)
+    assert any(
+        "does not match the directory `20260102-other-role`" in e
+        for e in errors_of(data_root, d2 / "job.yaml")
+    )
+
+
+def test_match_rules(data_root: DataRoot) -> None:
+    write_job(data_root)
+    assert errors_of(data_root, write_match(data_root)) == []
+    p = write_match(data_root, strengths=[{"text": "x", "source_facts": ["exp-acme.f99"]}])
+    assert any(
+        "strengths[0] cites unknown fact `exp-acme.f99`" in e for e in errors_of(data_root, p)
+    )
+    p = write_match(data_root, job_id="20260102-other-role")
+    errs = errors_of(data_root, p)
+    assert any("does not match the file name" in e for e in errs)
+    assert any("has no jobs/20260102-other-role/ directory" in e for e in errs)
+
+
+def test_letter_gate(data_root: DataRoot) -> None:
+    write_job(data_root)
+    assert errors_of(data_root, write_letter_md(data_root)) == []
+    p = write_letter_md(
+        data_root, status="approved", approved_on="2026-02-02", source_facts=["exp-acme.f02"]
+    )
+    assert any(
+        "status is `approved` but cites non-verified fact(s): exp-acme.f02" in e
+        for e in errors_of(data_root, p)
+    )
+    p = write_letter_md(data_root, source_facts=["exp-acme.f99"])
+    assert any(
+        "source_facts cites unknown fact `exp-acme.f99`" in e for e in errors_of(data_root, p)
+    )
+    p = write_letter_md(data_root, status="approved", approved_on="2026-02-02")
+    assert errors_of(data_root, p) == []
+    p = write_letter_md(data_root, language="zz", template="nope")
+    errs = errors_of(data_root, p)
+    assert any("no labels file for language `zz`" in e for e in errs)
+    assert any("template `nope` not found" in e for e in errs)
+
+
+def test_letter_without_kind_is_a_warning_not_an_error(data_root: DataRoot) -> None:
+    p = data_root.path / "users" / "test" / "applications" / JOB_ID / "letter.md"
+    p.parent.mkdir(parents=True)
+    p.write_text("---\ntype: cover-letter\nuser: test\n---\nDear team\n", "utf-8")
+    rep = validate_files(data_root, [p])
+    assert rep.errors == [] and any("no `kind` in the frontmatter" in w for w in rep.warnings)
+
+
+def test_markdown_without_frontmatter_is_an_error(data_root: DataRoot) -> None:
+    p = data_root.path / "users" / "test" / "applications" / JOB_ID / "letter.md"
+    p.parent.mkdir(parents=True)
+    p.write_text("Dear team\n", "utf-8")
+    assert any("has no YAML frontmatter" in e for e in errors_of(data_root, p))
+
+
+def test_discover_all_includes_jobs_matches_and_letters(data_root: DataRoot) -> None:
+    write_job(data_root)
+    write_match(data_root)
+    write_letter_md(data_root)
+    names = [p.name for p in discover_all(data_root)]
+    assert "job.yaml" in names and f"{JOB_ID}.yaml" in names and "letter.md" in names

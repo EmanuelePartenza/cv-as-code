@@ -1,0 +1,14 @@
+stage: 20_match
+version: 1
+engine: llm
+gate: none
+output_language: pivot
+params: [user, job_id]
+inputs:
+  - path: jobs/{job_id}/job.yaml
+  - path: users/{user}/profile.yaml
+  - path: users/{user}/search.yaml
+output:
+  path: users/{user}/matches/{job_id}.yaml
+  format: yaml
+  schema: match.schema.json

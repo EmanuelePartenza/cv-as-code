@@ -190,3 +190,93 @@ def data_root(tmp_path: Path) -> DataRoot:
 @pytest.fixture
 def profile() -> dict[str, Any]:
     return copy.deepcopy(PROFILE)
+
+
+# --- postings, matches and letters -------------------------------------------------------
+
+JOB_ID = "20260101-acme-widget"
+
+JOB: dict[str, Any] = {
+    "schema_version": 1,
+    "kind": "job",
+    "id": JOB_ID,
+    "source": {"channel": "careers page", "url": None, "captured_on": "2026-01-01"},
+    "company": {"name": "Acme Widgets", "location": "Testville", "industry": "Widgets"},
+    "title": "Widget Engineer",
+    "language": "en",
+    "modes": ["remote"],
+    "location": None,
+    "salary": None,
+    "requirements": [
+        {"text": "3+ years building widget pipelines", "kind": "must"},
+        {"text": "Experience with gadgets", "kind": "nice"},
+    ],
+    "responsibilities": ["Build widget pipelines"],
+    "keywords": ["widgets", "pipelines", "gadgets"],
+    "raw": "raw.txt",
+    "dedup_key": None,
+}
+
+MATCH: dict[str, Any] = {
+    "schema_version": 1,
+    "kind": "match",
+    "user": "test",
+    "job_id": JOB_ID,
+    "verdict": "stretch",
+    "strengths": [{"text": "Built the widget pipeline", "source_facts": ["exp-acme.f01"]}],
+    "gaps": [
+        {
+            "requirement": "Experience with gadgets",
+            "kind": "nice",
+            "note": "No evidence in the profile",
+        }
+    ],
+    "angle": "A widget engineer with a real pipeline; gadgets are a gap.",
+    "confidential_flags": [],
+    "created": "2026-01-02",
+}
+
+LETTER_FRONT: dict[str, Any] = {
+    "schema_version": 1,
+    "kind": "cover-letter",
+    "user": "test",
+    "job_id": JOB_ID,
+    "language": "en",
+    "headline": "Widget Engineer",
+    "template": "classic",
+    "output_name": "Test_User_Letter.pdf",
+    "status": "draft",
+    "approved_on": None,
+    "created": "2026-02-01",
+    "source_facts": ["exp-acme.f01"],
+}
+
+
+def write_job(root: DataRoot, job_id: str = JOB_ID) -> Path:
+    d = root.path / "jobs" / job_id
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "raw.txt").write_text(
+        "SOURCE: careers page\n---\nWidget Engineer wanted. 3+ years building widget "
+        "pipelines. Experience with gadgets is a plus.\n"
+    )
+    dump(d / "job.yaml", {**copy.deepcopy(JOB), "id": job_id})
+    return d
+
+
+def write_match(root: DataRoot, **overrides: Any) -> Path:
+    return dump(
+        root.path / "users" / "test" / "matches" / f"{JOB_ID}.yaml",
+        {**copy.deepcopy(MATCH), **overrides},
+    )
+
+
+def write_letter_md(root: DataRoot, **overrides: Any) -> Path:
+    fm = {**copy.deepcopy(LETTER_FRONT), **overrides}
+    text = (
+        "---\n" + yaml.safe_dump(fm, sort_keys=False) + "---\n\nDear Acme team,\n\n"
+        "I built the widget pipeline.\n\nTest User\n"
+    )
+    p = root.path / "users" / "test" / "applications" / JOB_ID / "letter.md"
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(text, "utf-8")
+    return p

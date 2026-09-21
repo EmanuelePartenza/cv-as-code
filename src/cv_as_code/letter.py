@@ -16,9 +16,9 @@ import json
 import re
 import shutil
 from pathlib import Path
-from typing import Any
 
 from .dataroot import DataRoot, load_yaml
+from .documents import parse_front_matter
 from .errors import CvacError
 from .render import (
     BUILD_DIR,
@@ -30,18 +30,6 @@ from .render import (
     prepare_build,
 )
 from .resolve import load_labels
-
-
-def parse_front_matter(text: str, where: str) -> tuple[dict[str, Any], str]:
-    m = re.match(r"^---\n(.*?)\n---\n?(.*)$", text, re.DOTALL)
-    if not m:
-        raise CvacError(f"{where} has no YAML frontmatter")
-    import yaml
-
-    fm = yaml.safe_load(m.group(1))
-    if not isinstance(fm, dict):
-        raise CvacError(f"{where}: frontmatter is not a mapping")
-    return fm, m.group(2).strip()
 
 
 def fmt_letter_date(iso: str, months: list[str]) -> str:

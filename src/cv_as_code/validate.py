@@ -15,10 +15,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-import yaml
 from jsonschema import Draft202012Validator
 
 from .dataroot import MARKER, DataRoot, package_dir
+from .documents import load_document
+from .errors import CvacError
 
 
 @dataclass
@@ -45,10 +46,9 @@ def load_schema(root: DataRoot, kind: str) -> dict[str, Any] | None:
 
 def _load(path: Path, where: str, rep: Report) -> Any:
     try:
-        with open(path, encoding="utf-8") as f:
-            return yaml.safe_load(f)
-    except yaml.YAMLError as e:
-        rep.error(where, f"YAML parse error: {e}")
+        return load_document(path, where)
+    except CvacError as e:
+        rep.error(where, str(e).replace(f"{where}: ", "").replace(f"{where} ", ""))
         return None
 
 
@@ -216,12 +216,88 @@ def check_dataroot(root: DataRoot, doc: dict, path: Path, where: str, rep: Repor
         rep.error(where, f"default_user `{user}` has no users/{user}/ directory")
 
 
+def check_job(root: DataRoot, doc: dict, path: Path, where: str, rep: Report) -> None:
+    if doc.get("id") != path.parent.name:
+        rep.error(where, f"id `{doc.get('id')}` does not match the directory `{path.parent.name}`")
+    if not (path.parent / "raw.txt").is_file():
+        rep.error(where, "raw.txt is missing next to job.yaml (the verbatim posting)")
+
+
+def _cited_facts(
+    root: DataRoot, doc: dict, where: str, rep: Report, refs: Any, at: str
+) -> tuple[list[str], dict[str, str]] | None:
+    """Check that every ref in `refs` is a fact of the document's user; return (cited, statuses)."""
+    user = doc.get("user")
+    profile_path = root.profile_path(str(user))
+    if not profile_path.exists():
+        rep.error(where, f"profile not found for user `{user}` ({root.rel(profile_path)})")
+        return None
+    profile = _load(profile_path, root.rel(profile_path), rep)
+    if profile is None:
+        return None
+    _, fact_status = citable_ids(profile)
+    cited = []
+    for r in refs or []:
+        if r not in fact_status:
+            rep.error(where, f"{at} cites unknown fact `{r}`")
+        else:
+            cited.append(r)
+    return cited, fact_status
+
+
+def check_match(root: DataRoot, doc: dict, path: Path, where: str, rep: Report) -> None:
+    job_id = doc.get("job_id")
+    if job_id != path.stem:
+        rep.error(where, f"job_id `{job_id}` does not match the file name `{path.stem}`")
+    if job_id and not root.job_dir(str(job_id)).is_dir():
+        rep.error(where, f"job_id `{job_id}` has no jobs/{job_id}/ directory")
+    for i, strength in enumerate(doc.get("strengths") or []):
+        if (
+            _cited_facts(root, doc, where, rep, strength.get("source_facts"), f"strengths[{i}]")
+            is None
+        ):
+            return
+
+
+def check_letter(root: DataRoot, doc: dict, path: Path, where: str, rep: Report) -> None:
+    job_id = doc.get("job_id")
+    if job_id and path.parent.name != job_id:
+        rep.error(
+            where,
+            f"job_id `{job_id}` does not match the application directory `{path.parent.name}`",
+        )
+    if job_id and not root.job_dir(str(job_id)).is_dir():
+        rep.error(where, f"job_id `{job_id}` has no jobs/{job_id}/ directory")
+    language = doc.get("language")
+    if language and root.labels_path(language) is None:
+        rep.error(where, f"no labels file for language `{language}`")
+    template = doc.get("template")
+    if template and root.template_dir(template) is None:
+        rep.error(where, f"template `{template}` not found (data root templates/ or the package)")
+    result = _cited_facts(root, doc, where, rep, doc.get("source_facts"), "source_facts")
+    if result is None:
+        return
+    cited, fact_status = result
+    if doc.get("status") == "approved":
+        unverified = sorted(f for f in cited if fact_status.get(f) != "verified")
+        if unverified:
+            rep.error(
+                where,
+                f"status is `approved` but cites non-verified fact(s): {', '.join(unverified)}",
+            )
+        if not doc.get("approved_on"):
+            rep.warn(where, "status is `approved` but approved_on is not set")
+
+
 CHECKS = {
     "profile": check_profile,
     "cv-spec": check_cvspec,
     "search": check_search,
     "labels": check_labels,
     "data-root": check_dataroot,
+    "job": check_job,
+    "match": check_match,
+    "cover-letter": check_letter,
 }
 
 
@@ -236,6 +312,13 @@ def validate_file(root: DataRoot, path: Path, rep: Report) -> None:
     if not isinstance(doc, dict):
         rep.error(where, "top-level document is not a mapping")
         return
+    if path.suffix == ".md" and "kind" not in doc:
+        rep.warn(
+            where,
+            "no `kind` in the frontmatter: not validated "
+            "(add `kind: cover-letter` to enable the gate)",
+        )
+        return
     if validate_form(root, doc, where, rep):
         check = CHECKS.get(doc.get("kind"))
         if check:
@@ -249,6 +332,7 @@ def discover_all(root: DataRoot) -> list[Path]:
         "users/*/search.yaml",
         "users/*/masters/*/cv-spec.yaml",
         "users/*/applications/*/cv-spec.yaml",
+        "users/*/applications/*/letter.md",
         "users/*/matches/*.yaml",
         "jobs/*/job.yaml",
         "i18n/labels.*.yaml",
