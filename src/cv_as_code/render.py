@@ -17,6 +17,7 @@ from __future__ import annotations
 import json
 import shutil
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
 
 from pypdf import PdfReader
@@ -51,7 +52,17 @@ def prepare_build(root: DataRoot, build: Path, template: str) -> Path:
     return build
 
 
-def compile_typst(entry: Path, output: Path, build: Path, fonts_dir: Path) -> None:
+def approval_timestamp(approved_on: object) -> int | None:
+    """Final PDFs carry the approval date as creation time, so a re-render is byte-identical."""
+    if not approved_on:
+        return None
+    y, m, d = (int(x) for x in str(approved_on).split("-")[:3])
+    return int(datetime(y, m, d, tzinfo=timezone.utc).timestamp())
+
+
+def compile_typst(
+    entry: Path, output: Path, build: Path, fonts_dir: Path, timestamp: int | None = None
+) -> None:
     import typst  # imported here: the compiler is heavy and only render needs it
 
     try:
@@ -61,6 +72,7 @@ def compile_typst(entry: Path, output: Path, build: Path, fonts_dir: Path) -> No
             root=str(build),
             font_paths=[str(fonts_dir)],
             ignore_system_fonts=True,
+            timestamp=timestamp,
         )
     except RuntimeError as e:  # typst reports compiler diagnostics as RuntimeError
         raise RenderError(f"typst compile failed:\n{e}") from e
@@ -99,7 +111,8 @@ def render(root: DataRoot, spec_arg: str | Path) -> RenderResult:
     )
 
     out_path = spec_dir / draft_name(spec["output_name"], draft)
-    compile_typst(entry, out_path, build, root.fonts_dir())
+    stamp = None if draft else approval_timestamp(spec.get("approved_on"))
+    compile_typst(entry, out_path, build, root.fonts_dir(), timestamp=stamp)
     pages = page_count(out_path)
 
     result = RenderResult(out_path=out_path, pages=pages, draft=draft)

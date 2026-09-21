@@ -20,7 +20,15 @@ from typing import Any
 
 from .dataroot import DataRoot, load_yaml
 from .errors import CvacError
-from .render import BUILD_DIR, RenderResult, compile_typst, draft_name, page_count, prepare_build
+from .render import (
+    BUILD_DIR,
+    RenderResult,
+    approval_timestamp,
+    compile_typst,
+    draft_name,
+    page_count,
+    prepare_build,
+)
 from .resolve import load_labels
 
 
@@ -94,7 +102,8 @@ def render_letter(root: DataRoot, app_arg: str | Path, mode: str | None = None) 
     )
 
     out_path = app_dir / draft_name(fm.get("output_name") or "cover-letter.pdf", draft)
-    compile_typst(entry, out_path, build, root.fonts_dir())
+    stamp = None if draft else approval_timestamp(fm.get("approved_on"))
+    compile_typst(entry, out_path, build, root.fonts_dir(), timestamp=stamp)
     pages = page_count(out_path)
     result = RenderResult(out_path=out_path, pages=pages, draft=draft)
     if pages > 1:

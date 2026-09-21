@@ -111,7 +111,7 @@ def cmd_validate(args: argparse.Namespace) -> int:
     elif args.files:
         files = [Path(f).expanduser().resolve() for f in args.files]
     else:
-        raise CvacError("nothing to validate: pass files or --all")
+        args.parser.error("nothing to validate: pass files or --all")
     rep = validate_files(root, files)
     for w in rep.warnings:
         print(f"WARN  {w}")
@@ -195,7 +195,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument("files", nargs="*", help="YAML files to validate")
     p.add_argument("--all", action="store_true", help="every known data file in the data root")
-    p.set_defaults(func=cmd_validate)
+    p.set_defaults(func=cmd_validate, parser=p)
 
     for name, func, doc in (
         ("resolve", cmd_resolve, "profile x cv-spec x labels -> cv.resolved.json"),

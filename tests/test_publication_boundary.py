@@ -42,8 +42,13 @@ TEXT_SUFFIXES = {
     ".ini",
     ".csv",
 }
-# Third-party licence texts may carry their authors' contact details.
-CONTENT_EXEMPT = {"LICENSE", "src/cv_as_code/templates/fonts/OFL.txt"}
+# Third-party licence texts may carry their authors' contact details, and this file
+# holds forbidden-shaped strings on purpose, as negative cases for the rules below.
+CONTENT_EXEMPT = {
+    "LICENSE",
+    "src/cv_as_code/templates/fonts/OFL.txt",
+    "tests/test_publication_boundary.py",
+}
 
 
 def tracked_files(repo: Path) -> list[str]:
