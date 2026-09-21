@@ -1,16 +1,33 @@
 #!/usr/bin/env bash
-# Publication boundary on every commit (ADR-0009). Activation:
-#   git config core.hooksPath .githooks && chmod +x .githooks/*
-# The wider gate set (format, lint, tests) is run by .claude/scripts/verify.sh.
+# Pre-commit gate. Activation: git config core.hooksPath .githooks && chmod +x .githooks/*
+#
+# Always: obvious secrets, the publication boundary (ADR-0009), broken links in the
+# staged documentation (advisory). Then, unless the commit is documentation only,
+# the quick gates (format, lint, boundary) via verify.sh --quick; the full test
+# suite runs with /verify or at session end.
 
 set -u
 
 ROOT="$(git rev-parse --show-toplevel)"
 cd "$ROOT" || exit 1
 
+STAGED="$(git diff --cached --name-only --diff-filter=ACM)"
+[ -z "$STAGED" ] && exit 0
+
 PY="$ROOT/.venv/bin/python"
 [ -x "$PY" ] || PY="$(command -v python3 || command -v python)"
 
+# --- obvious secrets --------------------------------------------------------------
+SUSPECT="$(printf '%s\n' "$STAGED" | grep -Ei '(^|/)\.env$|(^|/)\.env\.|id_rsa|\.pem$|credentials\.json$|denylist\.(txt|key)$' || true)"
+if [ -n "$SUSPECT" ]; then
+  echo ""
+  echo "pre-commit: potentially sensitive files staged:"
+  printf '  %s\n' $SUSPECT
+  echo "  If intentional, add them to .gitignore or unstage them."
+  exit 1
+fi
+
+# --- publication boundary ---------------------------------------------------------
 if ! "$PY" -m pytest -q tests/test_publication_boundary.py; then
   echo ""
   echo "pre-commit: publication boundary violated. Nothing personal enters this repository."
@@ -18,5 +35,32 @@ if ! "$PY" -m pytest -q tests/test_publication_boundary.py; then
   exit 1
 fi
 
-# Staged-but-not-yet-tracked files are in the index and therefore already covered above.
+# --- documentation drift (advisory) -----------------------------------------------
+if [ -f .claude/scripts/check_doc_drift.py ]; then
+  "$PY" .claude/scripts/check_doc_drift.py --staged || true
+fi
+
+# --- quick gates, unless documentation only ---------------------------------------
+DOCS_ONLY=1
+for f in $STAGED; do
+  case "$f" in
+    *.md|docs/*|LICENSE|.gitignore) ;;
+    *) DOCS_ONLY=0; break ;;
+  esac
+done
+if [ "$DOCS_ONLY" -eq 1 ]; then
+  echo "pre-commit: documentation-only commit, code gates skipped."
+  exit 0
+fi
+
+if [ -f .claude/scripts/verify.sh ] && [ -f .claude/project.conf ]; then
+  bash .claude/scripts/verify.sh --quick || {
+    echo ""
+    echo "pre-commit: gates are red. Fix the code, do not bypass the gate."
+    exit 1
+  }
+else
+  echo "pre-commit: .claude/project.conf absent, quick gates not run."
+fi
+
 exit 0

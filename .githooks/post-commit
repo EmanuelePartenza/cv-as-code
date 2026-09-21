@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# After every commit: refresh the automatic parts of STATUS.md (date, last commits)
+# and archive the session's edit log.
+#
+# Commits nothing: STATUS.md is left modified in the working tree and enters the
+# next commit. Never fails.
+
+set -u
+
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
+cd "$ROOT" || exit 0
+
+if command -v python3 >/dev/null 2>&1 && [ -f .claude/scripts/refresh_status.py ]; then
+  python3 .claude/scripts/refresh_status.py || true
+fi
+
+# The live log must describe the session AFTER the last commit: archive it.
+LOG=".claude/edit-log.jsonl"
+if [ -s "$LOG" ]; then
+  HASH="$(git rev-parse --short HEAD 2>/dev/null || echo unknown)"
+  mkdir -p .claude/edit-log-archive 2>/dev/null
+  mv "$LOG" ".claude/edit-log-archive/$HASH.jsonl" 2>/dev/null || true
+fi
+
+exit 0
