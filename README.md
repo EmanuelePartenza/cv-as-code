@@ -4,7 +4,7 @@
 
 Fact-grounded CV generation: verified career facts, an LLM-drafted content spec whose every line cites its source facts, a human approval gate, and a deterministic Python + Typst tail that turns the approved spec into a PDF.
 
-**Status: pre-release (v0.1.0 in progress).** This README is a stub; the full one lands with the first release. What exists today: the `cvac` command (`init`, `validate`, `resolve`, `render`, `cv`, `letter`), the data schemas, the `classic` Typst template with vendored fonts, and the publication-boundary test.
+**Status: pre-release (v0.1.0 in progress).** This README is a stub; the full one lands with the first release. What exists today: the `cvac` command (`init`, `validate`, `resolve`, `render`, `cv`, `letter`, `stage`), the data schemas, six stage contracts, the `classic` Typst template with vendored fonts, a complete example data root (`example/`, the fictional Robin Ashcombe) that CI renders on every push, and the publication-boundary test.
 
 ## Install
 

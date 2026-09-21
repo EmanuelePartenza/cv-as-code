@@ -1,0 +1,130 @@
+{
+  "meta": {
+    "draft": false,
+    "language": "en",
+    "source": "users/robin/applications/20260915-saltmere-port-operations-officer",
+    "footer": "Generated with cv-as-code · github.com/EmanuelePartenza/cv-as-code"
+  },
+  "labels": {
+    "summary": "Profile",
+    "experience": "Professional experience",
+    "projects": "Projects",
+    "skills": "Technical skills",
+    "education": "Education",
+    "languages": "Languages",
+    "present": "Present"
+  },
+  "identity": {
+    "full_name": "Robin Ashcombe",
+    "headline": "Marine Operations Officer",
+    "location": "Skerra, GB",
+    "email": "robin.ashcombe@example.com",
+    "phone": "+44 1632 960123",
+    "born": null,
+    "links": [
+      {
+        "label": "Fog-signal logger",
+        "url": "https://example.com/robin/fogsignal"
+      }
+    ],
+    "photo": null
+  },
+  "summary": "Marine operations professional with twelve years across a ferry deck and a remote lighthouse station. First point of contact for the coastguard on 14 incidents since 2019; plans and runs supply landings, stores and a consumables budget; keeps a first-order light and its generator in service (six years without an unplanned outage). Reports daily, and built the telemetry export the Lights Board schedules its maintenance from.",
+  "sections": [
+    "summary",
+    "experience",
+    "projects",
+    "skills",
+    "education",
+    "languages"
+  ],
+  "experience": [
+    {
+      "role": "Principal Keeper",
+      "org": "Northern Isles Lights Board, Skerra Head Lighthouse",
+      "dates": "04/2018 – Present",
+      "bullets": [
+        "Coordinated 14 incidents with the coastguard by VHF since 2019, including three helicopter medical evacuations — the station's first point of contact for emergency services.",
+        "Managed the station's stores and supplies: four supply landings a year planned end to end with the supply vessel's master, and a consumables and spares budget of about £40,000 a year.",
+        "Kept a first-order rotating light, its fog signal and the standby generator in service as sole keeper: six years without an unplanned outage (2018–2024).",
+        "Wrote the 40-page station handbook and trained five relief keepers on it; weather observations reported every three hours to the national meteorological service."
+      ]
+    },
+    {
+      "role": "Deckhand, then bosun's mate",
+      "org": "Marrow Sound Ferries, Kirkhaven",
+      "dates": "06/2013 – 03/2018",
+      "bullets": [
+        "Deck crew on a 40-metre ro-ro ferry, six crossings a day; bosun's mate from 2016 with the deck department's daily checks; radio watch on the bridge with the GMDSS General Operator's Certificate (2014) and STCW basic safety training (2013, renewed 2018)."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "role": "Fog-signal logger",
+      "org": "Telemetry for a lighthouse station · personal project",
+      "dates": "03/2022 – Present",
+      "bullets": [
+        "Raspberry Pi logger in Python with three years of continuous data on fog-signal activations and generator hours; the Lights Board's engineering office plans its maintenance visits from its monthly export."
+      ]
+    }
+  ],
+  "skills": {
+    "groups": [
+      {
+        "label": "Emergency and radio",
+        "items": [
+          "Incident coordination with the coastguard",
+          "VHF / GMDSS radio"
+        ]
+      },
+      {
+        "label": "Port and station logistics",
+        "items": [
+          "Stores and inventory",
+          "Supply-landing planning",
+          "Budget management",
+          "Contractor visits"
+        ]
+      },
+      {
+        "label": "Aids to navigation and reporting",
+        "items": [
+          "Aids-to-navigation maintenance",
+          "Weather observation",
+          "Written procedures and reports"
+        ]
+      },
+      {
+        "label": "Tooling",
+        "items": [
+          "Python / Raspberry Pi"
+        ]
+      }
+    ],
+    "emphasis": [
+      "Incident coordination with the coastguard",
+      "Stores and inventory",
+      "Aids-to-navigation maintenance"
+    ]
+  },
+  "education": [
+    {
+      "degree": "Diploma in Marine Operations",
+      "institution": "Kirkhaven Nautical College",
+      "location": "Kirkhaven",
+      "dates": "2011 – 2013",
+      "notes": null
+    }
+  ],
+  "languages": [
+    {
+      "name": "English",
+      "level": "Native"
+    },
+    {
+      "name": "French",
+      "level": "B2"
+    }
+  ]
+}

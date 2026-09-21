@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install (no external binary: Typst comes from PyPI)
+      - name: "Install (no external binary: Typst comes from PyPI)"
         run: |
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
@@ -29,3 +29,35 @@ jobs:
         env:
           CVAC_DENYLIST_KEY: ${{ secrets.CVAC_DENYLIST_KEY }}
         run: pytest -q
+      - name: Build the example PDFs from a fresh clone
+        working-directory: example
+        run: |
+          cvac validate --all
+          cvac cv users/robin/masters/port-operations-en --mode final
+          cvac cv users/robin/masters/port-operations-fr --mode final
+          cvac cv users/robin/applications/20260915-saltmere-port-operations-officer --mode final
+          cvac letter users/robin/applications/20260915-saltmere-port-operations-officer
+          mkdir -p ../pdfs && find users -name '*.pdf' -exec cp {} ../pdfs/ \;
+          sha256sum ../pdfs/*.pdf | tee ../pdfs/SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: example-pdfs-py${{ matrix.python-version }}
+          path: pdfs/
+
+  reproducible:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: example-pdfs-py3.10
+          path: a
+      - uses: actions/download-artifact@v4
+        with:
+          name: example-pdfs-py3.12
+          path: b
+      - name: The same JSON and template give the same PDF, whatever the Python version
+        run: |
+          (cd a && sha256sum *.pdf) > a.sums
+          (cd b && sha256sum *.pdf) > b.sums
+          diff a.sums b.sums && echo "identical PDFs across Python 3.10 and 3.12"

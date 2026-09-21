@@ -1,0 +1,93 @@
+schema_version: 1
+kind: cv-spec
+user: robin
+job_id: null
+based_on: masters/port-operations-en   # provenance: copied and translated, never merged
+language: fr
+template: classic
+max_pages: 1
+output_name: Robin_Ashcombe_Operations_Portuaires_FR.pdf
+status: approved        # Robin's explicit sign-off, 2026-09-16
+approved_on: "2026-09-16"
+footer: Généré avec cv-as-code · github.com/EmanuelePartenza/cv-as-code
+
+headline: Opérations maritimes · Gardien de phare principal
+
+summary:
+  text: >-
+    Huit ans d'opérations maritimes, du pont d'un ferry à une station de phare
+    isolée : gardien unique d'un feu de premier ordre, six ans sans panne
+    imprévue, 14 interventions coordonnées par radio avec les garde-côtes,
+    quatre ravitaillements par an planifiés de bout en bout. Construit les
+    outils qui manquent — un enregistreur de télémétrie dont l'office des
+    phares se sert pour planifier sa maintenance.
+  source_facts: [exp-skerra.f01, exp-skerra.f02, exp-skerra.f03, exp-skerra.f05, prj-fogsignal.f02]
+
+sections: [summary, experience, projects, skills, education, languages]
+
+experience:
+  - ref: exp-skerra
+    title: Gardien principal
+    subtitle: Northern Isles Lights Board, phare de Skerra Head
+    bullets:
+      - text: >-
+          Gardien unique d'un feu tournant de premier ordre et de sa corne de
+          brume, en alternance avec un gardien remplaçant ; six ans sans panne
+          imprévue du feu (2018–2024), en assurant moi-même l'entretien du
+          mécanisme de rotation, du changeur de lampe et du groupe de secours.
+        source_facts: [exp-skerra.f01, exp-skerra.f02]
+      - text: >-
+          14 interventions coordonnées par VHF avec les garde-côtes depuis 2019,
+          dont trois évacuations médicales par hélicoptère.
+        source_facts: [exp-skerra.f03]
+      - text: >-
+          Planification et gestion des quatre ravitaillements annuels —
+          inventaire, commandes et plan de débarquement convenu avec le
+          capitaine du navire ravitailleur — et du budget de consommables et
+          pièces de la station, environ 40 000 £ par an.
+        source_facts: [exp-skerra.f05, exp-skerra.f07]
+      - text: >-
+          Formation de cinq gardiens remplaçants et rédaction du manuel de
+          station (40 pages) ; observations météorologiques toutes les trois
+          heures pour le service national.
+        source_facts: [exp-skerra.f06, exp-skerra.f04]
+  - ref: exp-fairhaven
+    title: Matelot de pont, puis second maître d'équipage
+    subtitle: Marrow Sound Ferries, Kirkhaven
+    bullets:
+      - text: >-
+          Équipage de pont d'un ferry roulier de 40 mètres, six traversées par
+          jour : amarrage, saisissage du fret, consignes de sécurité aux
+          passagers ; second maître d'équipage à partir de 2016, responsable
+          des contrôles quotidiens du service pont.
+        source_facts: [exp-fairhaven.f01, exp-fairhaven.f02]
+      - text: >-
+          Veille radio à la passerelle ; certificat général d'opérateur GMDSS
+          (2014), formation de base STCW à la sécurité (2013, renouvelée 2018).
+        source_facts: [exp-fairhaven.f03, exp-fairhaven.f04]
+  - ref: prj-fogsignal
+    title: Enregistreur de corne de brume
+    subtitle: Télémétrie d'une station de phare · projet personnel
+    bullets:
+      - text: >-
+          Enregistreur sur Raspberry Pi, en Python, des activations de la corne
+          de brume et des heures de marche du groupe, trois ans de données
+          continues ; le bureau d'ingénierie de l'office des phares planifie ses
+          visites de maintenance à partir de l'export mensuel.
+        source_facts: [prj-fogsignal.f01, prj-fogsignal.f02]
+
+skills_layout:
+  groups:
+    - {label: Opérations, items: [Maintenance des aides à la navigation, Radio VHF / GMDSS, Coordination d'interventions, Observation météo]}
+    - {label: Logistique, items: [Magasin et inventaire, Planification des ravitaillements, Gestion budgétaire]}
+    - {label: Encadrement et outils, items: [Formation et rédaction de procédures, Python / Raspberry Pi]}
+  emphasis: [Coordination d'interventions, Radio VHF / GMDSS, Logistique]
+
+education:
+  - {ref: edu-kirkhaven, degree: Diplôme d'opérations maritimes}
+
+omitted: []
+
+ats_coverage:
+  covered: [opérations maritimes, VHF, GMDSS, garde-côtes, aides à la navigation, logistique, inventaire, formation]
+  missing: [système de gestion portuaire, VTS, planification des postes à quai]

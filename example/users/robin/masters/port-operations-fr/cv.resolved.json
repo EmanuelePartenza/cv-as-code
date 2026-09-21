@@ -1,0 +1,125 @@
+{
+  "meta": {
+    "draft": false,
+    "language": "fr",
+    "source": "users/robin/masters/port-operations-fr",
+    "footer": "Généré avec cv-as-code · github.com/EmanuelePartenza/cv-as-code"
+  },
+  "labels": {
+    "summary": "Profil",
+    "experience": "Expérience professionnelle",
+    "projects": "Projets",
+    "skills": "Compétences techniques",
+    "education": "Formation",
+    "languages": "Langues",
+    "present": "Présent"
+  },
+  "identity": {
+    "full_name": "Robin Ashcombe",
+    "headline": "Opérations maritimes · Gardien de phare principal",
+    "location": "Skerra, GB",
+    "email": "robin.ashcombe@example.com",
+    "phone": "+44 1632 960123",
+    "born": null,
+    "links": [
+      {
+        "label": "Fog-signal logger",
+        "url": "https://example.com/robin/fogsignal"
+      }
+    ],
+    "photo": null
+  },
+  "summary": "Huit ans d'opérations maritimes, du pont d'un ferry à une station de phare isolée : gardien unique d'un feu de premier ordre, six ans sans panne imprévue, 14 interventions coordonnées par radio avec les garde-côtes, quatre ravitaillements par an planifiés de bout en bout. Construit les outils qui manquent — un enregistreur de télémétrie dont l'office des phares se sert pour planifier sa maintenance.",
+  "sections": [
+    "summary",
+    "experience",
+    "projects",
+    "skills",
+    "education",
+    "languages"
+  ],
+  "experience": [
+    {
+      "role": "Gardien principal",
+      "org": "Northern Isles Lights Board, phare de Skerra Head",
+      "dates": "04/2018 – Présent",
+      "bullets": [
+        "Gardien unique d'un feu tournant de premier ordre et de sa corne de brume, en alternance avec un gardien remplaçant ; six ans sans panne imprévue du feu (2018–2024), en assurant moi-même l'entretien du mécanisme de rotation, du changeur de lampe et du groupe de secours.",
+        "14 interventions coordonnées par VHF avec les garde-côtes depuis 2019, dont trois évacuations médicales par hélicoptère.",
+        "Planification et gestion des quatre ravitaillements annuels — inventaire, commandes et plan de débarquement convenu avec le capitaine du navire ravitailleur — et du budget de consommables et pièces de la station, environ 40 000 £ par an.",
+        "Formation de cinq gardiens remplaçants et rédaction du manuel de station (40 pages) ; observations météorologiques toutes les trois heures pour le service national."
+      ]
+    },
+    {
+      "role": "Matelot de pont, puis second maître d'équipage",
+      "org": "Marrow Sound Ferries, Kirkhaven",
+      "dates": "06/2013 – 03/2018",
+      "bullets": [
+        "Équipage de pont d'un ferry roulier de 40 mètres, six traversées par jour : amarrage, saisissage du fret, consignes de sécurité aux passagers ; second maître d'équipage à partir de 2016, responsable des contrôles quotidiens du service pont.",
+        "Veille radio à la passerelle ; certificat général d'opérateur GMDSS (2014), formation de base STCW à la sécurité (2013, renouvelée 2018)."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "role": "Enregistreur de corne de brume",
+      "org": "Télémétrie d'une station de phare · projet personnel",
+      "dates": "03/2022 – Présent",
+      "bullets": [
+        "Enregistreur sur Raspberry Pi, en Python, des activations de la corne de brume et des heures de marche du groupe, trois ans de données continues ; le bureau d'ingénierie de l'office des phares planifie ses visites de maintenance à partir de l'export mensuel."
+      ]
+    }
+  ],
+  "skills": {
+    "groups": [
+      {
+        "label": "Opérations",
+        "items": [
+          "Maintenance des aides à la navigation",
+          "Radio VHF / GMDSS",
+          "Coordination d'interventions",
+          "Observation météo"
+        ]
+      },
+      {
+        "label": "Logistique",
+        "items": [
+          "Magasin et inventaire",
+          "Planification des ravitaillements",
+          "Gestion budgétaire"
+        ]
+      },
+      {
+        "label": "Encadrement et outils",
+        "items": [
+          "Formation et rédaction de procédures",
+          "Python / Raspberry Pi"
+        ]
+      }
+    ],
+    "emphasis": [
+      "Coordination d'interventions",
+      "Radio VHF / GMDSS",
+      "Logistique"
+    ]
+  },
+  "education": [
+    {
+      "degree": "Diplôme d'opérations maritimes",
+      "institution": "Kirkhaven Nautical College",
+      "location": "Kirkhaven",
+      "dates": "2011 – 2013",
+      "notes": null
+    }
+  ],
+  "languages": [
+    {
+      "name": "Anglais",
+      "level": "Langue maternelle"
+    },
+    {
+      "name": "Français",
+      "level": "B2"
+    }
+  ]
+}

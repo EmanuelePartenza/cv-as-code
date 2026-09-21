@@ -1,0 +1,20 @@
+schema_version: 1
+kind: search
+user: robin
+
+# From section G of the onboarding questionnaire (notes/01-onboarding.md).
+target_roles: [port-operations-officer, harbour-master]
+adjacent_roles: [marine-coordinator, vts-operator]
+
+markets:
+  - {area: Northern Isles, country: GB, modes: [onsite]}
+  - {area: UK coast, country: GB, modes: [onsite, hybrid], note: relocation if it is worth moving for}
+  - {area: Brittany, country: FR, modes: [onsite], note: French B2 — a season on the Brumeval route}
+
+cv_languages: [en, fr]
+
+salary: {min: 34000, currency: GBP, period: year}
+
+red_flags: [rotating night shifts without a relief plan]
+
+confidential: true   # the Board does not know, and the island is small

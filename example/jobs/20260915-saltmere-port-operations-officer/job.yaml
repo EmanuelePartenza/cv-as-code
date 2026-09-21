@@ -1,0 +1,36 @@
+schema_version: 1
+kind: job
+id: 20260915-saltmere-port-operations-officer
+source:
+  channel: harbour authority careers page
+  url: null
+  captured_on: "2026-09-15"
+company:
+  name: Port of Saltmere Harbour Authority
+  location: Saltmere
+  industry: Port operations
+title: Port Operations Officer
+language: en
+modes: [onsite]
+location: Saltmere
+salary: {min: 36000, max: 40000, currency: GBP, period: year}
+requirements:
+  - {text: 3+ years in a marine operations environment, kind: must}
+  - {text: GMDSS or VHF radio operator's certificate, kind: must}
+  - {text: Experience coordinating with the coastguard or other emergency services, kind: must}
+  - {text: "Working knowledge of a port management system (berth planning, vessel scheduling)", kind: must}
+  - {text: Strong written reporting skills, kind: must}
+  - {text: VTS operator certification, kind: nice}
+  - {text: Experience with vessel traffic monitoring, kind: nice}
+  - {text: "French language skills, for our ferry link to Brumeval", kind: nice}
+  - {text: Experience maintaining aids to navigation, kind: nice}
+responsibilities:
+  - Coordinate vessel movements and berth allocation across the two basins
+  - Maintain the daily port log and produce the monthly operations report
+  - Act as the port's first point of contact for the coastguard and other emergency services
+  - Manage the harbour's stores, fuel supplies and contractor visits
+  - Keep the port's aids to navigation in good order with the maintenance contractor
+  - Deputise for the Harbour Master when required
+keywords: [marine operations, GMDSS, VHF, coastguard, emergency services, port management system, berth planning, vessel scheduling, reporting, VTS, vessel traffic monitoring, French, aids to navigation, stores, fuel]
+raw: raw.txt
+dedup_key: null

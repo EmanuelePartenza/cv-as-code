@@ -33,20 +33,26 @@ The package:
 
 ```
 src/cv_as_code/
-├── cli.py          cvac: init · validate · resolve · render · cv · letter
+├── cli.py          cvac: init · validate · resolve · render · cv · letter · stage list|show|pack
 ├── dataroot.py     the data-root contract: location, user paths, asset lookup with overrides
 ├── validate.py     form (JSON Schema) + references + evidence paths + the approval gate
 ├── resolve.py      profile × cv-spec × labels → cv.resolved.json (draft/final modes)
 ├── render.py       resolved JSON → PDF via Typst in a transient build/ directory
 ├── letter.py       letter.md × profile × labels → PDF in the CV's style
+├── stages.py       stage contracts: list, resolve against a data root, pack for any engine
+├── documents.py    YAML and markdown-with-frontmatter documents; dates normalised to strings
 ├── errors.py       CvacError > ValidationError, RenderError
-├── schemas/        profile · search · cv-spec · cv-resolved · labels · data-root
+├── schemas/        profile · search · cv-spec · cv-resolved · labels · data-root · job · match ·
+│                   cover-letter · evidence · questionnaire · stage-io
+├── pipeline/       03_extract · 05_interview · 10_normalize · 20_match · 30_tailor · 60_letter
+│                   (INSTRUCTIONS.md + io.yaml each; 05 also ships the questionnaire skeleton)
 ├── i18n/           labels.it.yaml · labels.fr.yaml · labels.en.yaml
 └── templates/      classic/{template,letter}.typ · lib/common.typ · fonts/ (Lato, OFL)
 ```
 
-A data root (created by `cvac init`; the framework reads and writes nothing
-outside one):
+`example/` is a complete data root — the fictional user Robin Ashcombe, produced
+through the stages above — and CI renders it on every push. A data root
+(created by `cvac init`; the framework reads and writes nothing outside one):
 
 ```
 <data root>/
@@ -75,13 +81,15 @@ Tags and categories are free-form: matching is semantic, on the LLM side.
 |---|---|---|---|
 | `profile` | `users/<u>/profile.yaml` | built | facts with status and evidence; skills point to `evidence_facts` |
 | `search` | `users/<u>/search.yaml` | built | target roles, markets and modes, salary floor, `confidential` |
-| `cv-spec` | masters and applications | built | a master is a cv-spec with `job_id: null`; `based_on` is provenance only (copy, never merge) |
+| `cv-spec` | masters and applications | built | a master is a cv-spec with `job_id: null`; `based_on` is provenance only (copy, never merge); optional `footer` |
 | `cv-resolved` | `cv.resolved.json` | built | the generator ↔ template contract: no ids, no refs, final display text |
 | `labels` | `i18n/labels.<lang>.yaml` | built | headings, "present", date format, month names, language and level names |
 | `data-root` | `cvac.yaml` | built | the marker and contract of a data root |
 | `job` | `jobs/<id>/job.yaml` | built | normalised posting; requirements quoted verbatim, never paraphrased |
 | `match` | `users/<u>/matches/<id>.yaml` | built | `verdict: apply \| stretch \| skip`, strengths with fact refs, gaps, angle; no numeric score |
 | `cover-letter` | frontmatter of `letter.md` | built | `source_facts`, status, approval date |
+| `evidence` | frontmatter of `notes/<name>.md` | built | facts proposed by `03_extract`, each with the verbatim passage it rests on |
+| `questionnaire` | frontmatter of `interviews/<name>.md` | built | the profile interview of `05_interview`; the body is free text |
 
 Every kind above is validated by `cvac validate`; a markdown document
 (`letter.md`) is validated through its YAML frontmatter.
@@ -118,8 +126,8 @@ resolved against a data root.
 
 | Stage | Gate | Status |
 |---|---|---|
-| `03_extract` | none (facts land as draft) | next, with the example user |
-| `05_interview` | none | next, with the example user |
+| `03_extract` | none (facts land as draft) | built; exercised by the example |
+| `05_interview` | none | built; exercised by the example |
 | `10_normalize` | none | built |
 | `20_match` | none | built |
 | `30_tailor` | human | built |

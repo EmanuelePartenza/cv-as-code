@@ -13,6 +13,19 @@ Tags: `arch`, `perf`, `ui`, `test`, `docs`, `fix`, `cleanup`, `sec`.
 
 ## 2026-09-22
 
+### feat(example): Robin Ashcombe, a complete data root through the stages [arch, test]
+
+- `example/`: a fictional lighthouse keeper applying for a port role; questionnaire
+  filled, evidence note extracted, profile with facts at the three statuses,
+  search, English and French masters, posting, `stretch` match, tailored
+  application, letter — all approved by the persona, all rendered on one page.
+- `tests/test_end_to_end.py`: the example validates clean, renders, packs every
+  stage, and the gates refuse a draft fact in an approved spec and a final
+  render of a draft.
+- CI builds the four PDFs on Python 3.10 and 3.12, uploads them, and a final job
+  proves they are byte-identical across versions.
+- Files: `example/`, `tests/test_end_to_end.py`, `.github/workflows/ci.yml`.
+
 ### feat(stages): stage contracts, job/match/letter schemas, cvac stage [arch]
 
 - `pipeline/10_normalize`, `20_match`, `30_tailor`, `60_letter`: `INSTRUCTIONS.md`

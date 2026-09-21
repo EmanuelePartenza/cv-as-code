@@ -1,0 +1,52 @@
+schema_version: 1
+kind: match
+user: robin
+job_id: 20260915-saltmere-port-operations-officer
+verdict: stretch
+strengths:
+  - text: >-
+      Twelve years in marine operations, first on a ferry deck and since 2018
+      as sole keeper of a first-order light — well past the three years asked
+    source_facts: [exp-fairhaven.f01, exp-skerra.f01]
+  - text: GMDSS General Operator's Certificate (2014) and radio watch on a ferry bridge
+    source_facts: [exp-fairhaven.f03]
+  - text: >-
+      Fourteen incidents coordinated with the coastguard by VHF since 2019,
+      three of them helicopter evacuations — the posting's "first point of
+      contact for the coastguard" is the job already done
+    source_facts: [exp-skerra.f03]
+  - text: >-
+      Stores, fuel and contractor logistics: four supply landings a year planned
+      end to end and a consumables budget managed for eight years
+    source_facts: [exp-skerra.f05, exp-skerra.f07]
+  - text: Six years maintaining a first-order light and its generator without an unplanned outage
+    source_facts: [exp-skerra.f02]
+  - text: >-
+      Written reporting: a 40-page station handbook, weather observations eight
+      times a day, and a telemetry export the Lights Board schedules its
+      maintenance from
+    source_facts: [exp-skerra.f06, exp-skerra.f04, prj-fogsignal.f02]
+gaps:
+  - requirement: "Working knowledge of a port management system (berth planning, vessel scheduling)"
+    kind: must
+    note: >-
+      No port management software in the profile. Adjacent: landing plans
+      agreed with a vessel's master four times a year, and a data export the
+      Board plans from — planning and scheduling by hand, not in a system.
+      This is the gap that makes the verdict a stretch.
+  - requirement: VTS operator certification
+    kind: nice
+    note: No certification. Adjacent evidence is radio watchkeeping and incident coordination.
+  - requirement: Experience with vessel traffic monitoring
+    kind: nice
+    note: None as an operator; the ferry years are the other side of the radio.
+angle: >-
+  A keeper who has run a station alone — the light, the generator, the
+  landings, the coastguard on the radio — moving to the port end of the same
+  coast. Lead with incident coordination and logistics, which the posting
+  names first; be upfront that berth-planning software is new ground and that
+  the record of planning by hand and building a logger from nothing is the
+  argument for learning it fast. French B2 answers the Brumeval line.
+confidential_flags:
+  - The posting requires a reference from the current employer with the application; Robin's search is confidential.
+created: "2026-09-17"

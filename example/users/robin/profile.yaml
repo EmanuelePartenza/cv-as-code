@@ -1,0 +1,205 @@
+schema_version: 1
+kind: profile
+user: robin
+pivot_language: en
+
+# Robin Ashcombe is fictional: a lighthouse keeper applying for a port operations
+# role. Every fact below was proposed by stage 03 from the onboarding questionnaire
+# (notes/01-onboarding.md) and confirmed by Robin on 2026-09-16, except the two left
+# draft and the one rejected.
+
+identity:
+  full_name: Robin Ashcombe
+  born: null
+  location: {city: Skerra, country: GB}
+  email: robin.ashcombe@example.com
+  phone: "+44 1632 960123"
+  links:
+    - {label: Fog-signal logger, url: "https://example.com/robin/fogsignal"}
+
+languages:
+  - {code: en, level: native}
+  - code: fr
+    level: B2
+    note: a season as deck crew on the Brumeval route (2017); reads French pilot books
+
+experiences:
+  - id: exp-skerra
+    role: Principal Keeper
+    company: {name: Northern Isles Lights Board, location: Skerra Head Lighthouse, industry: Aids to navigation}
+    start: "2018-04"
+    end: null
+    stack: [first-order rotating light, fog signal, VHF, standby generator]
+    facts:
+      - id: exp-skerra.f01
+        claim: >-
+          Sole keeper responsible for the daily operation of a first-order
+          rotating light and its fog signal, on a rota with one relief keeper
+        metrics: {}
+        tags: [operations, lighthouse]
+        status: verified
+        verified_on: "2026-09-16"
+        evidence: notes/01-onboarding.md#daily-operation
+      - id: exp-skerra.f02
+        claim: >-
+          Maintained the lens drive, the lamp changer and the standby generator;
+          six years without an unplanned outage of the light (2018–2024)
+        metrics: {unplanned_outages: 0, years: 6}
+        tags: [maintenance, aids-to-navigation, reliability]
+        status: verified
+        verified_on: "2026-09-16"
+        evidence: notes/01-onboarding.md#six-years
+      - id: exp-skerra.f03
+        claim: >-
+          Coordinated by VHF with the coastguard during 14 incidents since 2019,
+          including 3 helicopter medical evacuations
+        metrics: {incidents: 14, medical_evacuations: 3}
+        tags: [incident-coordination, radio, coastguard]
+        status: verified
+        verified_on: "2026-09-16"
+        evidence: notes/01-onboarding.md#incidents
+      - id: exp-skerra.f04
+        claim: >-
+          Took and transmitted the station's weather observations every three
+          hours for the national meteorological service
+        metrics: {observations_per_day: 8}
+        tags: [weather, reporting]
+        status: verified
+        verified_on: "2026-09-16"
+        evidence: notes/01-onboarding.md#weather
+      - id: exp-skerra.f05
+        claim: >-
+          Planned and managed the four supply landings a year — inventory,
+          ordering and the landing plan agreed with the supply vessel's master
+        metrics: {landings_per_year: 4}
+        tags: [logistics, inventory, planning]
+        status: verified
+        verified_on: "2026-09-16"
+        evidence: notes/01-onboarding.md#landings
+      - id: exp-skerra.f06
+        claim: Trained five relief keepers and wrote the 40-page station handbook they work from
+        metrics: {relief_keepers_trained: 5, handbook_pages: 40}
+        tags: [training, documentation]
+        status: verified
+        verified_on: "2026-09-16"
+        evidence: notes/01-onboarding.md#handbook
+      - id: exp-skerra.f07
+        claim: Managed the station's budget for consumables and spares, about £40,000 a year (estimate)
+        metrics: {budget_gbp_per_year: "~40000"}
+        tags: [budget, procurement]
+        status: verified
+        verified_on: "2026-09-16"
+        evidence: notes/01-onboarding.md#budget
+      - id: exp-skerra.f08
+        claim: >-
+          Assisted a kayaker stranded below the cliffs at night by guiding the
+          lifeboat in by radio (2023, date to be confirmed against the logbook)
+        metrics: {}
+        tags: [incident-coordination, radio]
+        status: draft
+        verified_on: null
+        evidence: notes/01-onboarding.md#kayaker
+      - id: exp-skerra.f09
+        claim: >-
+          Reduced the standby generator's diesel consumption by about a fifth
+          by re-scheduling its test runs (2021, figure never measured)
+        metrics: {}
+        tags: [maintenance, efficiency]
+        status: draft
+        verified_on: null
+        evidence: notes/01-onboarding.md#diesel
+
+  - id: exp-fairhaven
+    role: Deckhand, then bosun's mate
+    company: {name: Marrow Sound Ferries, location: Kirkhaven, industry: Ferry services}
+    start: "2013-06"
+    end: "2018-03"
+    stack: [ro-ro ferry, VHF, GMDSS]
+    facts:
+      - id: exp-fairhaven.f01
+        claim: >-
+          Deck crew on a 40-metre ro-ro ferry making six crossings a day —
+          mooring, cargo lashing and passenger safety briefings
+        metrics: {crossings_per_day: 6, vessel_length_m: 40}
+        tags: [deck-operations, safety]
+        status: verified
+        verified_on: "2026-09-16"
+        evidence: notes/01-onboarding.md#deck
+      - id: exp-fairhaven.f02
+        claim: Promoted to bosun's mate in 2016, responsible for the deck department's daily checks
+        metrics: {}
+        tags: [promotion, deck-operations]
+        status: verified
+        verified_on: "2026-09-16"
+        evidence: notes/01-onboarding.md#bosun
+      - id: exp-fairhaven.f03
+        claim: Held the radio watch on the bridge; GMDSS General Operator's Certificate obtained in 2014
+        metrics: {}
+        tags: [radio, gmdss, certification]
+        status: verified
+        verified_on: "2026-09-16"
+        evidence: notes/01-onboarding.md#gmdss
+      - id: exp-fairhaven.f04
+        claim: STCW basic safety training completed in 2013 and renewed in 2018
+        metrics: {}
+        tags: [certification, safety]
+        status: verified
+        verified_on: "2026-09-16"
+        evidence: notes/01-onboarding.md#stcw
+      - id: exp-fairhaven.f05
+        claim: Reduced crossing times by 12%
+        metrics: {crossing_time_reduction_pct: 12}
+        tags: [performance]
+        status: rejected
+        verified_on: null
+        evidence: notes/01-onboarding.md#twelve-percent
+
+education:
+  - id: edu-kirkhaven
+    degree: Diploma in Marine Operations
+    institution: Kirkhaven Nautical College
+    location: Kirkhaven
+    start: "2011"
+    end: "2013"
+    notes: null
+
+skills:
+  - {id: skill-aids-to-navigation, name: Aids-to-navigation maintenance, category: operations, evidence_facts: [exp-skerra.f01, exp-skerra.f02]}
+  - {id: skill-radio, name: VHF / GMDSS radio, category: operations, evidence_facts: [exp-fairhaven.f03, exp-skerra.f03]}
+  - {id: skill-incident-coordination, name: "Incident coordination with emergency services", category: operations, evidence_facts: [exp-skerra.f03]}
+  - {id: skill-weather, name: Weather observation and reporting, category: operations, evidence_facts: [exp-skerra.f04]}
+  - {id: skill-logistics, name: "Stores, inventory and landing logistics", category: logistics, evidence_facts: [exp-skerra.f05, exp-skerra.f07]}
+  - {id: skill-training, name: Training and procedure writing, category: people, evidence_facts: [exp-skerra.f06]}
+  - {id: skill-deck, name: Vessel deck operations, category: operations, evidence_facts: [exp-fairhaven.f01, exp-fairhaven.f02]}
+  - {id: skill-python, name: Python / Raspberry Pi, category: tooling, evidence_facts: [prj-fogsignal.f01]}
+
+projects:
+  - id: prj-fogsignal
+    role: Author (personal project)
+    company: {name: null}
+    start: "2022-03"
+    end: null
+    stack: [Python, Raspberry Pi]
+    note: Public page at https://example.com/robin/fogsignal
+    facts:
+      - id: prj-fogsignal.f01
+        claim: >-
+          Built a telemetry logger on a Raspberry Pi (Python) recording
+          fog-signal activations and generator running hours; three years of
+          continuous data
+        metrics: {years_of_data: 3}
+        tags: [python, raspberry-pi, telemetry]
+        status: verified
+        verified_on: "2026-09-16"
+        evidence: notes/01-onboarding.md#logger
+      - id: prj-fogsignal.f02
+        claim: >-
+          The Lights Board's engineering office uses the logger's monthly export
+          to plan maintenance visits, since 2023
+        metrics: {}
+        tags: [adoption, maintenance-planning]
+        status: verified
+        verified_on: "2026-09-16"
+        evidence: notes/01-onboarding.md#adoption
+
+interests: [sea swimming, correspondence chess]

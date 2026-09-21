@@ -1,0 +1,14 @@
+# Rendering products are regenerated: commit only what you deliberately deliver.
+*-DRAFT.pdf
+build/
+*.report.md
+
+# Raw document inbox: nothing enters git until it is archived in users/<slug>/sources/.
+users/*/inbox/*
+!users/*/inbox/README.md
+
+# Agent-local configuration and session ephemera.
+.claude/project.conf
+.claude/settings.local.json
+.claude/edit-log.jsonl
+.claude/edit-log-archive/

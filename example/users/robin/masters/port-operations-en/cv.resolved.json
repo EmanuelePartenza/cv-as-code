@@ -1,0 +1,125 @@
+{
+  "meta": {
+    "draft": false,
+    "language": "en",
+    "source": "users/robin/masters/port-operations-en",
+    "footer": "Generated with cv-as-code · github.com/EmanuelePartenza/cv-as-code"
+  },
+  "labels": {
+    "summary": "Profile",
+    "experience": "Professional experience",
+    "projects": "Projects",
+    "skills": "Technical skills",
+    "education": "Education",
+    "languages": "Languages",
+    "present": "Present"
+  },
+  "identity": {
+    "full_name": "Robin Ashcombe",
+    "headline": "Marine Operations · Principal Lighthouse Keeper",
+    "location": "Skerra, GB",
+    "email": "robin.ashcombe@example.com",
+    "phone": "+44 1632 960123",
+    "born": null,
+    "links": [
+      {
+        "label": "Fog-signal logger",
+        "url": "https://example.com/robin/fogsignal"
+      }
+    ],
+    "photo": null
+  },
+  "summary": "Eight years of marine operations across a ferry deck and a remote lighthouse station: sole keeper of a first-order light with six years without an unplanned outage, 14 coastguard incidents coordinated by radio, four supply landings a year planned end to end. Builds the tools the job lacks — a telemetry logger the Lights Board now schedules its maintenance from.",
+  "sections": [
+    "summary",
+    "experience",
+    "projects",
+    "skills",
+    "education",
+    "languages"
+  ],
+  "experience": [
+    {
+      "role": "Principal Keeper",
+      "org": "Northern Isles Lights Board, Skerra Head Lighthouse",
+      "dates": "04/2018 – Present",
+      "bullets": [
+        "Sole keeper of a first-order rotating light and fog signal, on a rota with one relief keeper; six years without an unplanned outage of the light (2018–2024), maintaining the lens drive, lamp changer and standby generator myself.",
+        "Coordinated 14 incidents with the coastguard by VHF since 2019, including three helicopter medical evacuations.",
+        "Planned and managed four supply landings a year — inventory, ordering and the landing plan agreed with the supply vessel's master — and the station's consumables and spares budget of about £40,000 a year.",
+        "Trained five relief keepers and wrote the 40-page station handbook; weather observations every three hours for the national meteorological service."
+      ]
+    },
+    {
+      "role": "Deckhand, then bosun's mate",
+      "org": "Marrow Sound Ferries, Kirkhaven",
+      "dates": "06/2013 – 03/2018",
+      "bullets": [
+        "Deck crew on a 40-metre ro-ro ferry, six crossings a day: mooring, cargo lashing, passenger safety briefings; bosun's mate from 2016, responsible for the deck department's daily checks.",
+        "Radio watch on the bridge; GMDSS General Operator's Certificate (2014), STCW basic safety training (2013, renewed 2018)."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "role": "Fog-signal logger",
+      "org": "Telemetry for a lighthouse station · personal project",
+      "dates": "03/2022 – Present",
+      "bullets": [
+        "Raspberry Pi logger in Python recording fog-signal activations and generator running hours, three years of continuous data; the Lights Board's engineering office plans its maintenance visits from the monthly export."
+      ]
+    }
+  ],
+  "skills": {
+    "groups": [
+      {
+        "label": "Operations",
+        "items": [
+          "Aids-to-navigation maintenance",
+          "VHF / GMDSS radio",
+          "Incident coordination",
+          "Weather observation"
+        ]
+      },
+      {
+        "label": "Logistics",
+        "items": [
+          "Stores and inventory",
+          "Supply-landing planning",
+          "Budget management"
+        ]
+      },
+      {
+        "label": "People and tooling",
+        "items": [
+          "Training and procedure writing",
+          "Python / Raspberry Pi"
+        ]
+      }
+    ],
+    "emphasis": [
+      "Incident coordination",
+      "VHF / GMDSS radio",
+      "Logistics"
+    ]
+  },
+  "education": [
+    {
+      "degree": "Diploma in Marine Operations",
+      "institution": "Kirkhaven Nautical College",
+      "location": "Kirkhaven",
+      "dates": "2011 – 2013",
+      "notes": null
+    }
+  ],
+  "languages": [
+    {
+      "name": "English",
+      "level": "Native"
+    },
+    {
+      "name": "French",
+      "level": "B2"
+    }
+  ]
+}

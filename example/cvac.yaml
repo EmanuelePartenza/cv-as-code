@@ -1,0 +1,4 @@
+# cv-as-code data root - https://github.com/EmanuelePartenza/cv-as-code
+schema_version: 1
+kind: data-root
+default_user: robin
