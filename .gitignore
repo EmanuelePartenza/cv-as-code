@@ -1,0 +1,27 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+dist/
+*.egg-info/
+.ruff_cache/
+.pytest_cache/
+
+# Rendering outputs are regenerated, never tracked (see tests/test_publication_boundary.py)
+build/
+*.pdf
+*.report.md
+
+# Agent-local configuration and session ephemera
+.claude/project.conf
+.claude/settings.local.json
+.claude/edit-log.jsonl
+.claude/edit-log-archive/
+
+# Editors and vaults
+.obsidian/
+.idea/
+.vscode/
+*.tmp
+*~
+.DS_Store
