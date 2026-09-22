@@ -25,7 +25,7 @@ paraphrase a real profile into documentation or tests.
 
 ```bash
 git clone https://github.com/EmanuelePartenza/cv-as-code && cd cv-as-code
-make install                          # .venv with the package and dev tools
+make install                          # .venv with the package, dev tools and the ui extra
 git config core.hooksPath .githooks   # publication boundary and commit checks
 cp .claude/project.conf.example .claude/project.conf
 make lint && make test                # or: bash .claude/scripts/verify.sh

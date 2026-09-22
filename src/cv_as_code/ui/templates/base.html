@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}cvac{% endblock %} · cv-as-code</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="{{ url_for('index') }}">cv-as-code</a>
+  <nav>
+    {% if default_user %}
+      <a href="{{ url_for('profile', user=default_user) }}">Profile</a>
+      <a href="{{ url_for('cvs', user=default_user) }}">CVs</a>
+    {% endif %}
+    <a href="{{ url_for('validate') }}">Validate</a>
+  </nav>
+  <span class="root" title="data root">{{ root_path }}</span>
+</header>
+<main>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul class="flashes">
+        {% for category, message in messages %}
+          <li class="flash {{ category }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+<footer>Local UI over the same library as <code>cvac</code>. Every verify and approve here is your act; nothing is committed to git by this page.</footer>
+</body>
+</html>

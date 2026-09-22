@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Validate{% endblock %}
+{% block content %}
+<h1>Validate</h1>
+<p>{{ count }} file(s) checked — <strong class="{{ 'bad' if errors else 'good' }}">{{ errors|length }} error(s)</strong>, {{ warnings|length }} warning(s). Same rules as <code>cvac validate --all</code>.</p>
+{% if errors %}
+<h2>Errors</h2>
+<ul class="report">{% for e in errors %}<li class="bad">{{ e }}</li>{% endfor %}</ul>
+{% endif %}
+{% if warnings %}
+<h2>Warnings</h2>
+<ul class="report">{% for w in warnings %}<li class="warn">{{ w }}</li>{% endfor %}</ul>
+{% endif %}
+{% endblock %}

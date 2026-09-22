@@ -11,6 +11,22 @@ Tags: `arch`, `perf`, `ui`, `test`, `docs`, `fix`, `cleanup`, `sec`.
 
 ---
 
+## 2026-09-23
+
+### feat(ui): a local web UI for the gates and views, cvac ui [arch, ui]
+
+- `cvac ui` (extra `ui`, Flask) serves the data root on the loopback
+  interface: the profile with statuses, evidence quotes and the completeness
+  checklist; verify and reject buttons; CVs and applications with draft and
+  final render, PDF preview, approval of a spec or a letter; the validation
+  report; git status. Every button calls the library function the CLI calls.
+- `specs.approve`: approval as a library call, refused through the validator
+  so no rule is duplicated; `report.profile_data` and `evidence_quote` split
+  out of the Markdown report for the screens.
+- ADR-0014; decision D-06 answered (option A), slice 1 of 3.
+- Files: `src/cv_as_code/ui/`, `specs.py`, `report.py`, `cli.py`,
+  `pyproject.toml`, `tests/test_ui.py`, `tests/test_specs.py`.
+
 ## 2026-09-22
 
 ### feat(i18n): identity_fields per language and per spec [arch]

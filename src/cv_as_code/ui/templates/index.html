@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Data root{% endblock %}
+{% block content %}
+<h1>Data root</h1>
+<p><code>{{ root_path }}</code></p>
+
+<h2>Users</h2>
+{% if users %}
+<ul class="cards">
+  {% for u in users %}
+  <li class="card">
+    <strong>{{ u.full_name }}</strong> <code>{{ u.slug }}</code><br>
+    <a href="{{ url_for('profile', user=u.slug) }}">Profile and facts</a> ·
+    <a href="{{ url_for('cvs', user=u.slug) }}">CVs and applications</a>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="muted">No user yet: add <code>users/&lt;slug&gt;/profile.yaml</code>, or run the onboarding questionnaire (stage <code>05_interview</code>).</p>
+{% endif %}
+
+<h2>Git</h2>
+{% if git.available %}
+  {% if git.lines|length <= 1 %}
+    <p class="muted">{{ git.lines[0] if git.lines else '' }} — clean working tree.</p>
+  {% else %}
+    <pre>{{ git.lines|join('\n') }}</pre>
+    <p class="muted">This page never commits: review and commit from your terminal.</p>
+  {% endif %}
+{% else %}
+  <p class="muted">Not a git repository (or git is not available).</p>
+{% endif %}
+{% endblock %}

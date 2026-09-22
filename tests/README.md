@@ -18,6 +18,8 @@ test enforces that on the whole repository.
 | `test_end_to_end.py` | the example data root validates clean, renders three one-page CVs and a letter, packs every stage, and the gates refuse a draft fact in an approved spec and a final render of a draft |
 | `test_data_in.py` | the profile report (sections, counts, completeness checklist) and `cvac fact verify\|reject` (only the status lines change, unknown ids and facts without evidence refused) |
 | `test_cli.py` | exit codes 0/1/2, `--data-root` before or after the subcommand, `cvac init` |
+| `test_specs.py` | approval of a spec or a letter: only `status` and `approved_on` change, a trailing comment survives, refused through the validator (draft cited fact, twice, wrong kind, no frontmatter) |
+| `test_ui.py` | the local UI (skipped without the `ui` extra): pages on the fixture and on Robin, evidence quotes, verify/reject/approve/render buttons with the CLI's refusals, PDF preview, 404 on unknown or traversal paths, the missing-extra message |
 | `test_publication_boundary.py` | nothing personal is tracked: structural rules on every tracked file, the keyed denylist where the key exists, plus the rules tested on synthetic input |
 
 ## What is NOT covered, on purpose

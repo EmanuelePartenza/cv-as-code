@@ -33,7 +33,7 @@ The package:
 
 ```
 src/cv_as_code/
-├── cli.py          cvac: init · validate · resolve · render · cv · letter · stage · skills · profile · fact
+├── cli.py          cvac: init · validate · resolve · render · cv · letter · stage · skills · profile · fact · ui
 ├── dataroot.py     the data-root contract: location, user paths, asset lookup with overrides
 ├── validate.py     form (JSON Schema) + references + evidence paths + the approval gate
 ├── resolve.py      profile × cv-spec × labels → cv.resolved.json (draft/final modes)
@@ -43,6 +43,8 @@ src/cv_as_code/
 ├── skills.py       the Claude Code adapter: `cvac skills install` copies skills/ into a data root
 ├── report.py       `cvac profile report`: a generated Markdown view with a completeness checklist
 ├── facts.py        `cvac fact verify|reject`: the human gate on facts, layout-preserving
+├── specs.py        approval of a cv-spec or a letter, refused through the validator
+├── ui/             `cvac ui`: the local web UI, a Flask adapter over the modules above (extra `ui`)
 ├── documents.py    YAML and markdown-with-frontmatter documents; dates normalised to strings
 ├── errors.py       CvacError > ValidationError, RenderError
 ├── schemas/        profile · search · cv-spec · cv-resolved · labels · data-root · job · match ·
@@ -166,6 +168,19 @@ into a data root by `cvac skills install`, because Claude Code loads skills from
 the project it is opened in; the copies under this repository's `.claude/skills/`
 are kept identical to the sources by a test.
 
+## 5b. The UI
+
+`cvac ui` (extra `ui`: `pip install "cv-as-code[ui]"`) starts a local,
+server-rendered web UI bound to the loopback interface and opens the browser
+([ADR-0014](adr/0014-local-ui-thin-adapter.md)). It is a fourth adapter over
+the library, next to the CLI, the skills and `stage pack`: every screen reads
+through the same functions and every button calls the same gate the CLI
+exposes, with the same refusals. Slice 1, built: the profile with statuses,
+evidence quotes and the completeness checklist; verify and reject buttons;
+CVs and applications with draft and final render, PDF preview, approval of a
+spec or a letter; the validation report; the data root's git status (the UI
+never commits). Slices 2 and 3 are roadmap (§10).
+
 ## 6. Templates and rendering
 
 - One template = one directory exporting `cv(data)` (and `letter(data)`);
@@ -226,7 +241,9 @@ README.
 - `i18n/markets/` — market conventions beyond language (photo, address shape);
   today only `identity_fields` per language and per spec exists.
 - A deterministic `apply` of an evidence note into the profile (needs a
-  format-preserving YAML writer); an HTML view of the profile report; a photo
-  asset for markets that expect one.
+  format-preserving YAML writer); a photo asset for markets that expect one.
+- The UI's next slices (ADR-0014): the manual stage path in the browser
+  (pack, paste the answer, validate), then the stage screen over the API
+  runner.
 - PyPI release; Claude Code plugin packaging of the skills.
 - A CI job on Windows.

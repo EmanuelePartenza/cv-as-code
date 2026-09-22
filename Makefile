@@ -3,7 +3,7 @@ PY ?= .venv/bin/python
 
 install:            ## editable install with dev tools into .venv
 	uv venv .venv --allow-existing
-	uv pip install --python $(PY) -e ".[dev]"
+	uv pip install --python $(PY) -e ".[dev,ui]"
 
 lint:               ## formatting and lint checks, no changes
 	$(PY) -m ruff format --check .

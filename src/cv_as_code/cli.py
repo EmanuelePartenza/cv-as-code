@@ -246,6 +246,18 @@ def cmd_fact(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_ui(args: argparse.Namespace) -> int:
+    root = DataRoot.locate(args.data_root)
+    try:
+        from .ui import serve
+    except ModuleNotFoundError as e:
+        raise CvacError(
+            f"the UI needs the `ui` extra (missing module `{e.name}`): pip install 'cv-as-code[ui]'"
+        ) from e
+    serve(root, host=args.host, port=args.port, open_browser=not args.no_browser)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="cvac",
@@ -334,6 +346,12 @@ def build_parser() -> argparse.ArgumentParser:
     q = psub.add_parser("report", parents=[common], help="write users/<user>/profile.report.md")
     q.add_argument("user", nargs="?", help="default: the data root's default_user")
     q.set_defaults(func=cmd_profile_report)
+
+    p = sub.add_parser("ui", parents=[common], help="the local web UI: gates and views")
+    p.add_argument("--host", default="127.0.0.1", help="interface to bind (default: loopback)")
+    p.add_argument("--port", type=int, default=8765)
+    p.add_argument("--no-browser", action="store_true", help="do not open the browser")
+    p.set_defaults(func=cmd_ui)
 
     p = sub.add_parser("fact", parents=[common], help="the human gate on facts: verify or reject")
     fsub = p.add_subparsers(dest="fact_command", required=True, metavar="<verify|reject>")

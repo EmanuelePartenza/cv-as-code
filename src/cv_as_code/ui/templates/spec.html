@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}{{ s.name }} · {{ s.user }}{% endblock %}
+{% macro facts_list(facts) -%}
+  {% for f in facts %}<a href="{{ url_for('profile', user=s.user) }}#{{ f.id }}" class="badge {{ f.status }}" title="{{ f.status }}">{{ f.id }}</a> {% endfor %}
+{%- endmacro %}
+{% block content %}
+<p class="muted"><a href="{{ url_for('cvs', user=s.user) }}">CVs and applications</a> › {{ s.kind }}</p>
+<h1>{{ s.name }} <span class="badge {{ s.status }}">{{ s.status }}</span></h1>
+<p>{{ s.headline }} · <code>{{ s.language }}</code> · template <code>{{ s.template }}</code> · max {{ s.max_pages }} page(s){% if s.job_id %} · job <code>{{ s.job_id }}</code>{% endif %}{% if s.approved_on %} · approved on {{ s.approved_on }}{% endif %}</p>
+<p class="muted"><code>{{ s.rel }}/cv-spec.yaml</code></p>
+
+{% if s.errors %}
+<h2 class="bad">Validation errors</h2>
+<ul class="report">{% for e in s.errors %}<li class="bad">{{ e }}</li>{% endfor %}</ul>
+{% endif %}
+{% if s.warnings %}
+<ul class="report">{% for w in s.warnings %}<li class="warn">{{ w }}</li>{% endfor %}</ul>
+{% endif %}
+
+<h2>Cited facts</h2>
+<p>{{ facts_list(s.facts) }}{% if not s.facts %}<span class="muted">none</span>{% endif %}</p>
+
+<h2>CV</h2>
+<div class="actions">
+  <form method="post" action="{{ url_for('render_spec', user=s.user, kind=s.kind, name=s.name) }}"><input type="hidden" name="mode" value="draft"><button>Render draft</button></form>
+  {% if s.status != 'approved' %}
+  <form method="post" action="{{ url_for('approve_spec', user=s.user, kind=s.kind, name=s.name) }}" onsubmit="return confirm('Approve this CV as it is? This is your sign-off.')"><button class="ok">Approve</button></form>
+  {% else %}
+  <form method="post" action="{{ url_for('render_spec', user=s.user, kind=s.kind, name=s.name) }}"><input type="hidden" name="mode" value="final"><button class="ok">Render final</button></form>
+  {% endif %}
+</div>
+{% set shown = 'final' if s.pdf.final else ('draft' if s.pdf.draft else none) %}
+{% if shown %}
+<p class="muted">Showing the {{ shown }} PDF{% if s.pdf.final and s.pdf.draft %} (<a href="{{ url_for('pdf', user=s.user, kind=s.kind, name=s.name, which='draft') }}">draft</a> also exists){% endif %}.</p>
+<iframe class="pdf" src="{{ url_for('pdf', user=s.user, kind=s.kind, name=s.name, which=shown) }}" title="CV preview"></iframe>
+{% else %}
+<p class="muted">No PDF yet: render a draft.</p>
+{% endif %}
+
+{% if s.letter %}
+<h2>Cover letter <span class="badge {{ s.letter.status }}">{{ s.letter.status }}</span>{% if s.letter.approved_on %} <small class="muted">approved on {{ s.letter.approved_on }}</small>{% endif %}</h2>
+{% if s.letter.error %}<pre class="error">{{ s.letter.error }}</pre>{% endif %}
+<p>Cited facts: {{ facts_list(s.letter.facts) }}{% if not s.letter.facts %}<span class="muted">none</span>{% endif %}</p>
+<div class="actions">
+  <form method="post" action="{{ url_for('render_letter_of', user=s.user, kind=s.kind, name=s.name) }}"><input type="hidden" name="mode" value="draft"><button>Render draft</button></form>
+  {% if s.letter.status != 'approved' %}
+  <form method="post" action="{{ url_for('approve_letter_of', user=s.user, kind=s.kind, name=s.name) }}" onsubmit="return confirm('Approve this letter as it is? This is your sign-off.')"><button class="ok">Approve letter</button></form>
+  {% else %}
+  <form method="post" action="{{ url_for('render_letter_of', user=s.user, kind=s.kind, name=s.name) }}"><input type="hidden" name="mode" value="final"><button class="ok">Render final</button></form>
+  {% endif %}
+</div>
+{% set lshown = 'final' if s.letter.pdf.final else ('draft' if s.letter.pdf.draft else none) %}
+{% if lshown %}
+<iframe class="pdf" src="{{ url_for('pdf', user=s.user, kind=s.kind, name=s.name, which='letter-' + lshown) }}" title="Letter preview"></iframe>
+{% else %}
+<p class="muted">No letter PDF yet: render a draft.</p>
+{% endif %}
+{% endif %}
+{% endblock %}
