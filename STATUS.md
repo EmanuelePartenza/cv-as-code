@@ -51,7 +51,7 @@ Full queue in [docs/05-decisions-open.md](docs/05-decisions-open.md).
 
 | ID | Title | Blocks? |
 |---|---|---|
-| — | (none) | — |
+| D-06 | A user interface for the tool: which kind, where it lives, what it does first | yes — nothing built until answered |
 
 ## Open proposals
 
@@ -68,9 +68,9 @@ Details in [DEVLOG.md](DEVLOG.md), which is the source of truth.
 <!-- AUTO:COMMITS -->
 | Hash | Date | Message |
 |---|---|---|
+| `be1afc6` | 2026-09-22 | docs(status): plan audit, v0.2 scope, DEVLOG 1.1 closed with its hash |
 | `51bcd00` | 2026-09-22 | feat(i18n): identity_fields per language and per spec |
 | `a303794` | 2026-09-22 | feat(data-in): profile report, fact verify/reject, second extraction |
 | `cf94e6d` | 2026-09-22 | docs: README that earns the positioning, CONTRIBUTING, test map |
 | `3d75a0d` | 2026-09-22 | feat(skills): domain skills for Claude Code and cvac skills install |
-| `2b3ad32` | 2026-09-22 | feat(example): Robin Ashcombe, a complete data root through the stages |
 <!-- /AUTO:COMMITS -->
