@@ -251,6 +251,19 @@
       "type": "string",
       "minLength": 1,
       "description": "Optional one-line footer printed at the bottom of every page, e.g. a link to the tool that generated the CV"
+    },
+    "identity_fields": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "phone",
+          "links",
+          "born",
+          "photo"
+        ]
+      },
+      "description": "Optional override of the labels' identity_fields for this CV: which optional header fields (phone, links, born, photo) it shows; an empty list shows none"
     }
   },
   "$defs": {

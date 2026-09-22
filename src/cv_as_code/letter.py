@@ -29,7 +29,7 @@ from .render import (
     page_count,
     prepare_build,
 )
-from .resolve import load_labels
+from .resolve import header_identity, identity_fields_of, load_labels
 
 
 def fmt_letter_date(iso: str, months: list[str]) -> str:
@@ -59,19 +59,15 @@ def render_letter(root: DataRoot, app_arg: str | Path, mode: str | None = None) 
     lang = fm.get("language", "en")
     labels = load_labels(root, lang)
     profile = load_yaml(root.profile_path(str(user)))
-    ident = profile["identity"]
-    loc = ident["location"]
+    # a letter header carries contact details only, never the date of birth or a photo
+    fields = [f for f in identity_fields_of(labels) if f in ("phone", "links")]
+    ident = header_identity(profile, labels, fields, headline=fm.get("headline", ""))
 
     paragraphs = [re.sub(r"\s+", " ", p).strip() for p in re.split(r"\n\s*\n", body) if p.strip()]
     resolved = {
         "meta": {"draft": draft, "language": lang},
         "identity": {
-            "full_name": ident["full_name"],
-            "headline": fm.get("headline", ""),
-            "location": loc["city"] + (f", {loc['country']}" if loc.get("country") else ""),
-            "email": ident["email"],
-            "phone": ident.get("phone"),
-            "links": ident.get("links") or [],
+            k: ident[k] for k in ("full_name", "headline", "location", "email", "phone", "links")
         },
         "date": fmt_letter_date(str(fm.get("created", "")), labels["months"]),
         "paragraphs": paragraphs,

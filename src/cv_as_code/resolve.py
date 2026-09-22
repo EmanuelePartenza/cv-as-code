@@ -31,6 +31,8 @@ from .errors import CvacError, RenderError
 FACT_RE = re.compile(r"^(exp|prj)-[a-z0-9-]+\.f\d{2}$")
 SECTIONS = ("summary", "experience", "projects", "skills", "education", "languages")
 DATE_FORMATS = {"MM/YYYY": "{m}/{y}", "YYYY-MM": "{y}-{m}", "MM.YYYY": "{m}.{y}"}
+FULL_DATE_FORMATS = {"MM/YYYY": "{d}/{m}/{y}", "YYYY-MM": "{y}-{m}-{d}", "MM.YYYY": "{d}.{m}.{y}"}
+DEFAULT_IDENTITY_FIELDS = ("phone", "links")
 
 
 @dataclass
@@ -49,6 +51,16 @@ def fmt_date(d: Any, date_format: str = "MM/YYYY") -> str | None:
     if len(parts) == 1:
         return parts[0]
     return DATE_FORMATS[date_format].format(y=parts[0], m=parts[1])
+
+
+def fmt_full_date(d: Any, date_format: str = "MM/YYYY") -> str | None:
+    """'1990-03-12' -> '12/03/1990', in the day-precision family of date_format."""
+    if not d:
+        return None
+    parts = str(d).split("-")
+    if len(parts) < 3:
+        return fmt_date(d, date_format)
+    return FULL_DATE_FORMATS[date_format].format(y=parts[0], m=parts[1], d=parts[2])
 
 
 def fmt_range(start: Any, end: Any, present: str, date_format: str) -> str:
@@ -74,6 +86,38 @@ def load_labels(root: DataRoot, lang: str) -> dict[str, Any]:
     if not isinstance(labels, dict) or labels.get("kind") != "labels":
         raise CvacError(f"{root.rel(path)} is not a labels document (run `cvac validate` on it)")
     return labels
+
+
+def identity_fields_of(labels: dict[str, Any], override: Any = None) -> list[str]:
+    """Optional header fields a CV shows: the spec's list, else the labels', else the default."""
+    fields = override if override is not None else labels.get("identity_fields")
+    return list(fields) if fields is not None else list(DEFAULT_IDENTITY_FIELDS)
+
+
+def header_identity(
+    profile: dict[str, Any], labels: dict[str, Any], fields: list[str], headline: str = ""
+) -> dict[str, Any]:
+    """The identity as a rendered header: unlisted optional fields are nulled, never dropped."""
+    ident = profile["identity"]
+    loc = ident["location"]
+    born = None
+    if "born" in fields:
+        if not labels.get("born"):
+            raise CvacError(
+                f"identity_fields lists `born` but labels.{labels.get('language')}.yaml has no "
+                "`born` label to print before the date"
+            )
+        born = fmt_full_date(ident.get("born"), labels.get("date_format", "MM/YYYY"))
+    return {
+        "full_name": ident["full_name"],
+        "headline": headline,
+        "location": loc["city"] + (f", {loc['country']}" if loc.get("country") else ""),
+        "email": ident["email"],
+        "phone": ident.get("phone") if "phone" in fields else None,
+        "born": born,
+        "links": list(ident.get("links") or []) if "links" in fields else [],
+        "photo": None,  # photo assets are roadmap; the field is accepted so the contract is stable
+    }
 
 
 def resolve(root: DataRoot, spec_arg: str | Path, mode: str) -> ResolveResult:
@@ -198,9 +242,8 @@ def resolve(root: DataRoot, spec_arg: str | Path, mode: str) -> ResolveResult:
             "--mode final but these cited facts are not verified:\n  - " + "\n  - ".join(unverified)
         )
 
-    ident = profile["identity"]
-    loc = ident["location"]
-    location = loc["city"] + (f", {loc['country']}" if loc.get("country") else "")
+    fields = identity_fields_of(labels, spec.get("identity_fields"))
+    identity = header_identity(profile, labels, fields, headline=spec["headline"])
 
     resolved: dict[str, Any] = {
         "meta": {
@@ -217,16 +260,7 @@ def resolve(root: DataRoot, spec_arg: str | Path, mode: str) -> ResolveResult:
             "languages": lsec["languages"],
             "present": present,
         },
-        "identity": {
-            "full_name": ident["full_name"],
-            "headline": spec["headline"],
-            "location": location,
-            "email": ident["email"],
-            "phone": ident.get("phone"),
-            "born": ident.get("born"),
-            "links": ident.get("links") or [],
-            "photo": None,
-        },
+        "identity": identity,
         "summary": summary,
         "sections": [s for s in spec["sections"] if s in SECTIONS],
         "experience": resolved_exp,
@@ -236,6 +270,8 @@ def resolve(root: DataRoot, spec_arg: str | Path, mode: str) -> ResolveResult:
         "languages": languages,
     }
 
+    if identity["born"] is not None:
+        resolved["labels"]["born"] = labels["born"]
     if spec.get("footer"):
         resolved["meta"]["footer"] = spec["footer"]
 

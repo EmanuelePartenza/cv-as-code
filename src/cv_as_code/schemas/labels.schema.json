@@ -44,6 +44,17 @@
       "type": "object",
       "additionalProperties": { "type": "string" },
       "description": "Profile language level keys (e.g. native) -> display text; unknown keys pass through"
+    },
+    "identity_fields": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "enum": ["phone", "links", "born", "photo"] },
+      "description": "Optional header fields a CV in this language shows by default (full name, headline, location and email always show). Absent: phone and links. A cv-spec may override it. born requires the born label; photo is accepted but has no asset support yet."
+    },
+    "born": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Label printed before the date of birth; required when identity_fields lists born"
     }
   }
 }

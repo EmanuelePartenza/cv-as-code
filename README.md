@@ -90,13 +90,13 @@ serve three engines:
 |---|---|---|
 | `profile` | `users/<u>/profile.yaml` | ids unique, facts prefixed by their parent, evidence paths exist, skills cite facts |
 | `search` | `users/<u>/search.yaml` | the user exists |
-| `cv-spec` | masters and applications | every ref exists; `approved` ⇒ every cited fact `verified`; template and labels exist |
+| `cv-spec` | masters and applications | every ref exists; `approved` ⇒ every cited fact `verified`; template and labels exist; `identity_fields` may override the language's |
 | `job` | `jobs/<id>/job.yaml` | id equals its directory; the verbatim `raw.txt` is present |
 | `match` | `users/<u>/matches/<id>.yaml` | strengths cite existing facts; the job exists |
 | `cover-letter` | frontmatter of `letter.md` | source facts exist; `approved` ⇒ verified |
 | `evidence` | frontmatter of a note | proposed facts attach to existing or declared parents; the source exists |
 | `questionnaire` | frontmatter of an interview | shape and status |
-| `labels` | `i18n/labels.<lang>.yaml` | every rendered string present: a missing label fails, never renders blank |
+| `labels` | `i18n/labels.<lang>.yaml` | every rendered string present: a missing label fails, never renders blank; `identity_fields` says which header fields that language shows |
 | `data-root` | `cvac.yaml` | the marker of a data root |
 
 Schemas are in [`src/cv_as_code/schemas/`](src/cv_as_code/schemas/); every

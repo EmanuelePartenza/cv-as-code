@@ -12,6 +12,8 @@ sections:
   languages: Langues
 present: Présent
 date_format: MM/YYYY
+identity_fields: [phone, links]
+born: Date de naissance
 months: [janvier, février, mars, avril, mai, juin, juillet, août, septembre, octobre, novembre, décembre]
 language_names:
   it: Italien

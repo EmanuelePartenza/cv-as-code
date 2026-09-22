@@ -20,7 +20,7 @@ duplicates it.
 
 | ID | State | Priority | Area | Title |
 |---|---|---|---|---|
-| 1.1 | ⏳ | medium | resolve | `identity_fields` per language not yet consumed by the resolver |
+| 1.1 | ✅ | medium | resolve | `identity_fields` per language not yet consumed by the resolver |
 | 1.2 | ⏳ | low | letter | cover-letter length is warned, not enforced |
 | 2.1 | ⏳ | low | render | Typst compile diagnostics assumed to arrive as `RuntimeError` |
 | 2.2 | ⏳ | low | platform | Windows untested |
@@ -51,7 +51,7 @@ duplicates it.
 
 ## 1. Pipeline
 
-### 1.1 `identity_fields` per language not yet consumed by the resolver — ⏳ To do
+### 1.1 `identity_fields` per language not yet consumed by the resolver — ✅ Done (commit: feat(i18n), 2026-09-22)
 
 **Problem**: which identity fields a CV shows (date of birth, photo) is a market
 convention and belongs in data, not in template logic (ADR-0007). The labels

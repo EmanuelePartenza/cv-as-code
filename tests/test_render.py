@@ -130,3 +130,19 @@ def test_footer_is_rendered_only_when_the_spec_sets_it(data_root: DataRoot) -> N
     d2 = write_spec(data_root, name="plain")
     resolve(data_root, d2, "draft")
     assert "footer" not in json.loads((d2 / "cv.resolved.json").read_text())["meta"]
+
+
+def test_born_is_printed_only_when_the_identity_fields_show_it(data_root: DataRoot) -> None:
+    import yaml
+
+    profile = data_root.profile_path("test")
+    prof = yaml.safe_load(profile.read_text("utf-8"))
+    prof["identity"]["born"] = "1990-03-12"
+    dump(profile, prof)
+    hidden = write_spec(data_root)
+    resolve(data_root, hidden, "draft")
+    assert "12/03/1990" not in pdf_text(render(data_root, hidden).out_path)
+    shown = write_spec(data_root, name="shown", identity_fields=["born"])
+    resolve(data_root, shown, "draft")
+    text = pdf_text(render(data_root, shown).out_path)
+    assert "12/03/1990" in text and "Date of birth" in text

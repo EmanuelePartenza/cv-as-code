@@ -176,12 +176,20 @@ def check_cvspec(root: DataRoot, doc: dict, path: Path, where: str, rep: Report)
         rep.error(where, f"template `{template}` not found (data root templates/ or the package)")
 
     language = doc.get("language")
-    if language and root.labels_path(language) is None:
+    labels_path = root.labels_path(language) if language else None
+    if language and labels_path is None:
         rep.error(
             where,
             f"no labels file for language `{language}` (add i18n/labels.{language}.yaml "
             "to the data root)",
         )
+    elif labels_path is not None and "born" in (doc.get("identity_fields") or []):
+        labels = _load(labels_path, root.rel(labels_path), rep)
+        if labels is not None and not labels.get("born"):
+            rep.error(
+                where,
+                f"identity_fields lists `born` but {root.rel(labels_path)} has no `born` label",
+            )
 
     job_id = doc.get("job_id")
     if job_id and not root.job_dir(job_id).is_dir():
@@ -208,6 +216,8 @@ def check_labels(root: DataRoot, doc: dict, path: Path, where: str, rep: Report)
     expected = path.name.removeprefix("labels.").removesuffix(".yaml")
     if doc.get("language") != expected:
         rep.error(where, f"language `{doc.get('language')}` does not match the file name")
+    if "born" in (doc.get("identity_fields") or []) and not doc.get("born"):
+        rep.error(where, "identity_fields lists `born` but there is no `born` label")
 
 
 def check_dataroot(root: DataRoot, doc: dict, path: Path, where: str, rep: Report) -> None:

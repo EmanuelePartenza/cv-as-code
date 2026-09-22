@@ -13,6 +13,21 @@ Tags: `arch`, `perf`, `ui`, `test`, `docs`, `fix`, `cleanup`, `sec`.
 
 ## 2026-09-22
 
+### feat(i18n): identity_fields per language and per spec [arch]
+
+- `labels.<lang>.yaml` gains `identity_fields` (which optional header fields a
+  CV in that language shows: `phone`, `links`, `born`, `photo`) and a `born`
+  label; a cv-spec may override the list. Shipped defaults: phone and links
+  everywhere, plus the date of birth in Italian.
+- The resolver nulls what is not listed and formats `born` at day precision in
+  the language's date-format family; `born` without a label is refused by
+  `cvac validate` and by the resolver. The cover letter follows the same list
+  for phone and links. The `classic` template prints the date of birth.
+- Robin's resolved JSON and PDFs are unchanged (`born: null`).
+  [closes DEVLOG 1.1]
+- Files: `src/cv_as_code/resolve.py`, `letter.py`, `validate.py`, `schemas/`,
+  `i18n/`, `templates/classic/template.typ`, tests.
+
 ### feat(data-in): profile report, fact verify/reject, extraction on a second document [arch]
 
 - `cvac profile report <user>`: identity, timeline, facts with status and

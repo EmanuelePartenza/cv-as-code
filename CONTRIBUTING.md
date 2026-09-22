@@ -40,7 +40,9 @@ ADRs for non-obvious decisions, Conventional Commits) is in
 One YAML file: `i18n/labels.<lang>.yaml`, with `kind: labels` and every key of
 [`labels.schema.json`](src/cv_as_code/schemas/labels.schema.json) — section
 headings, `present`, `date_format`, the twelve month names, language names,
-level names. Put it in your data root's `i18n/` to use it now, or in
+level names, `identity_fields` (which optional header fields a CV in that
+language shows by default: `phone`, `links`, `born`) and the `born` label. Put
+it in your data root's `i18n/` to use it now, or in
 `src/cv_as_code/i18n/` to contribute it. `cvac validate --all` tells you what
 is missing; a spec in that language then renders with no code change.
 

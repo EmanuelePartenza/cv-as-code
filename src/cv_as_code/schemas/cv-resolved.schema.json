@@ -79,6 +79,10 @@
         },
         "present": {
           "type": "string"
+        },
+        "born": {
+          "type": "string",
+          "description": "Label before the date of birth; present only when identity.born is shown"
         }
       }
     },

@@ -9,9 +9,9 @@ test enforces that on the whole repository.
 | File | Covers |
 |---|---|
 | `test_validate.py` | every rule of `cvac validate`: form, references, evidence paths, labels, jobs, matches, letters, evidence notes, questionnaires, the approved ⇒ verified gate; each failing when it should and naming the culprit |
-| `test_resolve.py` | the join (dates, organisations, projects split, overrides, education, languages, sections), draft/final modes, both gates, data-root label overrides |
-| `test_render.py` | draft watermark and suffix, final without watermark, byte-for-byte reproducibility, the page budget (warn in draft, fail in final), the transient build directory, template overrides, the footer |
-| `test_letter.py` | frontmatter gate, language-aware date from the labels' months, paragraph collapsing |
+| `test_resolve.py` | the join (dates, organisations, projects split, overrides, education, languages, sections), draft/final modes, both gates, data-root label overrides, identity fields (labels default, spec override, date of birth formatted, born without a label refused) |
+| `test_render.py` | draft watermark and suffix, final without watermark, byte-for-byte reproducibility, the page budget (warn in draft, fail in final), the transient build directory, template overrides, the footer, the date of birth printed only when shown |
+| `test_letter.py` | frontmatter gate, language-aware date from the labels' months, paragraph collapsing, the header follows the labels' identity fields |
 | `test_dataroot.py` | flag > env > discovery, error messages, display paths, asset lookup order |
 | `test_stages.py` | every `io.yaml` validates and names a shipped schema; placeholders resolve; `pack` carries instructions, inputs, attachments and the output language; missing inputs and params are named |
 | `test_skills.py` | the six domain skills ship with frontmatter, install into a data root, and the repository's copies equal the sources |

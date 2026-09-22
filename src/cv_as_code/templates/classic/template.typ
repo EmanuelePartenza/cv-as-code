@@ -35,6 +35,7 @@
     let parts = (id.location, link("mailto:" + id.email)[#id.email])
     if id.phone != none { parts.push(id.phone) }
     for lnk in id.links { parts.push(link(lnk.url)[#lnk.label]) }
+    if id.born != none { parts.push(L.at("born", default: "") + " " + id.born) }
     block(text(size: 9pt, fill: luma(55), parts.join("  ·  ")))
   }
   v(1pt)

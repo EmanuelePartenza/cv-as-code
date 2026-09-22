@@ -100,3 +100,29 @@ def test_missing_user_and_missing_file(data_root: DataRoot) -> None:
         CvacError, match="missing users/test/applications/20260101-acme-widget/letter.md"
     ):
         render_letter(data_root, d)
+
+
+def test_letter_header_follows_the_labels_identity_fields(data_root: DataRoot) -> None:
+    import json
+
+    import yaml
+    from conftest import dump
+
+    profile = data_root.profile_path("test")
+    prof = yaml.safe_load(profile.read_text("utf-8"))
+    prof["identity"]["phone"] = "555-0100"
+    prof["identity"]["born"] = "1990-03-12"
+    dump(profile, prof)
+    d = write_letter(data_root)
+    render_letter(data_root, d)
+    ident = json.loads((d / "letter.resolved.json").read_text("utf-8"))["identity"]
+    assert ident["phone"] == "555-0100" and ident["links"]
+    assert "born" not in ident
+
+    labels = yaml.safe_load(data_root.labels_path("en").read_text("utf-8"))
+    labels["identity_fields"] = ["born"]
+    dump(data_root.path / "i18n" / "labels.en.yaml", labels)
+    render_letter(data_root, d)
+    ident = json.loads((d / "letter.resolved.json").read_text("utf-8"))["identity"]
+    assert ident["phone"] is None and ident["links"] == []
+    assert "born" not in ident

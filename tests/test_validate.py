@@ -225,6 +225,35 @@ def test_labels_missing_key_is_an_error(data_root: DataRoot) -> None:
     assert any("'present' is a required property" in e for e in errors_of(data_root, p))
 
 
+def test_labels_identity_fields_are_checked(data_root: DataRoot) -> None:
+    import yaml
+
+    doc = yaml.safe_load(data_root.labels_path("en").read_text("utf-8"))
+    doc["identity_fields"] = ["born"]
+    del doc["born"]
+    p = dump(data_root.path / "i18n" / "labels.en.yaml", doc)
+    assert any("no `born` label" in e for e in errors_of(data_root, p))
+    doc["identity_fields"] = ["address"]
+    p = dump(data_root.path / "i18n" / "labels.en.yaml", doc)
+    assert any("'address' is not one of" in e for e in errors_of(data_root, p))
+
+
+def test_spec_identity_fields_need_the_born_label(data_root: DataRoot) -> None:
+    import yaml
+
+    d = write_spec(data_root, identity_fields=["born"])
+    assert errors_of(data_root, d / "cv-spec.yaml") == []
+    doc = yaml.safe_load(data_root.labels_path("en").read_text("utf-8"))
+    del doc["born"]
+    dump(data_root.path / "i18n" / "labels.en.yaml", doc)
+    assert any(
+        "i18n/labels.en.yaml has no `born` label" in e
+        for e in errors_of(data_root, d / "cv-spec.yaml")
+    )
+    d2 = write_spec(data_root, name="bad", identity_fields=["born", "born"])
+    assert any("non-unique" in e for e in errors_of(data_root, d2 / "cv-spec.yaml"))
+
+
 def test_labels_language_must_match_file_name(data_root: DataRoot) -> None:
     import yaml
 

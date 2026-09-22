@@ -10,7 +10,7 @@ from conftest import dump, spec_doc, write_spec
 
 from cv_as_code.dataroot import DataRoot
 from cv_as_code.errors import CvacError
-from cv_as_code.resolve import fmt_date, fmt_range, resolve
+from cv_as_code.resolve import fmt_date, fmt_full_date, fmt_range, resolve
 
 
 def resolved_json(root: DataRoot, spec_dir: Path, mode: str = "draft") -> dict:
@@ -177,3 +177,103 @@ def test_missing_labels_language_fails(data_root: DataRoot) -> None:
     d = write_spec(data_root, language="zz")
     with pytest.raises(CvacError, match="no labels file for language `zz`"):
         resolve(data_root, d, "draft")
+
+
+# --- identity fields ---------------------------------------------------------------------
+
+
+def set_identity(root: DataRoot, **fields: object) -> None:
+    import yaml
+
+    profile = root.profile_path("test")
+    prof = yaml.safe_load(profile.read_text("utf-8"))
+    prof["identity"].update(fields)
+    dump(profile, prof)
+
+
+def override_labels(root: DataRoot, lang: str = "en", **changes: object) -> Path:
+    import yaml
+
+    labels = yaml.safe_load(root.labels_path(lang).read_text("utf-8"))
+    for key, value in changes.items():
+        if value is None:
+            labels.pop(key, None)
+        else:
+            labels[key] = value
+    return dump(root.path / "i18n" / f"labels.{lang}.yaml", labels)
+
+
+@pytest.mark.parametrize(
+    ("value", "fmt", "expected"),
+    [
+        ("1990-03-12", "MM/YYYY", "12/03/1990"),
+        ("1990-03-12", "YYYY-MM", "1990-03-12"),
+        ("1990-03-12", "MM.YYYY", "12.03.1990"),
+        ("1990-03", "MM/YYYY", "03/1990"),
+        (None, "MM/YYYY", None),
+    ],
+)
+def test_fmt_full_date(value: str | None, fmt: str, expected: str | None) -> None:
+    assert fmt_full_date(value, fmt) == expected
+
+
+def test_default_identity_fields_show_phone_and_links_but_not_born(data_root: DataRoot) -> None:
+    set_identity(data_root, born="1990-03-12", phone="555-0100")
+    doc = resolved_json(data_root, write_spec(data_root))
+    assert doc["identity"]["phone"] == "555-0100"
+    assert doc["identity"]["links"] == [{"label": "Site", "url": "https://example.com"}]
+    assert doc["identity"]["born"] is None and doc["identity"]["photo"] is None
+    assert "born" not in doc["labels"]
+
+
+def test_labels_identity_fields_show_born_in_the_language_full_date_format(
+    data_root: DataRoot,
+) -> None:
+    set_identity(data_root, born="1990-03-12")
+    override_labels(data_root, identity_fields=["phone", "links", "born"], born="Born on")
+    doc = resolved_json(data_root, write_spec(data_root))
+    assert doc["identity"]["born"] == "12/03/1990"
+    assert doc["labels"]["born"] == "Born on"
+    override_labels(data_root, identity_fields=["born"], born="Born on", date_format="YYYY-MM")
+    doc = resolved_json(data_root, write_spec(data_root))
+    assert doc["identity"]["born"] == "1990-03-12"
+    assert doc["identity"]["links"] == []
+
+
+def test_spec_identity_fields_override_the_labels(data_root: DataRoot) -> None:
+    set_identity(data_root, born="1990-03-12", phone="555-0100")
+    doc = resolved_json(data_root, write_spec(data_root, identity_fields=["born"]))
+    assert doc["identity"]["born"] == "12/03/1990"
+    assert doc["identity"]["phone"] is None and doc["identity"]["links"] == []
+    bare = resolved_json(data_root, write_spec(data_root, name="bare", identity_fields=[]))
+    assert bare["identity"]["phone"] is None and bare["identity"]["links"] == []
+    assert bare["identity"]["email"] == "test.user@example.com"
+    assert bare["identity"]["location"] == "Testville, XX"
+
+
+def test_born_without_a_born_label_is_an_error(data_root: DataRoot) -> None:
+    set_identity(data_root, born="1990-03-12")
+    override_labels(data_root, identity_fields=["born"], born=None)
+    with pytest.raises(CvacError, match="labels.en.yaml has no `born` label"):
+        resolve(data_root, write_spec(data_root), "draft")
+
+
+def test_born_listed_but_unknown_stays_null(data_root: DataRoot) -> None:
+    doc = resolved_json(data_root, write_spec(data_root, identity_fields=["born"]))
+    assert doc["identity"]["born"] is None and "born" not in doc["labels"]
+
+
+def test_photo_is_null_even_when_listed(data_root: DataRoot) -> None:
+    doc = resolved_json(data_root, write_spec(data_root, identity_fields=["photo", "phone"]))
+    assert doc["identity"]["photo"] is None
+
+
+def test_shipped_labels_declare_identity_fields_and_a_born_label() -> None:
+    import yaml
+
+    from cv_as_code.dataroot import package_dir
+
+    for path in sorted((package_dir() / "i18n").glob("labels.*.yaml")):
+        labels = yaml.safe_load(path.read_text("utf-8"))
+        assert labels["identity_fields"], path.name
+        assert labels["born"], path.name

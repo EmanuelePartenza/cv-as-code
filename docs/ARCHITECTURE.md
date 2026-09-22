@@ -85,9 +85,9 @@ Tags and categories are free-form: matching is semantic, on the LLM side.
 |---|---|---|---|
 | `profile` | `users/<u>/profile.yaml` | built | facts with status and evidence; skills point to `evidence_facts` |
 | `search` | `users/<u>/search.yaml` | built | target roles, markets and modes, salary floor, `confidential` |
-| `cv-spec` | masters and applications | built | a master is a cv-spec with `job_id: null`; `based_on` is provenance only (copy, never merge); optional `footer` |
+| `cv-spec` | masters and applications | built | a master is a cv-spec with `job_id: null`; `based_on` is provenance only (copy, never merge); optional `footer` and `identity_fields` |
 | `cv-resolved` | `cv.resolved.json` | built | the generator ↔ template contract: no ids, no refs, final display text |
-| `labels` | `i18n/labels.<lang>.yaml` | built | headings, "present", date format, month names, language and level names |
+| `labels` | `i18n/labels.<lang>.yaml` | built | headings, "present", date format, month names, language and level names, `identity_fields` (which optional header fields a CV in that language shows: phone, links, date of birth) |
 | `data-root` | `cvac.yaml` | built | the marker and contract of a data root |
 | `job` | `jobs/<id>/job.yaml` | built | normalised posting; requirements quoted verbatim, never paraphrased |
 | `match` | `users/<u>/matches/<id>.yaml` | built | `verdict: apply \| stretch \| skip`, strengths with fact refs, gaps, angle; no numeric score |
@@ -223,7 +223,8 @@ README.
 - `70_interview_prep` — the stage of ADR-0005, at a user's first interview.
 - Connectors for posting aggregators with public APIs; `dedup_key`.
 - Application tracking (`application.yaml`, a generated index).
-- `i18n/markets/` — market conventions beyond language (photo, date of birth).
+- `i18n/markets/` — market conventions beyond language (photo, address shape);
+  today only `identity_fields` per language and per spec exists.
 - A deterministic `apply` of an evidence note into the profile (needs a
   format-preserving YAML writer); an HTML view of the profile report; a photo
   asset for markets that expect one.
