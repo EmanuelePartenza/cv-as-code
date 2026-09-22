@@ -200,11 +200,8 @@ def test_a_letter_without_frontmatter_is_shown_as_invalid_not_hidden(data_root: 
     assert "invalid" in page(c, "/u/test/cvs")
     body = page(c, "/u/test/applications/20260101-acme-widget")
     assert "has no YAML frontmatter" in body
-    assert "cannot approve" in post(
-        c, "/u/test/applications/20260101-acme-widget/letter/approve"
-    ) or "no YAML frontmatter" in post(
-        c, "/u/test/applications/20260101-acme-widget/letter/approve"
-    )
+    body = post(c, "/u/test/applications/20260101-acme-widget/letter/approve")
+    assert "has no YAML frontmatter" in body
 
 
 # --- on the example user -------------------------------------------------------------------

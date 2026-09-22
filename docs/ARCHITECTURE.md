@@ -179,7 +179,9 @@ exposes, with the same refusals. Slice 1, built: the profile with statuses,
 evidence quotes and the completeness checklist; verify and reject buttons;
 CVs and applications with draft and final render, PDF preview, approval of a
 spec or a letter; the validation report; the data root's git status (the UI
-never commits). Slices 2 and 3 are roadmap (§10).
+never commits). A POST whose `Origin` or `Referer` is not the UI's own host is
+refused, so another page open in the browser cannot press a gate button.
+Slices 2 and 3 are roadmap (§10).
 
 ## 6. Templates and rendering
 
