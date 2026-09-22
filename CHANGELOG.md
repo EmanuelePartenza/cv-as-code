@@ -13,6 +13,15 @@ Tags: `arch`, `perf`, `ui`, `test`, `docs`, `fix`, `cleanup`, `sec`.
 
 ## 2026-09-22
 
+### docs: README that earns the positioning, CONTRIBUTING, test map [docs]
+
+- README: architecture in sixty seconds, five-minute try-out on the example,
+  three engines, the data contracts with what each rule enforces, language
+  layers, declared limits, honest status and roadmap.
+- CONTRIBUTING: adding a language, a template, a stage; the denylist.
+- `tests/README.md`: every suite listed, what is deliberately not covered.
+- Files: `README.md`, `CONTRIBUTING.md`, `tests/README.md`.
+
 ### feat(skills): domain skills for Claude Code and cvac skills install [arch]
 
 - Six skills shipped in the package: `cv-master`, `job-ingest`, `cv-tailor`,

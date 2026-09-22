@@ -24,8 +24,12 @@ renders it and proves the PDFs identical across Python versions.
 
 The six domain skills ship in the package and install into any data root.
 
-Next block: the README that earns the positioning, CONTRIBUTING, then the
-publication checklist (history check, tag, visibility).
+README, CONTRIBUTING and the test map are written.
+
+Next block: publication (WP-10 of the maintainer's plan) — the maintainer reads
+the README critically, pushes so CI runs, `scripts/denylist.py check-history`,
+tag v0.1.0, repository public. Then v0.2: `cvac profile report`, `cvac fact
+verify`, extraction exercised on a second document.
 
 ## Blockers
 
@@ -61,9 +65,9 @@ Details in [DEVLOG.md](DEVLOG.md), which is the source of truth.
 <!-- AUTO:COMMITS -->
 | Hash | Date | Message |
 |---|---|---|
+| `3d75a0d` | 2026-09-22 | feat(skills): domain skills for Claude Code and cvac skills install |
 | `2b3ad32` | 2026-09-22 | feat(example): Robin Ashcombe, a complete data root through the stages |
 | `c04bdef` | 2026-09-22 | feat(stages): data-in contracts, evidence notes, questionnaires, footer |
 | `949b5b5` | 2026-09-22 | feat(stages): stage contracts, job/match/letter schemas, cvac stage |
 | `d1f7b9b` | 2026-09-22 | docs: navigator, status, conventions, process, decision queues, ADRs |
-| `a467fee` | 2026-09-22 | chore(process): verification engine, git hooks, settings, skills |
 <!-- /AUTO:COMMITS -->
