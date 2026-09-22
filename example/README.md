@@ -23,7 +23,8 @@ PDFs are never committed; CI builds them as artefacts on every push.
 |---|---|---|
 | `users/robin/interviews/01-onboarding.md` | `05_interview`, filled by Robin | the standard questionnaire; answers in the user's own words, with a number Robin refuses to guess and one Robin retracts |
 | `users/robin/notes/01-onboarding.md` | `03_extract` | an evidence note: every proposed fact with the verbatim passage it rests on; the anchors profile facts point at |
-| `users/robin/profile.yaml` | applied by hand, verified by Robin | 15 `verified` facts, 2 `draft` (the kayaker's date, the diesel figure), 1 `rejected` (the "12%" that was the master's timetable) |
+| `users/robin/profile.yaml` | applied by hand, verified by Robin | 14 `verified` facts, 2 `draft` (the diesel figure, a 2025 outage), 1 `rejected` (the "12%" that was the master's timetable) |
+| `users/robin/sources/skerra-logbook-2025-excerpt.md` → `notes/02-logbook-excerpt.md` | `03_extract`, second document | a logbook sharpens two draft facts with dates and numbers; `cvac fact verify exp-skerra.f08` verified one, the other stays draft on purpose |
 | `users/robin/search.yaml` | section G of the questionnaire | a confidential search with a salary floor and a red flag |
 | `users/robin/masters/port-operations-en/` | `30_tailor`, master mode | a generic one-page CV, approved, with a footer |
 | `users/robin/masters/port-operations-fr/` | `30_tailor`, `based_on` the English master | the same facts in a French CV: labels, dates and degree names from `labels.fr.yaml`; the pivot language stays English |
@@ -38,14 +39,22 @@ The gates are mechanical. Two ways to see them:
 
 ```bash
 # 1. cite a draft fact from an approved spec: validation fails, naming the fact
-sed -i 's/exp-skerra.f03\]/exp-skerra.f03, exp-skerra.f08]/' users/robin/masters/port-operations-en/cv-spec.yaml
-cvac validate --all            # ERROR ... cites non-verified fact(s): exp-skerra.f08
+sed -i 's/exp-skerra.f03\]/exp-skerra.f03, exp-skerra.f09]/' users/robin/masters/port-operations-en/cv-spec.yaml
+cvac validate --all            # ERROR ... cites non-verified fact(s): exp-skerra.f09
 git checkout -- users/robin/masters/port-operations-en/cv-spec.yaml
 
 # 2. render a draft as final: the resolver refuses
 sed -i 's/status: approved/status: draft/' users/robin/masters/port-operations-fr/cv-spec.yaml
 cvac cv users/robin/masters/port-operations-fr --mode final   # ERROR (cv): --mode final requires status: approved
 git checkout -- users/robin/masters/port-operations-fr/cv-spec.yaml
+```
+
+## See the profile, verify a fact
+
+```bash
+cvac profile report robin           # → users/robin/profile.report.md, with a completeness checklist
+cvac fact verify exp-skerra.f10     # the human gate as a command (refuses a fact without evidence)
+git checkout -- users/robin/profile.yaml
 ```
 
 ## Run a stage yourself

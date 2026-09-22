@@ -5,8 +5,9 @@ pivot_language: en
 
 # Robin Ashcombe is fictional: a lighthouse keeper applying for a port operations
 # role. Every fact below was proposed by stage 03 from the onboarding questionnaire
-# (notes/01-onboarding.md) and confirmed by Robin on 2026-09-16, except the two left
-# draft and the one rejected.
+# (notes/01-onboarding.md) and confirmed by Robin on 2026-09-16, except the ones left
+# draft and the one rejected; a logbook excerpt (notes/02-logbook-excerpt.md) then
+# sharpened f08 (verified 2026-09-19 with `cvac fact verify`) and f09, and added f10.
 
 identity:
   full_name: Robin Ashcombe
@@ -92,13 +93,14 @@ experiences:
         evidence: notes/01-onboarding.md#budget
       - id: exp-skerra.f08
         claim: >-
-          Assisted a kayaker stranded below the cliffs at night by guiding the
-          lifeboat in by radio (2023, date to be confirmed against the logbook)
-        metrics: {}
+          Assisted a kayaker stranded below the north cliff at night by guiding
+          the lifeboat in by VHF and searchlight (7 October 2023); casualty
+          recovered without injury
+        metrics: {date: "2023-10-07", lifeboat_alongside_minutes: 26}
         tags: [incident-coordination, radio]
-        status: draft
-        verified_on: null
-        evidence: notes/01-onboarding.md#kayaker
+        status: verified
+        verified_on: "2026-09-19"
+        evidence: [notes/01-onboarding.md#kayaker, notes/02-logbook-excerpt.md#kayaker-2023-10-07]
       - id: exp-skerra.f09
         claim: >-
           Reduced the standby generator's diesel consumption by about a fifth
@@ -107,7 +109,16 @@ experiences:
         tags: [maintenance, efficiency]
         status: draft
         verified_on: null
-        evidence: notes/01-onboarding.md#diesel
+        evidence: [notes/01-onboarding.md#diesel, notes/02-logbook-excerpt.md#diesel-2021]
+      - id: exp-skerra.f10
+        claim: >-
+          Restored the light within 40 minutes after a drive-belt failure in a
+          storm (11 February 2025) using the spare belt
+        metrics: {outage_minutes: 40}
+        tags: [maintenance, incident]
+        status: draft
+        verified_on: null
+        evidence: notes/02-logbook-excerpt.md#outage-2025
 
   - id: exp-fairhaven
     role: Deckhand, then bosun's mate

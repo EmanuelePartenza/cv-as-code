@@ -16,6 +16,7 @@ test enforces that on the whole repository.
 | `test_stages.py` | every `io.yaml` validates and names a shipped schema; placeholders resolve; `pack` carries instructions, inputs, attachments and the output language; missing inputs and params are named |
 | `test_skills.py` | the six domain skills ship with frontmatter, install into a data root, and the repository's copies equal the sources |
 | `test_end_to_end.py` | the example data root validates clean, renders three one-page CVs and a letter, packs every stage, and the gates refuse a draft fact in an approved spec and a final render of a draft |
+| `test_data_in.py` | the profile report (sections, counts, completeness checklist) and `cvac fact verify\|reject` (only the status lines change, unknown ids and facts without evidence refused) |
 | `test_cli.py` | exit codes 0/1/2, `--data-root` before or after the subcommand, `cvac init` |
 | `test_publication_boundary.py` | nothing personal is tracked: structural rules on every tracked file, the keyed denylist where the key exists, plus the rules tested on synthetic input |
 

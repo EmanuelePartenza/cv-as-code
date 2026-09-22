@@ -38,6 +38,7 @@ maintainer, the decision is opened first, then — once taken — formalised in 
 | [0010](0010-documentation-in-the-repository.md) | Documentation lives in the repository, single home in `docs/` | accepted |
 | [0011](0011-commit-cadence-push-on-request.md) | Local commits free, push on explicit request | accepted |
 | [0012](0012-rendering-reproducibility.md) | Rendering reproducibility: Typst from PyPI, vendored fonts | accepted |
+| [0013](0013-data-in.md) | Data in: extraction and interview stages, facts enter as draft, verification is a command | accepted |
 
 Numbers 0001–0005 were first recorded in the maintainer's private working
 repository, from which this framework was extracted; they are re-authored here

@@ -82,10 +82,10 @@ def test_every_production_stage_packs_on_the_example(example: DataRoot) -> None:
 def test_the_gates_refuse_a_draft_fact_in_an_approved_spec(example: DataRoot) -> None:
     spec = example.path / MASTERS[0] / "cv-spec.yaml"
     spec.write_text(
-        spec.read_text().replace("exp-skerra.f03]", "exp-skerra.f03, exp-skerra.f08]", 1)
+        spec.read_text().replace("exp-skerra.f03]", "exp-skerra.f03, exp-skerra.f09]", 1)
     )
     rep = validate_files(example, [spec])
-    assert any("cites non-verified fact(s): exp-skerra.f08" in e for e in rep.errors)
+    assert any("cites non-verified fact(s): exp-skerra.f09" in e for e in rep.errors)
     with pytest.raises(CvacError, match="not verified"):
         resolve(example, MASTERS[0], "final")
 

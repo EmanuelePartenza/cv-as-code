@@ -13,8 +13,10 @@ from pathlib import Path
 from . import __version__
 from .dataroot import ENV_VAR, MARKER, DataRoot
 from .errors import CvacError
+from .facts import profile_of, set_status
 from .letter import render_letter
 from .render import render
+from .report import write_report
 from .resolve import resolve
 from .skills import install, list_skills
 from .stages import describe, list_stages, load_stage, pack, resolve_stage
@@ -226,6 +228,24 @@ def cmd_skills_list(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_profile_report(args: argparse.Namespace) -> int:
+    root = DataRoot.locate(args.data_root)
+    user, _ = profile_of(root, args.user)
+    path = write_report(root, user)
+    print(f"report written to {root.rel(path)}")
+    return 0
+
+
+def cmd_fact(args: argparse.Namespace) -> int:
+    root = DataRoot.locate(args.data_root)
+    user, _ = profile_of(root, args.user)
+    status = {"verify": "verified", "reject": "rejected"}[args.fact_command]
+    changes = set_status(root, user, args.ids, status, on=args.on)
+    for c in changes:
+        print(f"{c.fact_id}: {c.old_status} -> {c.new_status}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="cvac",
@@ -309,6 +329,23 @@ def build_parser() -> argparse.ArgumentParser:
         "--to", metavar="DIR", help="target directory (default: <data root>/.claude/skills)"
     )
     q.set_defaults(func=cmd_skills_install)
+    p = sub.add_parser("profile", parents=[common], help="a generated view of a user's profile")
+    psub = p.add_subparsers(dest="profile_command", required=True, metavar="<report>")
+    q = psub.add_parser("report", parents=[common], help="write users/<user>/profile.report.md")
+    q.add_argument("user", nargs="?", help="default: the data root's default_user")
+    q.set_defaults(func=cmd_profile_report)
+
+    p = sub.add_parser("fact", parents=[common], help="the human gate on facts: verify or reject")
+    fsub = p.add_subparsers(dest="fact_command", required=True, metavar="<verify|reject>")
+    for name, doc in (
+        ("verify", "set status: verified and verified_on"),
+        ("reject", "set status: rejected"),
+    ):
+        q = fsub.add_parser(name, parents=[common], help=doc)
+        q.add_argument("ids", nargs="+", metavar="FACT_ID")
+        q.add_argument("--user", help="default: the data root's default_user")
+        q.add_argument("--on", metavar="YYYY-MM-DD", help="verification date (default: today)")
+        q.set_defaults(func=cmd_fact)
     return parser
 
 

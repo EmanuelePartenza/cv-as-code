@@ -6,7 +6,7 @@
 > session end.
 
 **Updated:** 2026-09-22
-**Phase:** towards v0.1.0 — the first public release
+**Phase:** v0.1.0 published (2026-09-22); v0.2 in progress
 
 ## In progress
 
@@ -24,12 +24,12 @@ renders it and proves the PDFs identical across Python versions.
 
 The six domain skills ship in the package and install into any data root.
 
-README, CONTRIBUTING and the test map are written.
+v0.1.0 is public and tagged; CI is green on both Python versions. v0.2 adds
+the data-in commands: `cvac profile report` and `cvac fact verify|reject`,
+with the extraction stage exercised on a second document of the example.
 
-Next block: publication (WP-10 of the maintainer's plan) — the maintainer reads
-the README critically, pushes so CI runs, `scripts/denylist.py check-history`,
-tag v0.1.0, repository public. Then v0.2: `cvac profile report`, `cvac fact
-verify`, extraction exercised on a second document.
+Next block: tag v0.2.0 after the maintainer's review; then the gap-closing
+stage when a user first needs it (roadmap).
 
 ## Blockers
 
@@ -65,9 +65,9 @@ Details in [DEVLOG.md](DEVLOG.md), which is the source of truth.
 <!-- AUTO:COMMITS -->
 | Hash | Date | Message |
 |---|---|---|
+| `cf94e6d` | 2026-09-22 | docs: README that earns the positioning, CONTRIBUTING, test map |
 | `3d75a0d` | 2026-09-22 | feat(skills): domain skills for Claude Code and cvac skills install |
 | `2b3ad32` | 2026-09-22 | feat(example): Robin Ashcombe, a complete data root through the stages |
 | `c04bdef` | 2026-09-22 | feat(stages): data-in contracts, evidence notes, questionnaires, footer |
 | `949b5b5` | 2026-09-22 | feat(stages): stage contracts, job/match/letter schemas, cvac stage |
-| `d1f7b9b` | 2026-09-22 | docs: navigator, status, conventions, process, decision queues, ADRs |
 <!-- /AUTO:COMMITS -->

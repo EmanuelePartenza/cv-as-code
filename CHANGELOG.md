@@ -13,6 +13,18 @@ Tags: `arch`, `perf`, `ui`, `test`, `docs`, `fix`, `cleanup`, `sec`.
 
 ## 2026-09-22
 
+### feat(data-in): profile report, fact verify/reject, extraction on a second document [arch]
+
+- `cvac profile report <user>`: identity, timeline, facts with status and
+  evidence resolution, skills, education, languages, a completeness checklist;
+  written to the gitignored `profile.report.md`.
+- `cvac fact verify|reject <id>…`: changes only the status lines, refuses a
+  fact without existing evidence.
+- Robin's logbook excerpt extracted (`notes/02-logbook-excerpt.md`): two draft
+  facts sharpened, one verified with the command, one new draft fact.
+- `docs/data-in.md`, ADR-0013.
+- Files: `src/cv_as_code/report.py`, `facts.py`, `example/`, `tests/test_data_in.py`.
+
 ### docs: README that earns the positioning, CONTRIBUTING, test map [docs]
 
 - README: architecture in sixty seconds, five-minute try-out on the example,

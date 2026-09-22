@@ -33,7 +33,7 @@ The package:
 
 ```
 src/cv_as_code/
-├── cli.py          cvac: init · validate · resolve · render · cv · letter · stage · skills
+├── cli.py          cvac: init · validate · resolve · render · cv · letter · stage · skills · profile · fact
 ├── dataroot.py     the data-root contract: location, user paths, asset lookup with overrides
 ├── validate.py     form (JSON Schema) + references + evidence paths + the approval gate
 ├── resolve.py      profile × cv-spec × labels → cv.resolved.json (draft/final modes)
@@ -41,6 +41,8 @@ src/cv_as_code/
 ├── letter.py       letter.md × profile × labels → PDF in the CV's style
 ├── stages.py       stage contracts: list, resolve against a data root, pack for any engine
 ├── skills.py       the Claude Code adapter: `cvac skills install` copies skills/ into a data root
+├── report.py       `cvac profile report`: a generated Markdown view with a completeness checklist
+├── facts.py        `cvac fact verify|reject`: the human gate on facts, layout-preserving
 ├── documents.py    YAML and markdown-with-frontmatter documents; dates normalised to strings
 ├── errors.py       CvacError > ValidationError, RenderError
 ├── schemas/        profile · search · cv-spec · cv-resolved · labels · data-root · job · match ·
@@ -115,7 +117,9 @@ posting (text)
 Upstream of the profile, two more stages bring data *in*: `03_extract` (a
 document or a filled questionnaire → draft facts + an evidence note) and
 `05_interview` (profile + search → a questionnaire in the user's language, only
-the missing items in update mode). Facts always enter as `draft`.
+the missing items in update mode). Facts always enter as `draft`; `cvac fact
+verify|reject` is the gate and `cvac profile report` the view
+([data-in.md](data-in.md), [ADR-0013](adr/0013-data-in.md)).
 
 An LLM stage is a directory `pipeline/<NN_name>/` with `INSTRUCTIONS.md` (the
 prompt: inputs, outputs, rules; it never names an engine) and `io.yaml` (the
@@ -220,6 +224,8 @@ README.
 - Connectors for posting aggregators with public APIs; `dedup_key`.
 - Application tracking (`application.yaml`, a generated index).
 - `i18n/markets/` — market conventions beyond language (photo, date of birth).
-- An HTML view of the profile report; a photo asset for markets that expect one.
+- A deterministic `apply` of an evidence note into the profile (needs a
+  format-preserving YAML writer); an HTML view of the profile report; a photo
+  asset for markets that expect one.
 - PyPI release; Claude Code plugin packaging of the skills.
 - A CI job on Windows.

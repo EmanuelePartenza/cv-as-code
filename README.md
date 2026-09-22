@@ -68,7 +68,8 @@ Data enters through a questionnaire in your language, not through a chat:
 stage `05_interview` writes it, you fill it at your own pace, stage
 `03_extract` turns it (or an old CV, a review, any document) into an evidence
 note with proposed facts, each carrying the verbatim passage it rests on. Facts
-enter your profile as `draft`; you verify them one by one. Then a master CV,
+enter your profile as `draft`; you verify them one by one (`cvac fact verify`)
+and see what you have and what is missing with `cvac profile report`. Then a master CV,
 then postings, matches, tailored CVs and letters. The `/onboard` skill is that
 procedure written down.
 
@@ -122,10 +123,10 @@ an English profile. [ADR-0007](docs/adr/0007-language-layers.md).
 
 ## Status
 
-`v0.1` — the CLI, six stage contracts, the skills, the example, the tests and
-CI exist. Roadmap (designed, not built): an API runner, a gap-closing stage
-that turns a match's gaps into an evidence plan, interview preparation as a
-stage, a profile report and `cvac fact verify`, market conventions beyond
+`v0.2` — the CLI, six stage contracts, the skills, the example, the profile
+report and the fact gate, the tests and CI exist. Roadmap (designed, not
+built): an API runner, a gap-closing stage that turns a match's gaps into an
+evidence plan, interview preparation as a stage, market conventions beyond
 language, connectors for posting APIs, application tracking. See
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) §10 and the
 [ADRs](docs/adr/README.md).
