@@ -51,7 +51,7 @@ duplicates it.
 
 ## 1. Pipeline
 
-### 1.1 `identity_fields` per language not yet consumed by the resolver — ✅ Done (commit: feat(i18n), 2026-09-22)
+### 1.1 `identity_fields` per language not yet consumed by the resolver — ✅ Done (commit 51bcd00)
 
 **Problem**: which identity fields a CV shows (date of birth, photo) is a market
 convention and belongs in data, not in template logic (ADR-0007). The labels
