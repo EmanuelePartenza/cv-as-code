@@ -137,7 +137,9 @@ session, `cvac stage pack` for any chat (paste the bundle, paste the answer
 back, validate — see [manual-path.md](manual-path.md)), and `cvac stage run`,
 which executes the stage with Claude Code in print mode as a confined
 subprocess and accepts the result only if it validates
-([ADR-0015](adr/0015-claude-code-headless-engine.md)); an API runner for
+([ADR-0015](adr/0015-claude-code-headless-engine.md)) — it writes only
+inside the data root, may read outside it (the package's schemas, for one),
+and every denied tool call is listed in the run's result; an API runner for
 people without Claude Code is roadmap. `cvac stage list` and `cvac stage show`
 print the contracts resolved against a data root.
 

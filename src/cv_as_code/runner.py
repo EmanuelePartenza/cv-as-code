@@ -59,6 +59,7 @@ class RunResult:
     session_id: str | None = None
     cost_usd: float | None = None
     engine_error: str | None = None
+    denied: list[str] = field(default_factory=list)
 
     @property
     def ok(self) -> bool:
@@ -145,9 +146,12 @@ def summarise_event(line: str) -> str | None:
         return "\n".join(parts) or None
     if kind == "result":
         cost = event.get("total_cost_usd")
-        tail = f" (cost {cost:.4f} USD)" if isinstance(cost, int | float) else ""
+        notes = [f"cost {cost:.4f} USD"] if isinstance(cost, int | float) else []
+        denials = event.get("permission_denials") or []
+        if denials:
+            notes.append(f"{len(denials)} tool call(s) denied")
         state = "error" if event.get("is_error") else "done"
-        return f"result: {state}{tail}"
+        return f"result: {state}" + (f" ({'; '.join(notes)})" if notes else "")
     return None
 
 
@@ -179,6 +183,7 @@ def run_stage(
     session_id: str | None = None
     cost: float | None = None
     engine_error: str | None = None
+    denied: list[str] = []
     with log.open("w", encoding="utf-8") as handle:
         handle.write(json.dumps({"type": "cvac", "stage": rs.stage.name, "cmd": cmd}) + "\n")
         try:
@@ -212,6 +217,11 @@ def run_stage(
                         cost = float(event["total_cost_usd"])
                     if event.get("is_error"):
                         engine_error = str(event.get("result") or event.get("subtype") or "error")
+                    denied = [
+                        f"{d.get('tool_name')}: {_short(d.get('tool_input'))}"
+                        for d in event.get("permission_denials") or []
+                        if isinstance(d, dict)
+                    ]
             exit_code = proc.wait(timeout=timeout)
         except subprocess.TimeoutExpired:
             proc.kill()
@@ -231,10 +241,19 @@ def run_stage(
         session_id=session_id,
         cost_usd=cost,
         engine_error=engine_error,
+        denied=denied,
     )
     if exit_code != 0 and not engine_error:
         result.engine_error = f"engine exited with code {exit_code}"
     return result
+
+
+def _short(tool_input: Any) -> str:
+    """The one field of a tool input worth showing in a denial."""
+    if not isinstance(tool_input, dict):
+        return ""
+    value = tool_input.get("command") or tool_input.get("file_path") or tool_input.get("url") or ""
+    return str(value)[:120]
 
 
 def _event(line: str) -> dict[str, Any]:

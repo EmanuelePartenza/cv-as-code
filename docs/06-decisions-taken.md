@@ -17,8 +17,22 @@
 | D-03 | 2026-09-21 | The example user counts as a user of the framework | [0008](adr/0008-example-user-is-a-user.md) |
 | D-04 | 2026-09-21 | Fresh public history with a mechanical publication boundary | [0009](adr/0009-publication-boundary.md) |
 | D-05 | 2026-09-21 | Typst from PyPI, vendored fonts, reproducible PDFs | [0012](adr/0012-rendering-reproducibility.md) |
+| D-06 | 2026-09-23 | A local, server-rendered web UI inside the package, a thin adapter over the library | [0014](adr/0014-local-ui-thin-adapter.md) |
 
 ---
+
+### D-06 — A user interface for the tool — 2026-09-23
+
+The maintainer asked for a UI; the plan had cut every UI. Options weighed: (A)
+a local web UI inside the package, server-rendered, Flask and plain forms; (B)
+a terminal UI; (C) a single-page application over a JSON API; (D) Streamlit or
+NiceGUI; (E) keep Claude Code and Obsidian as the UI. Chosen (A): the only
+option with a PDF preview, one language and one toolchain, and gates that are
+buttons over the same library functions the CLI calls. Built in slices: the
+gate and the views (2026-09-23); the data-root chooser, documents, jobs, the
+editor and stage runs (2026-09-24, D-07). The planned "manual stage path in
+the browser" was superseded by the engine of ADR-0015, which runs a stage
+directly. Outcome: [ADR-0014](adr/0014-local-ui-thin-adapter.md).
 
 ### D-01 — Two repositories, one copy of the code — 2026-09-21
 

@@ -65,7 +65,14 @@ def test_footer_is_on_the_example_cvs(example: DataRoot) -> None:
 
 def test_every_production_stage_packs_on_the_example(example: DataRoot) -> None:
     params = {"user": "robin", "job_id": JOB, "master": "port-operations-en"}
-    for stage in ("10_normalize", "20_match", "30_tailor", "60_letter"):
+    for stage in (
+        "10_normalize",
+        "20_match",
+        "30_tailor",
+        "40_gap_plan",
+        "60_letter",
+        "70_interview_prep",
+    ):
         text = pack(example, resolve_stage(example, stage, params))
         assert text.startswith(f"# Stage {stage}")
     text = pack(
@@ -77,6 +84,25 @@ def test_every_production_stage_packs_on_the_example(example: DataRoot) -> None:
         ),
     )
     assert "## Input users/robin/interviews/01-onboarding.md" in text
+
+
+def test_example_carries_a_gap_plan_and_an_interview_prep_from_the_engine(
+    example: DataRoot,
+) -> None:
+    """Stages 40 and 70 ran on Robin with the real engine; their outputs validate with the rest."""
+    from cv_as_code.documents import load_document
+
+    growth = example.path / "users" / "robin" / "growth" / f"{JOB}.md"
+    prep = example.path / APP / "interview-prep.md"
+    plan = load_document(growth)
+    assert plan["kind"] == "gap-plan" and plan["job_id"] == JOB
+    requirements = {g["requirement"] for g in plan["gaps"]}
+    assert any("port management system" in r for r in requirements)
+    assert all(g["path"] and all(step["artefact"] for step in g["path"]) for g in plan["gaps"])
+    doc = load_document(prep)
+    assert doc["kind"] == "interview-prep" and 3 <= len(doc["stories"]) <= 5
+    assert all(s["source_facts"] for s in doc["stories"])
+    assert growth in discover_all(example) and prep in discover_all(example)
 
 
 def test_the_gates_refuse_a_draft_fact_in_an_approved_spec(example: DataRoot) -> None:

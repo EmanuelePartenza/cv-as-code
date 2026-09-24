@@ -15,61 +15,9 @@
 
 ## Queue
 
-### D-06 — A user interface for the tool: which kind, where it lives, what it does first
-
-**Opened:** 2026-09-22 · **Blocks:** no longer — answered 2026-09-23 (option A); the entry stays here until the three slices are implemented.
-
-**Context.** The maintainer wants a UI to work with the tool. Today the tool has three surfaces: the `cvac` CLI (deterministic tail, gates, report), the Claude Code skills (an LLM engine in session) and `cvac stage pack` (any chat, by copy and paste). What a person actually does with the tool, in order of frequency: read the profile and see what is missing; verify or reject facts; fill a questionnaire; run a stage on a posting; review a draft PDF and approve a spec or a letter; render the final; keep track of applications. The first five are the human gate and its views — exactly what a UI is for. What a UI cannot be: a fourth copy of the rules. Every rule lives once, in the library (`validate`, `resolve`, `render`, `facts`, `report`, `stages`); the CLI is already a thin adapter over it, and a UI must be one too, in the same sense that the skills are (ADR-0002). Constraints that bind any option: the UI reads and writes only through a data root (ADR-0006); the human gate stays a human act — a button is fine, an auto-click is not (ADR-0001); the framework's surface is English, the data it shows is in the user's languages (ADR-0007); no infrastructure before a user exercises it, Robin counts (ADR-0008); Python 3.10+, CI on Linux, ruff and pytest as the quality floor (D22 of the plan). One more fact shapes the ordering: running a stage *from* a UI needs an LLM engine the UI can call, and the API runner (`cvac stage run`) is roadmap. Without it a UI can only pack a stage and take the answer back — the manual path in a browser. So the UI's first value is the gate and the views, not the stages.
-
-**Option A — Local web UI inside the package, server-rendered (recommended)**
-
-- Shape: `pip install "cv-as-code[ui]"`, `cvac ui` starts a local server bound to `127.0.0.1` and opens the browser. Flask + Jinja2 templates + HTMX (vendored single file, no build step, works offline). A module `ui/` in the package that imports the library and that nothing in the library imports; the CLI stays the reference adapter.
-- Pros: one language, one toolchain, same gates and CI; PDF preview in the browser (`<iframe>` on the rendered file); gates become buttons that call the same functions the CLI calls; a screen per user job; installable by a stranger with one command; the extra keeps the core dependency set unchanged for CLI-only users.
-- Cons: a second surface to keep honest (every screen must be exercised on Robin and tested); Flask and Jinja2 are new dependencies (`TO VERIFY`: Flask 3.x supports Python 3.10; htmx licence is 0BSD); a local server is still a server — bind to loopback only, no auth by design, single user.
-- Cost / reversibility: first slice \~2 owner sessions; reversible — deleting `ui/` and the extra leaves the library untouched.
-
-**Option B — Terminal UI (Textual)**
-
-- Pros: closest to the CLI culture; keyboard-driven; one dependency; runs over SSH.
-- Cons: no PDF preview (the artefact reviewers look at); long text (questionnaires, letters, evidence quotes) is painful in a terminal; Textual apps are harder to test than HTTP routes; for the person who asked, "a UI" most likely means a window.
-- Cost / reversibility: similar to A, same reversibility.
-
-**Option C — Single-page app (React or Vue) over a JSON API**
-
-- Pros: richest interaction; a JSON API could serve other clients later.
-- Cons: a Node toolchain, a second language, a build step in CI, a bundle to ship as package data; for a single-user local tool of \~2000 lines of Python this is the over-engineering rule 9 exists for. If a JSON API is wanted later, Flask routes can return JSON next to HTML without a SPA.
-- Cost: 2-3× option A; the frontend becomes the heaviest part of the repo.
-
-**Option D — Streamlit or NiceGUI**
-
-- Pros: fastest first screen.
-- Cons: their state model fights file-based data (reruns on every click, widgets keyed to session state); heavy dependency trees; hard to make a gate feel deliberate; weak fit for a portfolio project meant to be read.
-- Cost: cheapest start, most expensive to keep honest.
-
-**Option E — Keep Claude Code and Obsidian as the UI**
-
-- Pros: zero code; the skills already sequence the stages; `profile.report.md`already opens in Obsidian; the maintainer uses both.
-- Cons: the gates stay in the terminal; no PDF preview; a stranger without Claude Code has only the CLI; does not answer the request.
-
-**Recommendation.** Option A, in three vertical slices, each exercised on Robin and each a session with its own commit and tests:
-
-1. **Gate and views** (no LLM involved): profile screen built from the report's data (not from its Markdown) with statuses, evidence quotes and the completeness checklist; *verify* / *reject* buttons calling `facts.set_status`; the list of masters and applications with *render draft*, PDF preview, *approve* (sets `status: approved` and `approved_on`on the person's click, nothing else) and *render final*; a validate button showing the report. This alone is the human gate with a face.
-2. **Manual stage path in the browser**: choose a stage and its params, copy the pack, paste the answer, validate, see the result — `cvac stage pack`with a text box. Ugly but honest, and it works with any chat today.
-3. **API runner** (`cvac stage run`, roadmap item, its own ADR) and then the stage screen calls it with progress and the same gate afterwards.
-
-Also decided if A is chosen: `ui/` is inside the package, not a separate repository (a second repository would duplicate the process machinery and split the data contracts); the UI never commits to git — it shows the data root's `git status` and leaves committing to the person; nothing in the UI sets `verified` or `approved` except a handler bound to a button; the publication boundary and the existing tests keep running unchanged; an ADR records the choice (thin adapter over the library, server-rendered, local only) since it is costly to undo once screens exist. Roadmap wording in `docs/ARCHITECTURE.md` §10 ("HTML view of the profile report") is superseded by that ADR.
-
-If the real wish is a *conversational* UI — talking to the tool rather than clicking through it — then the answer is not A but slice 3 first (the API runner) and Claude Code as the surface, which already exists; say so and the recommendation changes.
-
-**Your answer.**
-
-> *Option A - dd/mm/yyyy*
-
-**Outcome.** *(filled in by Claude once implemented)*
-
 ### D-07 — The UI as the bridge to a person's data: scope, engine, order of the slices
 
-**Opened:** 2026-09-24 · **Blocks:** no — proceeding with the recommendation provisionally; the three questions at the end are the only ones that pause anything.
+**Opened:** 2026-09-24 · **Blocks:** no — proceeding with the recommendation provisionally; the three questions at the end are the only ones that pause anything. **Status:** points 1-3 of option A built (engine, UI slice 2, stages 40 and 70); point 4 (deterministic apply, form editor) roadmap.
 
 **Context.** After D-06 (option A, slice 1 built) the maintainer described what the UI is for: a bridge between the framework and a person's own data. On first open it asks where that data lives; then it offers (1) a place to configure one's data and have it written to that folder, (2) a place to read and edit it, (3) a place to drop documents from which Claude compiles the data, (4) a jobs area where postings are uploaded and from which Claude produces CVs, cover letters, interview preparation and gap-closing plans — and, throughout, the possibility to "ask Claude" by starting Claude processes from the UI. Every item maps onto something the framework already defines: (1) is `cvac init` plus a user scaffold plus the questionnaire of stage `05_interview`; (2) is the profile screen plus an editor over the data files; (3) is `inbox/` plus stage `03_extract`; (4) is `jobs/<id>/raw.txt` plus stages 10, 20, 30, 60 and the two stages still on trigger, `40_gap_plan` (plan WP-13, D24) and `70_interview_prep` (ADR-0005) — this request is their trigger. "Ask Claude" is the engine question of D-06 slice 3: verified on 2026-09-24, Claude Code's print mode can run a stage as a subprocess with the person's own login (ADR-0015); no API key is needed. What the framework does not have yet: a deterministic *apply* of an evidence note into the profile (roadmap: it needs a layout-preserving YAML writer) — today the skills have Claude apply the note in session.
 

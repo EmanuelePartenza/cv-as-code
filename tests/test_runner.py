@@ -39,8 +39,12 @@ if content is not None and out:
     with open(out, "w", encoding="utf-8") as h:
         h.write(open(content, encoding="utf-8").read())
 is_error = os.environ.get("FAKE_IS_ERROR") == "1"
+denials = []
+if os.environ.get("FAKE_DENY"):
+    denials = [{"tool_name": "Bash", "tool_input": {"command": "find / -name x"}}]
 print(json.dumps({"type": "result", "subtype": "success", "is_error": is_error,
-                  "result": "DONE " + str(out), "session_id": "s-1", "total_cost_usd": 0.0123}))
+                  "result": "DONE " + str(out), "session_id": "s-1", "total_cost_usd": 0.0123,
+                  "permission_denials": denials}))
 sys.exit(int(os.environ.get("FAKE_EXIT", "0")))
 '''
 
@@ -55,6 +59,7 @@ def fake_claude(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.delenv("FAKE_OUTPUT", raising=False)
     monkeypatch.delenv("FAKE_EXIT", raising=False)
     monkeypatch.delenv("FAKE_IS_ERROR", raising=False)
+    monkeypatch.delenv("FAKE_DENY", raising=False)
     return script
 
 
@@ -149,6 +154,16 @@ def test_run_reports_engine_errors_and_missing_output(
         run_stage(data_root, rs, engine="gpt")
 
 
+def test_run_lists_the_tool_calls_the_engine_was_denied(
+    data_root: DataRoot, fake_claude: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    write_job(data_root)
+    monkeypatch.setenv("FAKE_OUTPUT", str(match_file(tmp_path)))
+    monkeypatch.setenv("FAKE_DENY", "1")
+    result = run_stage(data_root, resolve_stage(data_root, "20_match", {"job_id": JOB_ID}))
+    assert result.ok and result.denied == ["Bash: find / -name x"]
+
+
 def test_summarise_event_reads_assistant_and_result_lines() -> None:
     assistant = json.dumps(
         {
@@ -166,6 +181,8 @@ def test_summarise_event_reads_assistant_and_result_lines() -> None:
         "result: done (cost 0.5000 USD)"
     )
     assert summarise_event(json.dumps({"type": "result", "is_error": True})) == "result: error"
+    denied = {"type": "result", "permission_denials": [{"tool_name": "Bash"}]}
+    assert summarise_event(json.dumps(denied)) == "result: done (1 tool call(s) denied)"
     assert summarise_event(json.dumps({"type": "user"})) is None
     assert summarise_event("plain text") == "plain text"
 

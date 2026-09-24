@@ -5,33 +5,26 @@
 > [DEVLOG.md](DEVLOG.md). First file to read at session start, last to update at
 > session end.
 
-**Updated:** 2026-09-23
+**Updated:** 2026-09-24
 **Phase:** v0.1.0 published (2026-09-22); v0.2 in progress
 
 ## In progress
 
-Building the public framework from the maintainer's private working repository,
-with fresh history. Done so far: the `cvac` package and CLI with data-root
-discovery (validate, resolve, render, cv, letter), the test suite and CI, the
-publication boundary (structural rules + keyed denylist, pre-commit and CI),
-the working method (verification engine, git hooks, process skills), the six
-stage contracts with `cvac stage list|show|pack`, the example user Robin
-Ashcombe produced through the stages and rendered by CI, the six domain skills
-installed by `cvac skills install`.
-
 v0.1.0 is public and tagged; CI is green on both Python versions. v0.2, not yet
-tagged, adds the data-in commands (`cvac profile report`, `cvac fact
-verify|reject`, extraction on a second document of the example),
-`identity_fields` per language and per spec (DEVLOG 1.1 closed), and the
-local web UI `cvac ui` (ADR-0014, decision D-06 option A): slice 1 of 3, the
-gate and the views, exercised on Robin and on the synthetic fixture.
+tagged, adds: the data-in commands (`cvac profile report`, `cvac fact
+verify|reject`); `identity_fields` per language and per spec; the local web UI
+`cvac ui` (ADR-0014); `cvac stage run`, a stage executed by Claude Code in
+print mode as a confined subprocess (ADR-0015); stages `40_gap_plan` and
+`70_interview_prep` with schemas, validator rules and skills.
 
-Audit of the plan (private `docs/PLAN-2026-09.md`) on 2026-09-22: every work
-package up to WP-12 is delivered. `05_interview` update mode is delivered
-differently from the plan's `--mode update` flag: the stage decides full or
-update from what the profile holds, and the questionnaire frontmatter records
-it. WP-13 (`40_gap_plan`) stays on its trigger (D24: the first session in which
-a user asks for it); WP-14 is roadmap only.
+The UI (decision D-07, 2026-09-24) is the bridge to a person's data: first
+open asks for the folder; new user; documents in (upload, extract, question-
+naire); an editor that saves only what validates; the jobs area with one
+button per stage; CV and letter gates; run logs. Every button is a library
+call; nothing verifies or approves without the person's click.
+
+The example user exercises stages 40 and 70 through the real engine (the
+outputs under `example/users/robin/growth/` and the application).
 
 ## Blockers
 
@@ -39,15 +32,13 @@ a user asks for it); WP-14 is roadmap only.
 
 ## Next steps
 
-1. Maintainer: review v0.2 (`cvac profile report`, `cvac fact verify`,
-   `identity_fields`), then `git push` and `git tag -a v0.2.0`.
-2. Maintainer, in the personal data root: the Italian master now shows the
-   date of birth by default (labels.it.yaml); keep it or set
-   `identity_fields: [phone, links]` in the spec.
-3. UI slice 2: the manual stage path in the browser (pack, paste the answer,
-   validate); then slice 3 over the API runner (`cvac stage run`, its own ADR).
-4. `40_gap_plan` when a user first asks for it; Robin's stretch match is the
-   test bed.
+1. Maintainer: answer the three questions of D-07 (the `claude` executable on
+   PATH, applying extraction notes, cost and model defaults); try `cvac ui`
+   on the personal data root end to end (a posting → stage 10 → 20).
+2. Maintainer: review v0.2, `git push`, `git tag -a v0.2.0`.
+3. A deterministic apply of an evidence note into the profile (layout-
+   preserving), so extraction no longer needs a second Claude run.
+4. Form-based editing once a layout-preserving YAML writer exists.
 
 ## Decisions pending
 
@@ -55,7 +46,7 @@ Full queue in [docs/05-decisions-open.md](docs/05-decisions-open.md).
 
 | ID | Title | Blocks? |
 |---|---|---|
-| D-06 | A user interface for the tool | decided (A); slices 2-3 in progress |
+| D-07 | The UI as the bridge to a person's data | no — three questions open, proceeding provisionally |
 
 ## Open proposals
 
@@ -72,9 +63,9 @@ Details in [DEVLOG.md](DEVLOG.md), which is the source of truth.
 <!-- AUTO:COMMITS -->
 | Hash | Date | Message |
 |---|---|---|
+| `6b8d96e` | 2026-09-24 | feat(ui): the data-root chooser, jobs, documents, editor, runs |
+| `9951353` | 2026-09-24 | feat(runner): cvac stage run over Claude Code, stages 40 and 70 |
+| `d2a6498` | 2026-09-23 | docs(ui): same-origin rule, one assertion tightened, STATUS |
 | `833dae2` | 2026-09-23 | feat(ui): a local web UI for the gates and views, cvac ui |
 | `67cef24` | 2026-09-22 | docs(decide): D-06, a user interface for the tool |
-| `be1afc6` | 2026-09-22 | docs(status): plan audit, v0.2 scope, DEVLOG 1.1 closed with its hash |
-| `51bcd00` | 2026-09-22 | feat(i18n): identity_fields per language and per spec |
-| `a303794` | 2026-09-22 | feat(data-in): profile report, fact verify/reject, second extraction |
 <!-- /AUTO:COMMITS -->
