@@ -162,7 +162,10 @@ def init_user(
         "identity": {
             "full_name": full_name.strip(),
             "born": None,
-            "location": {"city": city.strip(), "country": (country or "").strip() or None},
+            "location": {
+                "city": city.strip(),
+                **({"country": country.strip()} if country and country.strip() else {}),
+            },
             "email": email.strip(),
             "phone": None,
             "links": [],
@@ -184,7 +187,7 @@ def init_user(
         "markets": [
             {
                 "area": city.strip(),
-                "country": (country or "").strip() or None,
+                **({"country": country.strip()} if country and country.strip() else {}),
                 "modes": ["onsite", "hybrid", "remote"],
             }
         ],

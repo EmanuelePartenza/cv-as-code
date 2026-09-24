@@ -41,6 +41,8 @@ src/cv_as_code/
 ├── letter.py       letter.md × profile × labels → PDF in the CV's style
 ├── stages.py       stage contracts: list, resolve against a data root, pack for any engine
 ├── runner.py       `cvac stage run`: a stage executed by an engine (Claude Code in print mode, ADR-0015)
+│                   or, for a deterministic stage, by its code
+├── apply.py        stage 04 as code: a note's facts into the profile, additive and layout-preserving
 ├── scaffold.py     `cvac init` and a new user's first files (profile, search), never overwriting
 ├── skills.py       the Claude Code adapter: `cvac skills install` copies skills/ into a data root
 ├── report.py       `cvac profile report`: a generated Markdown view with a completeness checklist
@@ -124,8 +126,8 @@ posting (text)
 
 Upstream of the profile, three more stages bring data *in*: `03_extract` (a
 document or a filled questionnaire → an evidence note with proposed facts),
-`04_apply` (the note's facts into `profile.yaml` as `draft`, in place, the note
-marked `applied`) and `05_interview` (profile + search → a questionnaire in the
+`04_apply` (deterministic: the note's facts appended to `profile.yaml` as
+`draft`, every existing line untouched, the note marked `applied`) and `05_interview` (profile + search → a questionnaire in the
 user's language, only the missing items in update mode). Facts always enter as `draft`; `cvac fact
 verify|reject` is the gate and `cvac profile report` the view
 ([data-in.md](data-in.md), [ADR-0013](adr/0013-data-in.md)).
@@ -147,7 +149,7 @@ print the contracts resolved against a data root.
 | Stage | Gate | Status |
 |---|---|---|
 | `03_extract` | none (facts land as draft) | built; exercised by the example |
-| `04_apply` | none (facts land as draft) | built; exercised by the example |
+| `04_apply` | none (facts land as draft) | built, deterministic (code, no model); exercised by the example |
 | `05_interview` | none | built; exercised by the example |
 | `10_normalize` | none | built |
 | `20_match` | none | built |
@@ -262,9 +264,7 @@ README.
 - Application tracking (`application.yaml`, a generated index).
 - `i18n/markets/` — market conventions beyond language (photo, address shape);
   today only `identity_fields` per language and per spec exists.
-- A deterministic engine for `04_apply` (needs a layout-preserving YAML
-  writer), so applying a note no longer spends a model run; a photo asset for
-  markets that expect one.
+- A photo asset for markets that expect one.
 - In the UI: a form-based editor once a layout-preserving YAML writer
   exists; the manual stage path (pack, paste the answer) for people without
   Claude Code.

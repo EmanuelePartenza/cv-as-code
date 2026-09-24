@@ -204,3 +204,32 @@ def test_cli_stage_run_exit_codes(
     out = capsys.readouterr().out
     assert "ok: users/test/matches" in out and "[Write]" in out and "result: done" in out
     assert os.environ["CVAC_CLAUDE_BIN"] == str(fake_claude)
+
+
+def test_a_deterministic_stage_runs_without_any_engine(
+    data_root: DataRoot,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    from test_apply import fact, write_note
+
+    monkeypatch.setenv("CVAC_CLAUDE_BIN", str(tmp_path / "no-engine-at-all"))
+    write_note(data_root, fact("exp-acme", "Shipped releases", "r"))
+    rs = resolve_stage(data_root, "04_apply", {"name": "old-cv"})
+    lines: list[str] = []
+    result = run_stage(data_root, rs, on_line=lines.append)
+    assert result.ok and result.cost_usd is None and result.output == data_root.profile_path("test")
+    assert any("added exp-acme.f04 (draft)" in line for line in lines)
+    assert json.loads(result.log.read_text("utf-8").splitlines()[0]) == {
+        "type": "cvac",
+        "stage": "04_apply",
+        "engine": "code",
+    }
+    with pytest.raises(CvacError, match="already applied"):
+        run_stage(data_root, rs)
+    write_note(data_root, fact("exp-acme", "Another", "a"), name="two")
+    root = str(data_root.path)
+    assert main(["stage", "run", "04_apply", "--name", "two", "--data-root", root]) == 0
+    assert "added exp-acme.f05" in capsys.readouterr().out
+    assert main(["stage", "run", "04_apply", "--name", "two", "--data-root", root]) == 1

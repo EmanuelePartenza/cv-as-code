@@ -13,6 +13,19 @@ Tags: `arch`, `perf`, `ui`, `test`, `docs`, `fix`, `cleanup`, `sec`.
 
 ## 2026-09-24
 
+### feat(apply): stage 04 becomes deterministic — a note into the profile by code [arch]
+
+- `apply.py`: facts appended under their parent as `draft` with continued
+  ids, new parents appended, both list layouts handled, duplicates skipped,
+  the result validated before it stands, the note marked `applied`; no model.
+- `cvac stage run` executes a `deterministic` stage through its code, same
+  result shape and log; the UI's apply button no longer spends a run.
+- `validate.write_validated` shared by the editor and the apply.
+- Robin: a fourth document (the weather service's letter) extracted by the
+  engine and applied by code, a new project with four facts.
+- Files: `src/cv_as_code/apply.py`, `runner.py`, `validate.py`,
+  `pipeline/04_apply/io.yaml`, `tests/test_apply.py`, `example/`.
+
 ### feat(stages): 04_apply — an evidence note into the profile, as a contract [arch]
 
 - Stage `04_apply` (note + profile → profile edited in place, facts as

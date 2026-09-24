@@ -89,7 +89,7 @@ The framework's surface — code, messages, docs, stage instructions — is Engl
 
 ## Status
 
-`v0.2` — the CLI, nine stage contracts, the skills, the example, the profile report and the fact gate, a local web UI (`cvac ui`), a stage runner over Claude Code (`cvac stage run`), the tests and CI exist. Roadmap (designed, not built): an API runner for people without Claude Code, market conventions beyond language, connectors for posting APIs, application tracking, a deterministic engine for applying an evidence note. See docs/ARCHITECTURE.md §10 and the ADRs.
+`v0.2` — the CLI, nine stage contracts, the skills, the example, the profile report and the fact gate, a local web UI (`cvac ui`), a stage runner over Claude Code (`cvac stage run`), the tests and CI exist. Roadmap (designed, not built): an API runner for people without Claude Code, market conventions beyond language, connectors for posting APIs, application tracking. See docs/ARCHITECTURE.md §10 and the ADRs.
 
 Nothing personal is in this repository, by construction: [CONTRIBUTING.md](CONTRIBUTING.md) explains the publication boundary.
 

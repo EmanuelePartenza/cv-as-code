@@ -105,6 +105,17 @@ def test_example_carries_a_gap_plan_and_an_interview_prep_from_the_engine(
     assert growth in discover_all(example) and prep in discover_all(example)
 
 
+def test_example_carries_a_note_applied_by_the_deterministic_stage(example: DataRoot) -> None:
+    from cv_as_code.documents import load_document
+
+    note = load_document(example.path / "users" / "robin" / "notes" / "04-met-office-letter.md")
+    assert note["status"] == "applied" and note["new_parents"][0]["id"] == "prj-weather-logger"
+    profile = load_document(example.profile_path("robin"))
+    logger = next(p for p in profile["projects"] if p["id"] == "prj-weather-logger")
+    assert len(logger["facts"]) == 4 and all(f["status"] == "draft" for f in logger["facts"])
+    assert all(f["evidence"].startswith("notes/04-met-office-letter.md#") for f in logger["facts"])
+
+
 def test_the_gates_refuse_a_draft_fact_in_an_approved_spec(example: DataRoot) -> None:
     spec = example.path / MASTERS[0] / "cv-spec.yaml"
     spec.write_text(

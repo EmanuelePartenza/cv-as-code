@@ -30,16 +30,19 @@ The output is an **evidence note**, `users/<slug>/notes/old-cv.md`: its
 frontmatter lists the proposed facts, each with the verbatim passage it rests
 on; its body repeats the quotes under anchors. `cvac validate` checks that
 every proposed fact attaches to an existing experience or a declared new one.
-Then stage `04_apply` carries the note into the profile:
+Then stage `04_apply` carries the note into the profile — deterministic
+code, no model:
 
 ```bash
-cvac stage run 04_apply --user <slug> --name old-cv      # or: stage pack, or the UI's button
+cvac stage run 04_apply --user <slug> --name old-cv      # or the UI's button on the note
 ```
 
-The facts enter `profile.yaml` as `draft`, pointing at the note
-(`evidence: notes/old-cv.md#<anchor>`), with the smallest in-place edit; the
-note becomes `applied`; the document moves from `inbox/` to `sources/` by
-your hand.
+The facts are appended under their parent as `draft`, pointing at the note
+(`evidence: notes/old-cv.md#<anchor>`), ids continue the parent's numbering,
+new parents are appended to their list, and every existing line of the
+profile stays as it was; a fact the profile already holds is skipped; a
+result that would not validate is not written. The note becomes `applied`;
+the document moves from `inbox/` to `sources/` by your hand.
 
 ## 3. Verification (the human gate as a command)
 

@@ -23,9 +23,9 @@ naire); an editor that saves only what validates; the jobs area with one
 button per stage; CV and letter gates; run logs. Every button is a library
 call; nothing verifies or approves without the person's click.
 
-The example user exercises stages 03, 04, 40 and 70 through the real engine
-(a third document extracted and applied; the gap plan under
-`example/users/robin/growth/`; the preparation in the application).
+The example user exercises stages 03, 40 and 70 through the real engine and
+04 through its code (two more documents extracted and applied; the gap plan
+under `example/users/robin/growth/`; the preparation in the application).
 
 ## Blockers
 
@@ -37,9 +37,8 @@ The example user exercises stages 03, 04, 40 and 70 through the real engine
    → 03 → 04 → verify; a posting → 10 → 20 → 30); install Claude Code's CLI so
    the engine no longer depends on the VS Code extension's bundle.
 2. Maintainer: review v0.2, `git push`, `git tag -a v0.2.0`.
-3. A deterministic engine for `04_apply` (layout-preserving YAML writer), so
-   applying a note no longer spends a model run.
-4. Form-based editing once that writer exists.
+3. Form-based editing of the profile (the layout-preserving insertions of
+   `apply.py` are the seed of the writer it needs).
 
 ## Decisions pending
 
@@ -64,9 +63,9 @@ Details in [DEVLOG.md](DEVLOG.md), which is the source of truth.
 <!-- AUTO:COMMITS -->
 | Hash | Date | Message |
 |---|---|---|
+| `82565d9` | 2026-09-24 | feat(stages): 04_apply, an evidence note into the profile as a contract |
 | `0cc154e` | 2026-09-24 | test: keep the config directory visible to the boundary test |
 | `6bb159d` | 2026-09-24 | feat(example): Robin's gap plan and interview prep from the real engine |
 | `ae199c8` | 2026-09-24 | feat(example): Robin's gap plan and interview prep from the real engine |
 | `6b8d96e` | 2026-09-24 | feat(ui): the data-root chooser, jobs, documents, editor, runs |
-| `9951353` | 2026-09-24 | feat(runner): cvac stage run over Claude Code, stages 40 and 70 |
 <!-- /AUTO:COMMITS -->

@@ -429,3 +429,16 @@ def validate_files(root: DataRoot, files: list[Path]) -> Report:
     for path in files:
         validate_file(root, Path(path), rep)
     return rep
+
+
+def write_validated(root: DataRoot, path: Path, text: str) -> Report:
+    """Write text and validate the file; on errors the previous content is restored."""
+    before = path.read_text("utf-8") if path.is_file() else None
+    path.write_text(text, "utf-8")
+    rep = validate_files(root, [path])
+    if rep.errors:
+        if before is None:
+            path.unlink()
+        else:
+            path.write_text(before, "utf-8")
+    return rep

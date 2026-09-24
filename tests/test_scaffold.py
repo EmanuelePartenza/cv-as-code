@@ -63,3 +63,11 @@ def test_default_user_is_set_once(tmp_path: Path) -> None:
     assert text.count("default_user:") == 1 and "default_user: first" in text
     with pytest.raises(CvacError, match="already exists"):
         init_data_root(tmp_path / "dr")
+
+
+def test_a_user_without_a_country_validates(tmp_path: Path) -> None:
+    root = DataRoot.load(init_data_root(tmp_path / "dr"))
+    init_user(root, "ada", "Ada", "a@example.org", "Testville", None, target_roles=["x"])
+    assert validate_files(root, discover_all(root)).errors == []
+    profile = yaml.safe_load(root.profile_path("ada").read_text("utf-8"))
+    assert "country" not in profile["identity"]["location"]

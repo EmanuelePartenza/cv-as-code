@@ -487,30 +487,27 @@ def test_a_missing_engine_is_an_immediate_message_not_a_thread(
 
 
 def test_apply_button_runs_stage_04_on_a_proposed_note_only(
-    data_root: DataRoot, ui_env: Path, monkeypatch: pytest.MonkeyPatch
+    data_root: DataRoot, ui_env: Path
 ) -> None:
-    import stat
+    from test_apply import fact, write_note
 
-    from test_runner import FAKE
-
-    fake = ui_env / "fake-claude"
-    fake.write_text(FAKE, "utf-8")
-    fake.chmod(fake.stat().st_mode | stat.S_IXUSR)
-    monkeypatch.setenv("CVAC_CLAUDE_BIN", str(fake))
-    notes = data_root.path / "users" / "test" / "notes"
-    notes.mkdir(parents=True, exist_ok=True)
-    fm = "---\nschema_version: 1\nkind: evidence\nuser: test\nsource: inbox/x.md\n"
-    fm += "extracted_on: '2026-01-05'\nstatus: {status}\nfacts: []\n---\n\n# note\n"
-    (notes / "fresh.md").write_text(fm.format(status="proposed"), "utf-8")
-    (notes / "done.md").write_text(fm.format(status="applied"), "utf-8")
+    write_note(data_root, fact("exp-acme", "Shipped releases", "r"), name="fresh")
+    write_note(data_root, fact("exp-acme", "Older", "o"), name="done")
+    done = data_root.path / "users" / "test" / "notes" / "done.md"
+    done.write_text(done.read_text("utf-8").replace("status: proposed", "status: applied"), "utf-8")
     app = create_app(data_root)
     app.config["TESTING"] = True
     c = app.test_client()
     body = page(c, "/u/test/documents")
-    assert body.count("Apply to the profile with Claude (04)") == 1
+    assert body.count("Apply to the profile (04)") == 1
     r = c.post("/u/test/documents/apply", data={"name": "fresh"})
     assert r.status_code == 302 and "/runs/" in r.headers["Location"]
     run = app.extensions["cvac"].runs.wait(r.headers["Location"].rsplit("/", 1)[1])
-    assert run.stage == "04_apply" and run.params == {"user": "test", "name": "fresh"}
+    assert run.status == "ok" and run.stage == "04_apply"
+    assert "added exp-acme.f04 (draft)" in page(c, f"/runs/{run.id}")
+    assert "exp-acme.f04" in page(c, "/u/test")
     assert "is not an evidence note" in post(c, "/u/test/documents/apply", name="ghost")
     assert "is not an evidence note" in post(c, "/u/test/documents/apply", name="../profile")
+    r = c.post("/u/test/documents/apply", data={"name": "done"})
+    run = app.extensions["cvac"].runs.wait(r.headers["Location"].rsplit("/", 1)[1])
+    assert run.status == "failed" and "already applied" in page(c, f"/runs/{run.id}")

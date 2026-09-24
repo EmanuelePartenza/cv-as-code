@@ -18,6 +18,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from .apply import apply_note
 from .dataroot import DataRoot
 from .errors import CvacError
 from .stages import ResolvedStage, pack
@@ -30,6 +31,10 @@ ALLOWED_TOOLS = (
     "Bash(cvac validate:*),Bash(cvac stage:*),Bash(cvac profile:*)"
 )
 DISALLOWED_TOOLS = "Bash(git:*),Bash(rm:*),WebFetch,WebSearch"
+# Stages whose engine is code, not a model: `stage run` executes them directly (ADR-0002).
+DETERMINISTIC: dict[str, Callable[[DataRoot, ResolvedStage], list[str]]] = {
+    "04_apply": lambda root, rs: apply_note(root, rs.params["user"], rs.params["name"]).lines,
+}
 ENGINE_NOTE = """
 
 ---
@@ -174,6 +179,8 @@ def run_stage(
     binary: Path | None = None,
 ) -> RunResult:
     """Run one resolved stage to completion; the log holds every engine event."""
+    if rs.stage.contract.get("engine") == "deterministic":
+        return _run_deterministic(root, rs, on_line, log_path)
     if engine not in ENGINES:
         raise CvacError(f"unknown engine `{engine}` (known: {', '.join(ENGINES)})")
     binary = binary or find_claude()
@@ -255,6 +262,52 @@ def _short(tool_input: Any) -> str:
         return ""
     value = tool_input.get("command") or tool_input.get("file_path") or tool_input.get("url") or ""
     return str(value)[:120]
+
+
+def _run_deterministic(
+    root: DataRoot,
+    rs: ResolvedStage,
+    on_line: Callable[[str], None] | None,
+    log_path: Path | None,
+) -> RunResult:
+    """A stage implemented in code: same result shape, same validation, no model."""
+    fn = DETERMINISTIC.get(rs.stage.name)
+    if fn is None:
+        raise CvacError(f"stage {rs.stage.name} is deterministic but has no implementation")
+    assert rs.output is not None
+    log = log_path or _log_path(rs.stage.name)
+    with log.open("w", encoding="utf-8") as handle:
+        handle.write(json.dumps({"type": "cvac", "stage": rs.stage.name, "engine": "code"}) + "\n")
+        try:
+            lines = fn(root, rs)
+        except CvacError as e:
+            event = json.dumps({"type": "result", "is_error": True, "result": str(e)})
+            handle.write(event + "\n")
+            if on_line:
+                on_line(event)
+            raise
+        for text in lines:
+            event = json.dumps(
+                {"type": "assistant", "message": {"content": [{"type": "text", "text": text}]}}
+            )
+            handle.write(event + "\n")
+            if on_line:
+                on_line(event)
+        done = json.dumps({"type": "result", "is_error": False, "result": f"DONE {rs.output_rel}"})
+        handle.write(done + "\n")
+        if on_line:
+            on_line(done)
+    rep = validate_files(root, [rs.output])
+    return RunResult(
+        stage=rs.stage.name,
+        output=rs.output,
+        output_rel=rs.output_rel,
+        log=log,
+        exit_code=0,
+        written=rs.output.is_file(),
+        errors=list(rep.errors),
+        warnings=list(rep.warnings),
+    )
 
 
 def _event(line: str) -> dict[str, Any]:

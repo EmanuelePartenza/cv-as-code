@@ -13,7 +13,7 @@ from ..dataroot import DataRoot
 from ..documents import load_document
 from ..errors import CvacError
 from ..scaffold import init_user
-from ..validate import validate_files
+from ..validate import write_validated
 from . import views
 from .state import current_root, state
 
@@ -75,22 +75,6 @@ def next_questionnaire_name(udir: Path) -> str:
 
 def editable(rel: str) -> bool:
     return any(rx.match(rel) for rx in EDITABLE)
-
-
-def save_validated(root: DataRoot, path: Path, text: str) -> list[str]:
-    """Write text, validate the file; on errors restore the previous content and return them."""
-    before = path.read_text("utf-8") if path.is_file() else None
-    path.write_text(text, "utf-8")
-    rep = validate_files(root, [path])
-    if rep.errors:
-        if before is None:
-            path.unlink()
-        else:
-            path.write_text(before, "utf-8")
-        return rep.errors
-    for w in rep.warnings:
-        flash(w, "warn")
-    return []
 
 
 @bp.get("/u/<user>/documents")
@@ -200,7 +184,10 @@ def edit(user: str, rel: str):
     text = path.read_text("utf-8") if path.is_file() else ""
     if request.method == "POST":
         text = request.form.get("text", "").replace("\r\n", "\n")
-        errors = save_validated(root, path, text)
+        rep = write_validated(root, path, text)
+        errors = rep.errors
+        for w in rep.warnings:
+            flash(w, "warn")
         if not errors:
             flash(f"{rel} saved and valid", "ok")
             return redirect(url_for("data.edit", user=user, rel=rel))
