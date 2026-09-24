@@ -1,0 +1,24 @@
+# Section headings and display strings for German CVs.
+# Read by resolve/letter; injected resolved into the render input.
+schema_version: 1
+kind: labels
+language: de
+sections:
+  summary: Profil
+  experience: Berufserfahrung
+  projects: Projekte
+  skills: Fachliche Kompetenzen
+  education: Ausbildung
+  languages: Sprachen
+present: heute
+date_format: MM.YYYY
+identity_fields: [phone, links, born]
+born: Geburtsdatum
+months: [Januar, Februar, März, April, Mai, Juni, Juli, August, September, Oktober, November, Dezember]
+language_names:
+  de: Deutsch
+  en: Englisch
+  fr: Französisch
+  it: Italienisch
+levels:
+  native: Muttersprache

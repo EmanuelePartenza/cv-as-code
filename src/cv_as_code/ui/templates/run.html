@@ -1,16 +1,16 @@
 {% extends "base.html" %}
-{% block title %}Run {{ run.stage }}{% endblock %}
+{% block title %}{{ t('Run') }} {{ run.stage }}{% endblock %}
 {% block content %}
 {% if run.status == 'running' %}<meta http-equiv="refresh" content="3">{% endif %}
-<p class="muted"><a href="{{ url_for('runs.runs') }}">Runs</a> › {{ run.id }}</p>
-<h1>{{ run.stage }} <span class="badge {{ run.status }}">{{ run.status }}</span></h1>
-<p>{% for k, v in run.params.items() %}<code>{{ k }}={{ v }}</code> {% endfor %} · started {{ run.started.strftime('%H:%M:%S') }}{% if run.result and run.result.cost_usd is not none %} · cost {{ '%.4f'|format(run.result.cost_usd) }} USD{% endif %}</p>
+<p class="muted"><a href="{{ url_for('runs.runs') }}">{{ t('Runs') }}</a> › {{ run.id }}</p>
+<h1>{{ run.stage }} <span class="badge {{ run.status }}">{{ t(run.status) }}</span></h1>
+<p>{% for k, v in run.params.items() %}<code>{{ k }}={{ v }}</code> {% endfor %} · {{ t('started') }} {{ run.started.strftime('%H:%M:%S') }}{% if run.result and run.result.cost_usd is not none %} · {{ t('cost') }} {{ '%.4f'|format(run.result.cost_usd) }} USD{% endif %}</p>
 <p class="{{ 'good' if run.status == 'ok' else ('bad' if run.status == 'failed' else 'muted') }}">{{ run.summary }}</p>
-{% if run.status == 'running' %}<p class="muted">Claude is working in your data root; this page refreshes itself.</p>{% endif %}
-<p><a href="{{ run.back_url }}">Back to where you started</a></p>
+{% if run.status == 'running' %}<p class="muted">{{ t('Claude is working in your data root; this page refreshes itself.') }}</p>{% endif %}
+<p><a href="{{ run.back_url }}">{{ t('Back to where you started') }}</a></p>
 {% if run.result and run.result.warnings %}<ul class="report">{% for w in run.result.warnings %}<li class="warn">{{ w }}</li>{% endfor %}</ul>{% endif %}
-<h2>Log</h2>
+<h2>{{ t('Log') }}</h2>
 <pre class="log">{% for line in run.lines %}{{ line }}
 {% endfor %}</pre>
-{% if run.result %}<p class="muted">Full event log: <code>{{ run.result.log }}</code></p>{% endif %}
+{% if run.result %}<p class="muted">{{ t('Full event log:') }} <code>{{ run.result.log }}</code></p>{% endif %}
 {% endblock %}

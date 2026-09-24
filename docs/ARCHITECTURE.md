@@ -57,7 +57,7 @@ src/cv_as_code/
 │                   40_gap_plan · 60_letter · 70_interview_prep (INSTRUCTIONS.md + io.yaml each;
 │                   05 also ships the questionnaire skeleton)
 ├── skills/         cv-master · job-ingest · cv-tailor · cover-letter · gap-plan · interview-prep · onboard
-├── i18n/           labels.it.yaml · labels.fr.yaml · labels.en.yaml
+├── i18n/           labels.en.yaml · labels.fr.yaml · labels.de.yaml · labels.it.yaml
 └── templates/      classic/{template,letter}.typ · lib/common.typ · fonts/ (Lato, OFL)
 ```
 
@@ -206,6 +206,14 @@ as a thread over `cvac stage run` with a live log page; the validation
 report; the data root's git status (the UI never commits). A POST whose
 `Origin` or `Referer` is not the UI's own host is refused, so another page
 open in the browser cannot press a gate button.
+
+The UI's chrome speaks the person's language — English, French, German or
+Italian, chosen in the header and remembered in the user's config
+directory, the browser's language before a choice; library messages
+(validation, gates, engine logs) stay English
+([ADR-0016](adr/0016-ui-in-the-persons-language.md)). The chooser browses
+the machine's folders, opens a data root, creates one in an empty folder or
+in a new folder it makes.
 
 ## 6. Templates and rendering
 

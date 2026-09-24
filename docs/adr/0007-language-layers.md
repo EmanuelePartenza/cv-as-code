@@ -1,6 +1,6 @@
 # ADR-0007 — Language layers: English framework surface, user locale data
 
-- **Status**: accepted
+- **Status**: accepted; amended by [ADR-0016](0016-ui-in-the-persons-language.md) (the UI's chrome is translated)
 - **Date**: 2026-09-21
 
 ## Context

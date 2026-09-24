@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,17 +11,22 @@
   <a class="brand" href="{{ url_for('index') }}">cv-as-code</a>
   <nav>
     {% if default_user %}
-      <a href="{{ url_for('profile', user=default_user) }}">Profile</a>
-      <a href="{{ url_for('data.documents', user=default_user) }}">Documents</a>
-      <a href="{{ url_for('jobs.listing', user=default_user) }}">Jobs</a>
-      <a href="{{ url_for('cvs', user=default_user) }}">CVs</a>
+      <a href="{{ url_for('profile', user=default_user) }}">{{ t('Profile') }}</a>
+      <a href="{{ url_for('data.documents', user=default_user) }}">{{ t('Documents') }}</a>
+      <a href="{{ url_for('jobs.listing', user=default_user) }}">{{ t('Jobs') }}</a>
+      <a href="{{ url_for('cvs', user=default_user) }}">{{ t('CVs') }}</a>
     {% endif %}
     {% if root_path %}
-      <a href="{{ url_for('runs.runs') }}">Runs</a>
-      <a href="{{ url_for('validate') }}">Validate</a>
+      <a href="{{ url_for('runs.runs') }}">{{ t('Runs') }}</a>
+      <a href="{{ url_for('validate') }}">{{ t('Validate') }}</a>
     {% endif %}
   </nav>
-  <span class="root" title="data root">{% if root_path %}{{ root_path }} · <a href="{{ url_for('open_root') }}">change</a>{% else %}no data root open{% endif %}</span>
+  <span class="root" title="{{ t('data root') }}">{% if root_path %}{{ root_path }} · <a href="{{ url_for('open_root') }}">{{ t('change') }}</a>{% else %}{{ t('no data root open') }}{% endif %}</span>
+  <form method="post" action="{{ url_for('language') }}" class="lang">
+    <input type="hidden" name="next" value="{{ request.path }}">
+    <select name="lang" aria-label="{{ t('Language') }}">{% for code, name in languages.items() %}<option value="{{ code }}"{% if code == lang %} selected{% endif %}>{{ name }}</option>{% endfor %}</select>
+    <button>{{ t('OK') }}</button>
+  </form>
 </header>
 <main>
   {% with messages = get_flashed_messages(with_categories=true) %}
@@ -35,6 +40,6 @@
   {% endwith %}
   {% block content %}{% endblock %}
 </main>
-<footer>Local UI over the same library as <code>cvac</code>. Every verify and approve here is your act; nothing is committed to git by this page.</footer>
+<footer>{{ t('Local UI over the same library as the cvac command. Every verify and approve here is your act; nothing is committed to git by this page.') }}</footer>
 </body>
 </html>

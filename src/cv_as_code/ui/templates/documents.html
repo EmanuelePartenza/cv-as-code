@@ -1,52 +1,52 @@
 {% extends "base.html" %}
-{% block title %}Documents · {{ user }}{% endblock %}
+{% block title %}{{ t('Documents') }} · {{ user }}{% endblock %}
 {% block content %}
-<h1>Documents — <code>{{ user }}</code></h1>
-<p class="muted">Facts enter the profile from documents: a filled questionnaire, an old CV, a review. Claude extracts them into an evidence note with the passage each fact rests on; they land as <em>draft</em> and you verify them on the <a href="{{ url_for('profile', user=user) }}">profile</a>.</p>
+<h1>{{ t('Documents') }} — <code>{{ user }}</code></h1>
+<p class="muted">{{ t('Facts enter the profile from documents: a filled questionnaire, an old CV, a review. Claude extracts them into an evidence note with the passage each fact rests on; they land as draft and you verify them on the profile.') }}</p>
 
 <section class="two">
   <div>
-    <h2>Questionnaire</h2>
-    <p class="muted">Claude writes it in your language; you fill it in at your own pace (edit it here), set <code>status: filled</code>, then extract it.</p>
+    <h2>{{ t('Questionnaire') }}</h2>
+    <p class="muted">{{ t('Claude writes it in your language; you fill it in at your own pace (edit it here), set status: filled, then extract it.') }}</p>
     <form method="post" action="{{ url_for('data.questionnaire', user=user) }}" class="inline">
-      <label>Name <input name="name" value="{{ next_name }}" pattern="[a-z0-9][a-z0-9-]*"></label>
-      <button>Generate with Claude (05)</button>
+      <label>{{ t('Name') }} <input name="name" value="{{ next_name }}" pattern="[a-z0-9][a-z0-9-]*"></label>
+      <button>{{ t('Generate with Claude (05)') }}</button>
     </form>
     <ul>
       {% for f in d.interviews %}
-      <li><a href="{{ url_for('data.edit', user=user, rel=f.rel) }}">{{ f.name }}</a> {% if f.status %}<span class="badge {{ f.status }}">{{ f.status }}</span>{% endif %}
-        <form method="post" action="{{ url_for('data.extract', user=user) }}" class="inline"><input type="hidden" name="document" value="{{ f.rel }}"><input type="hidden" name="name" value="{{ f.name[:-3] }}"><button {% if f.status != 'filled' %}disabled title="fill it in first"{% endif %}>Extract (03)</button></form>
+      <li><a href="{{ url_for('data.edit', user=user, rel=f.rel) }}">{{ f.name }}</a> {% if f.status %}<span class="badge {{ f.status }}">{{ t(f.status) }}</span>{% endif %}
+        <form method="post" action="{{ url_for('data.extract', user=user) }}" class="inline"><input type="hidden" name="document" value="{{ f.rel }}"><input type="hidden" name="name" value="{{ f.name[:-3] }}"><button {% if f.status != 'filled' %}disabled title="{{ t('fill it in first') }}"{% endif %}>{{ t('Extract (03)') }}</button></form>
       </li>
       {% endfor %}
     </ul>
   </div>
   <div>
-    <h2>Upload a document</h2>
+    <h2>{{ t('Upload a document') }}</h2>
     <form method="post" action="{{ url_for('data.upload', user=user) }}" enctype="multipart/form-data" class="inline">
       <input type="file" name="file" required>
-      <button>Upload to inbox</button>
+      <button>{{ t('Upload to inbox') }}</button>
     </form>
-    <h3>Inbox</h3>
+    <h3>{{ t('Inbox') }}</h3>
     <ul>
       {% for f in d.inbox %}
       <li>{{ f.name }}
-        <form method="post" action="{{ url_for('data.extract', user=user) }}" class="inline"><input type="hidden" name="document" value="{{ f.rel }}"><label>note name <input name="name" value="{{ f.name.rsplit('.', 1)[0]|lower|replace(' ', '-')|replace('_', '-') }}" size="18" pattern="[a-z0-9][a-z0-9-]*"></label><button>Extract (03)</button></form>
+        <form method="post" action="{{ url_for('data.extract', user=user) }}" class="inline"><input type="hidden" name="document" value="{{ f.rel }}"><label>{{ t('note name') }} <input name="name" value="{{ f.name.rsplit('.', 1)[0]|lower|replace(' ', '-')|replace('_', '-') }}" size="18" pattern="[a-z0-9][a-z0-9-]*"></label><button>{{ t('Extract (03)') }}</button></form>
       </li>
-      {% else %}<li class="muted">empty</li>{% endfor %}
+      {% else %}<li class="muted">{{ t('empty') }}</li>{% endfor %}
     </ul>
-    <h3>Sources (archived)</h3>
-    <ul>{% for f in d.sources %}<li>{{ f.name }}</li>{% else %}<li class="muted">none</li>{% endfor %}</ul>
+    <h3>{{ t('Sources (archived)') }}</h3>
+    <ul>{% for f in d.sources %}<li>{{ f.name }}</li>{% else %}<li class="muted">{{ t('none') }}</li>{% endfor %}</ul>
   </div>
 </section>
 
-<h2>Evidence notes</h2>
+<h2>{{ t('Evidence notes') }}</h2>
 <ul>
-  {% for f in d.notes %}<li><a href="{{ url_for('data.edit', user=user, rel=f.rel) }}">{{ f.name }}</a> {% if f.status %}<span class="badge {{ f.status }}">{{ f.status }}</span>{% endif %}
-    {% if f.status == 'proposed' %}<form method="post" action="{{ url_for('data.apply_note', user=user) }}" class="inline"><input type="hidden" name="name" value="{{ f.name[:-3] }}"><button>Apply to the profile (04)</button></form>{% endif %}
-  </li>{% else %}<li class="muted">none yet</li>{% endfor %}
+  {% for f in d.notes %}<li><a href="{{ url_for('data.edit', user=user, rel=f.rel) }}">{{ f.name }}</a> {% if f.status %}<span class="badge {{ f.status }}">{{ t(f.status) }}</span>{% endif %}
+    {% if f.status == 'proposed' %}<form method="post" action="{{ url_for('data.apply_note', user=user) }}" class="inline"><input type="hidden" name="name" value="{{ f.name[:-3] }}"><button>{{ t('Apply to the profile (04)') }}</button></form>{% endif %}
+  </li>{% else %}<li class="muted">{{ t('none yet') }}</li>{% endfor %}
 </ul>
-<p class="muted">Applying a note is deterministic: its facts are appended to <code>profile.yaml</code> as <em>draft</em>, each pointing at its passage, and nothing else in the file moves; nothing becomes verified here.</p>
+<p class="muted">{{ t('Applying a note is deterministic: its facts are appended to profile.yaml as draft, each pointing at its passage, and nothing else in the file moves; nothing becomes verified here.') }}</p>
 
-<h2>Data files</h2>
-<p><a href="{{ url_for('data.edit', user=user, rel='profile.yaml') }}">profile.yaml</a> · <a href="{{ url_for('data.edit', user=user, rel='search.yaml') }}">search.yaml</a> — edited as text, validated before saving.</p>
+<h2>{{ t('Data files') }}</h2>
+<p><a href="{{ url_for('data.edit', user=user, rel='profile.yaml') }}">profile.yaml</a> · <a href="{{ url_for('data.edit', user=user, rel='search.yaml') }}">search.yaml</a> — {{ t('edited as text, validated before saving.') }}</p>
 {% endblock %}

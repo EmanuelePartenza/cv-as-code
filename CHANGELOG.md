@@ -11,6 +11,21 @@ Tags: `arch`, `perf`, `ui`, `test`, `docs`, `fix`, `cleanup`, `sec`.
 
 ---
 
+## 2026-09-25
+
+### feat(ui): four languages for the UI, a folder browser in the chooser [ui, arch]
+
+- The UI's chrome in English, French, German and Italian: selector in the
+  header, choice remembered in `~/.config/cvac/ui.yaml`, browser language
+  before a choice; catalogs in `ui/i18n/`, a test keeps them complete;
+  library messages stay English (ADR-0016, amending ADR-0007).
+- `labels.de.yaml`: German CVs render; `de` named in every labels file; the
+  new-user form offers the four languages as pivot.
+- The chooser browses folders (hidden ones skipped, data roots marked),
+  opens a root, creates one in an empty folder or in a new folder it makes.
+- Files: `src/cv_as_code/ui/i18n.py`, `ui/i18n/*.yaml`, templates,
+  `ui/state.py`, `i18n/labels.de.yaml`, `tests/test_ui_i18n.py`.
+
 ## 2026-09-24
 
 ### feat(apply): stage 04 becomes deterministic — a note into the profile by code [arch]

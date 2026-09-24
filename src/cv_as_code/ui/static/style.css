@@ -59,3 +59,7 @@ ol.pipeline li { margin: 8px 0; } ol.pipeline form { margin-left: 8px; }
 pre.log { max-height: 60vh; overflow: auto; white-space: pre-wrap; }
 .badge.running { background: #dbeafe; color: #1e3a8a; } .badge.ok, .badge.apply, .badge.filled, .badge.applied { background: #d1fae5; color: #065f46; }
 .badge.failed, .badge.skip, .badge.invalid { background: #fee2e2; color: #991b1b; } .badge.stretch, .badge.to-fill, .badge.proposed { background: #fef3c7; color: #92400e; }
+form.lang { display: inline-flex; gap: 4px; margin-left: 12px; } form.lang select { font: inherit; font-size: 12px; padding: 2px 4px; }
+ul.folders { list-style: none; padding: 0; max-height: 50vh; overflow: auto; border: 1px solid var(--line); background: white; border-radius: 4px; }
+ul.folders li { padding: 4px 10px; border-bottom: 1px solid var(--line); } ul.folders li:last-child { border-bottom: none; }
+p.path code { font-size: 13px; }

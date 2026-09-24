@@ -1,0 +1,230 @@
+# UI chrome, German. Keys are the English strings (ADR-0016).
+? A posting enters verbatim as jobs/<id>/raw.txt; every step after that is a stage run by Claude and checked by the validator.
+: Eine Stellenanzeige kommt wörtlich nach jobs/<id>/raw.txt; jeder weitere Schritt ist eine Stufe, die Claude ausführt und der Validator prüft.
+Add a posting: Stellenanzeige hinzufügen
+Apply to the profile (04): Ins Profil übernehmen (04)
+? 'Applying a note is deterministic: its facts are appended to profile.yaml as draft, each pointing at its passage, and nothing else in the file moves; nothing becomes verified here.'
+: 'Das Übernehmen einer Notiz ist deterministisch: ihre Fakten werden als Entwurf an profile.yaml angehängt, jeder mit Verweis auf seine Textstelle, und sonst bewegt sich nichts in der Datei; nichts wird hier verifiziert.'
+Approve: Freigeben
+Approve letter: Anschreiben freigeben
+Approve this CV as it is? This is your sign-off.: Diesen Lebenslauf so freigeben? Das ist Ihre Unterschrift.
+Approve this letter as it is? This is your sign-off.: Dieses Anschreiben so freigeben? Das ist Ihre Unterschrift.
+Back to the start: Zurück zum Anfang
+Back to where you started: Zurück zum Ausgangspunkt
+Browse: Durchsuchen
+CVs: Lebensläufe
+CVs and applications: Lebensläufe und Bewerbungen
+Cited facts: Zitierte Fakten
+City: Stadt
+Claude is working in your data root; this page refreshes itself.: Claude arbeitet in Ihrem Datenordner; diese Seite aktualisiert sich selbst.
+'Claude writes it in your language; you fill it in at your own pace (edit it here), set status: filled, then extract it.': 'Claude schreibt ihn in Ihrer Sprache; Sie füllen ihn in Ihrem Tempo aus (hier bearbeiten), setzen status: filled und extrahieren ihn dann.'
+Company: Unternehmen
+Completeness: Vollständigkeit
+Country code (ISO, optional): Ländercode (ISO, optional)
+Cover letter: Anschreiben
+Cover letter (60): Anschreiben (60)
+Create: Anlegen
+Create it and start there: Anlegen und dort beginnen
+Create the data root here: Datenordner hier anlegen
+Data files: Datendateien
+Data root: Datenordner
+Date: Datum
+Documents: Dokumente
+E-mail for applications: E-Mail für Bewerbungen
+? Each run is Claude Code in print mode inside your data root, with file tools only; the result counts only if it validates. Approval of the CV and the letter stays on their page.
+: Jeder Lauf ist Claude Code im Print-Modus in Ihrem Datenordner, nur mit Dateiwerkzeugen; das Ergebnis zählt nur, wenn es validiert. Die Freigabe von Lebenslauf und Anschreiben bleibt auf deren Seite.
+Education: Ausbildung
+Error: Fehler
+Errors: Fehler
+Evidence notes: Belegnotizen
+Extract (03): Extrahieren (03)
+Facts: Fakten
+? 'Facts enter the profile from documents: a filled questionnaire, an old CV, a review. Claude extracts them into an evidence note with the passage each fact rests on; they land as draft and you verify them on the profile.'
+: 'Fakten gelangen aus Dokumenten ins Profil: ein ausgefüllter Fragebogen, ein alter Lebenslauf, eine Beurteilung. Claude extrahiert sie in eine Belegnotiz mit der Textstelle, auf der jeder Fakt beruht; sie landen als Entwurf und Sie verifizieren sie im Profil.'
+Folder name: Ordnername
+'Full event log:': 'Vollständiges Ereignisprotokoll:'
+Full name: Vollständiger Name
+Gap plan: Lückenplan
+Gap plan (40): Lückenplan (40)
+Generate with Claude (05): Mit Claude erzeugen (05)
+Go: Los
+Identity: Identität
+Inbox: Eingang
+Interview preparation: Vorbereitung auf das Gespräch
+Interview preparation (70): Vorbereitung auf das Gespräch (70)
+Jobs: Stellen
+Language: Sprache
+Languages: Sprachen
+? Local UI over the same library as the cvac command. Every verify and approve here is your act; nothing is committed to git by this page.
+: Lokale Oberfläche über derselben Bibliothek wie der Befehl cvac. Jedes Verifizieren und Freigeben hier ist Ihre Handlung; diese Seite committet nichts in git.
+Log: Protokoll
+Match: Abgleich
+Match (20): Abgleich (20)
+Name: Name
+New folder here: Neuer Ordner hier
+New user: Neuer Benutzer
+'No PDF yet: render a draft.': 'Noch kein PDF: erzeugen Sie einen Entwurf.'
+No anchored passage; open the note.: Keine verankerte Textstelle; öffnen Sie die Notiz.
+No facts.: Keine Fakten.
+'No letter PDF yet: render a draft.': 'Noch kein PDF des Anschreibens: erzeugen Sie einen Entwurf.'
+No posting yet.: Noch keine Stellenanzeige.
+No run in this session.: Kein Lauf in dieser Sitzung.
+No user yet.: Noch kein Benutzer.
+Normalise (10): Normalisieren (10)
+Not a git repository (or git is not available).: Kein git-Repository (oder git ist nicht verfügbar).
+Not found: Nicht gefunden
+'Not saved: validation errors': 'Nicht gespeichert: Validierungsfehler'
+Nothing here yet.: Hier ist noch nichts.
+Nothing missing that the framework can see.: Es fehlt nichts, was das Framework sehen kann.
+OK: OK
+Open a data root: Datenordner öffnen
+Open this data root: Diesen Datenordner öffnen
+Pipeline: Pipeline
+Pivot language: Pivotsprache
+Posting: Stellenanzeige
+Postings: Stellenanzeigen
+Profile: Profil
+Profile and facts: Profil und Fakten
+Questionnaire: Fragebogen
+Recent: Zuletzt
+Reject: Ablehnen
+Render draft: Entwurf erzeugen
+Render final: Endfassung erzeugen
+Role title: Stellenbezeichnung
+Run: Lauf
+Run with Claude: Mit Claude ausführen
+Runs: Läufe
+Same rules as cvac validate --all.: Dieselben Regeln wie cvac validate --all.
+Save the posting: Stellenanzeige speichern
+? Saving runs the same rules as cvac validate; a file that does not validate is not written. The statuses verified and approved are set from their buttons, not here.
+: Beim Speichern gelten dieselben Regeln wie bei cvac validate; eine Datei, die nicht validiert, wird nicht geschrieben. Die Status verified und approved werden über ihre Schaltflächen gesetzt, nicht hier.
+Showing the {which} PDF.: 'Angezeigtes PDF: {which}.'
+Skills: Kompetenzen
+Slug (folder name, lowercase): Slug (Ordnername, Kleinbuchstaben)
+Sources (archived): Quellen (archiviert)
+Tailor the CV (30): Lebenslauf zuschneiden (30)
+Target roles, comma-separated: Zielpositionen, durch Kommas getrennt
+The posting, pasted verbatim: Die Stellenanzeige, wörtlich eingefügt
+This folder: Dieser Ordner
+This folder is neither a data root nor empty. Enter one of its folders, or create a new folder below.: Dieser Ordner ist weder ein Datenordner noch leer. Wechseln Sie in einen seiner Ordner oder legen Sie unten einen neuen Ordner an.
+'This page never commits: review and commit from your terminal.': 'Diese Seite committet nie: prüfen und committen Sie im Terminal.'
+Upload a document: Dokument hochladen
+Upload to inbox: In den Eingang hochladen
+Users: Benutzer
+Validate: Validieren
+Validate and save: Validieren und speichern
+Validation errors: Validierungsfehler
+Verify: Verifizieren
+Verify a fact only when its evidence says what the claim says. Rejected facts are kept, never deleted.: Verifizieren Sie einen Fakt nur, wenn sein Beleg sagt, was die Aussage sagt. Abgelehnte Fakten bleiben erhalten, sie werden nie gelöscht.
+Warnings: Warnungen
+Where is your data?: Wo sind Ihre Daten?
+Where you found it: Wo Sie sie gefunden haben
+? 'Writes profile.yaml and search.yaml under users/<slug>/, empty but valid. Career facts never come from this form: they enter through a questionnaire or a document, and you verify them one by one.'
+: 'Schreibt profile.yaml und search.yaml unter users/<slug>/, leer, aber gültig. Karrierefakten kommen nie aus diesem Formular: sie kommen über einen Fragebogen oder ein Dokument, und Sie verifizieren sie einzeln.'
+Your language (the language of your facts and questionnaires): Ihre Sprache (die Sprache Ihrer Fakten und Fragebögen)
+'`{day}` is not a date (YYYY-MM-DD)': '`{day}` ist kein Datum (JJJJ-MM-TT)'
+'`{name}` is not a document under inbox/, sources/ or interviews/': '`{name}` ist kein Dokument unter inbox/, sources/ oder interviews/'
+'`{name}` is not a note name (lowercase letters, digits and dashes)': '`{name}` ist kein Notizname (Kleinbuchstaben, Ziffern und Bindestriche)'
+'`{name}` is not a questionnaire name (lowercase letters, digits and dashes)': '`{name}` ist kein Fragebogenname (Kleinbuchstaben, Ziffern und Bindestriche)'
+'`{name}` is not an evidence note under notes/': '`{name}` ist keine Belegnotiz unter notes/'
+'`{name}`: unsupported type (allowed: {types})': '`{name}`: nicht unterstützter Typ (erlaubt: {types})'
+? 'a slug, your name, your e-mail and where you live: the profile starts empty and fills through a questionnaire and the documents you drop in.'
+: 'ein Slug, Ihr Name, Ihre E-Mail und Ihr Wohnort: das Profil beginnt leer und füllt sich über einen Fragebogen und die Dokumente, die Sie ablegen.'
+application: Bewerbung
+applications: Bewerbungen
+applied: übernommen
+apply: bewerben
+approved: freigegeben
+approved on: freigegeben am
+approved on {date}; render the final when ready: freigegeben am {date}; erzeugen Sie die Endfassung, wenn Sie so weit sind
+born: geboren
+but invalid: aber ungültig
+careers page, LinkedIn, referral: Karriereseite, LinkedIn, Empfehlung
+category: Kategorie
+change: wechseln
+choose a file to upload: wählen Sie eine Datei zum Hochladen
+clean working tree.: sauberer Arbeitsbaum.
+company: Unternehmen
+company and role must each contain at least one letter or digit: Unternehmen und Stellenbezeichnung müssen je mindestens einen Buchstaben oder eine Ziffer enthalten
+cost: Kosten
+? cv-as-code keeps everything about you in a folder of your own, the data root, marked by a cvac.yaml file, and never anywhere else. Open an existing one, or create one in a new or empty folder.
+: cv-as-code bewahrt alles über Sie in einem eigenen Ordner auf, dem Datenordner, markiert durch eine Datei cvac.yaml, und nirgendwo sonst. Öffnen Sie einen bestehenden oder legen Sie einen in einem neuen oder leeren Ordner an.
+data root: Datenordner
+'data root: {path}': 'Datenordner: {path}'
+draft: Entwurf
+e-mail: E-Mail
+edited as text, validated before saving.: als Text bearbeitet, vor dem Speichern validiert.
+empty: leer
+'engine: {error}': 'Engine: {error}'
+evidence facts: Belegfakten
+failed: fehlgeschlagen
+fill it in first: erst ausfüllen
+filled: ausgefüllt
+final: Endfassung
+full name: vollständiger Name
+gap plan: Lückenplan
+headline: Überschrift
+inbox/{name} already exists; rename the file: inbox/{name} existiert bereits; benennen Sie die Datei um
+inbox/{name} uploaded; extract it when ready (stage 03): inbox/{name} hochgeladen; extrahieren Sie sie, wenn Sie so weit sind (Stufe 03)
+invalid: ungültig
+invalid match file: ungültige Abgleichdatei
+job: Stelle
+jobs/{id}/ already exists; postings are never overwritten: jobs/{id}/ existiert bereits; Stellenanzeigen werden nie überschrieben
+'jobs/{id}/raw.txt written; next: normalise it (stage 10)': 'jobs/{id}/raw.txt geschrieben; als Nächstes: normalisieren (Stufe 10)'
+language: Sprache
+letter: Anschreiben
+letter approved on {date}; render the final when ready: Anschreiben freigegeben am {date}; erzeugen Sie die Endfassung, wenn Sie so weit sind
+links: Links
+location: Ort
+masters: Master
+match: Abgleich
+match first: zuerst abgleichen
+max {n} page(s): max. {n} Seite(n)
+missing: fehlt
+name: Name
+needs a match and a master CV: braucht einen Abgleich und einen Master-Lebenslauf
+'no': nein
+no data root open: kein Datenordner geöffnet
+no evidence: kein Beleg
+no folders here: keine Ordner hier
+no raw.txt: keine raw.txt
+no result: kein Ergebnis
+none: keine
+none yet: noch keine
+normalise first: zuerst normalisieren
+normalised: normalisiert
+not yet: noch nicht
+note name: Notizname
+ok: ok
+'ok: {output} written and valid': 'ok: {output} geschrieben und gültig'
+open: öffnen
+parameters: Parameter
+paste the posting's text: fügen Sie den Text der Stellenanzeige ein
+phone: Telefon
+prep: Gespräch
+proposed: vorgeschlagen
+rejected: abgelehnt
+'rendered {name}: {pages} page(s)': 'erzeugt {name}: {pages} Seite(n)'
+role: Position
+running: läuft
+saved: gespeichert
+skill: Kompetenz
+skip: auslassen
+stage: Stufe
+started: gestartet
+status: Status
+stretch: grenzwertig
+tailor the CV first: zuerst den Lebenslauf zuschneiden
+template: Vorlage
+to-fill: auszufüllen
+up: nach oben
+'user `{slug}` created; next: a questionnaire, or documents to extract': 'Benutzer `{slug}` angelegt; als Nächstes: ein Fragebogen oder Dokumente zum Extrahieren'
+verification needs evidence that exists: Verifizieren braucht einen vorhandenen Beleg
+verified: verifiziert
+written: geschrieben
+'yes': ja
+'{count} file(s) checked': '{count} Datei(en) geprüft'
+'{name} saved and valid': '{name} gespeichert und gültig'
+'{n} error(s)': '{n} Fehler'
+'{n} warning(s)': '{n} Warnung(en)'
+'{output} was not written': '{output} wurde nicht geschrieben'

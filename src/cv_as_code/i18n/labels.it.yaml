@@ -17,6 +17,7 @@ identity_fields: [phone, links, born]
 born: Data di nascita
 months: [gennaio, febbraio, marzo, aprile, maggio, giugno, luglio, agosto, settembre, ottobre, novembre, dicembre]
 language_names:
+  de: Tedesco
   it: Italiano
   fr: Francese
   en: Inglese

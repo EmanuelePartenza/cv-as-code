@@ -41,6 +41,7 @@ maintainer, the decision is opened first, then — once taken — formalised in 
 | [0013](0013-data-in.md) | Data in: extraction and interview stages, facts enter as draft, verification is a command | accepted |
 | [0014](0014-local-ui-thin-adapter.md) | A local, server-rendered UI as a thin adapter over the library | accepted |
 | [0015](0015-claude-code-headless-engine.md) | Claude Code in print mode as the first engine that runs a stage | accepted |
+| [0016](0016-ui-in-the-persons-language.md) | The UI's chrome speaks the person's language; the library stays English (amends 0007) | accepted |
 
 Numbers 0001–0005 were first recorded in the maintainer's private working
 repository, from which this framework was extracted; they are re-authored here

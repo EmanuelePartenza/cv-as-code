@@ -1,19 +1,48 @@
 {% extends "base.html" %}
-{% block title %}Open a data root{% endblock %}
+{% block title %}{{ t('Open a data root') }}{% endblock %}
 {% block content %}
-<h1>Where is your data?</h1>
-<p>cv-as-code keeps everything about you in a folder of your own — the <em>data root</em>, marked by a <code>cvac.yaml</code> file — and never anywhere else. Point the UI at an existing one, or at an empty folder to create one.</p>
-<form method="post" class="stack">
-  <label>Folder <input type="text" name="path" value="{{ path }}" placeholder="/home/you/my-cv" required size="60"></label>
-  <label><input type="checkbox" name="create"> create it if it does not exist yet (or is empty)</label>
-  <button class="ok">Open</button>
-</form>
-{% if recent %}
-<h2>Recent</h2>
-<ul>
-  {% for r in recent %}
-  <li><form method="post" class="inline"><input type="hidden" name="path" value="{{ r }}"><button class="link">{{ r }}</button></form></li>
-  {% endfor %}
-</ul>
-{% endif %}
+<h1>{{ t('Where is your data?') }}</h1>
+<p>{{ t('cv-as-code keeps everything about you in a folder of your own, the data root, marked by a cvac.yaml file, and never anywhere else. Open an existing one, or create one in a new or empty folder.') }}</p>
+
+<section class="two">
+  <div>
+    <h2>{{ t('Browse') }}</h2>
+    <p class="path"><code>{{ listing.path }}</code>
+      {% if listing.is_root %}<span class="badge verified">{{ t('data root') }}</span>{% elif listing.empty %}<span class="badge draft">{{ t('empty') }}</span>{% endif %}</p>
+    <ul class="folders">
+      {% if listing.parent %}<li><a href="{{ url_for('open_root', dir=listing.parent) }}">..</a> <span class="muted">{{ t('up') }}</span></li>{% endif %}
+      {% for f in listing.folders %}
+      <li><a href="{{ url_for('open_root', dir=f.path) }}">{{ f.name }}/</a>{% if f.is_root %} <span class="badge verified">{{ t('data root') }}</span>{% endif %}</li>
+      {% else %}<li class="muted">{{ t('no folders here') }}</li>{% endfor %}
+    </ul>
+    <form method="get" action="{{ url_for('open_root') }}" class="inline">
+      <input type="text" name="dir" value="{{ listing.path }}" size="40"><button>{{ t('Go') }}</button>
+    </form>
+  </div>
+  <div>
+    <h2>{{ t('This folder') }}</h2>
+    {% if listing.is_root %}
+    <form method="post" class="stack"><input type="hidden" name="path" value="{{ listing.path }}"><input type="hidden" name="action" value="open"><button class="ok">{{ t('Open this data root') }}</button></form>
+    {% elif listing.empty %}
+    <form method="post" class="stack"><input type="hidden" name="path" value="{{ listing.path }}"><input type="hidden" name="action" value="create"><button class="ok">{{ t('Create the data root here') }}</button></form>
+    {% else %}
+    <p class="muted">{{ t('This folder is neither a data root nor empty. Enter one of its folders, or create a new folder below.') }}</p>
+    {% endif %}
+    <h3>{{ t('New folder here') }}</h3>
+    <form method="post" class="stack">
+      <input type="hidden" name="dir" value="{{ listing.path }}">
+      <input type="hidden" name="action" value="new-folder">
+      <label>{{ t('Folder name') }} <input type="text" name="name" placeholder="my-cv" required></label>
+      <button class="ok">{{ t('Create it and start there') }}</button>
+    </form>
+    {% if recent %}
+    <h3>{{ t('Recent') }}</h3>
+    <ul>
+      {% for r in recent %}
+      <li><form method="post" class="inline"><input type="hidden" name="path" value="{{ r }}"><input type="hidden" name="action" value="open"><button class="link">{{ r }}</button></form></li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+</section>
 {% endblock %}

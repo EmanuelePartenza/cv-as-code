@@ -46,6 +46,14 @@ it in your data root's `i18n/` to use it now, or in
 `src/cv_as_code/i18n/` to contribute it. `cvac validate --all` tells you what
 is missing; a spec in that language then renders with no code change.
 
+## Adding a UI language
+
+One YAML file: `src/cv_as_code/ui/i18n/<lang>.yaml`, mapping every English
+chrome string (the key, as the templates and handlers pass it to `t()`) to
+its translation, plus the entry in `LANGUAGES` in `ui/i18n.py`. A test lists
+the keys that are missing or unused. Library messages are not translated
+(ADR-0016).
+
 ## Adding a template
 
 A directory exporting `cv(data)` in `template.typ` (and `letter(data)` in

@@ -1,16 +1,18 @@
 {% extends "base.html" %}
-{% block title %}New user{% endblock %}
+{% block title %}{{ t('New user') }}{% endblock %}
 {% block content %}
-<h1>New user</h1>
-<p class="muted">Writes <code>users/&lt;slug&gt;/profile.yaml</code> and <code>search.yaml</code>, empty but valid. Career facts never come from this form: they enter through a questionnaire or a document, and you verify them one by one.</p>
+<h1>{{ t('New user') }}</h1>
+<p class="muted">{{ t('Writes profile.yaml and search.yaml under users/<slug>/, empty but valid. Career facts never come from this form: they enter through a questionnaire or a document, and you verify them one by one.') }}</p>
 <form method="post" class="stack">
-  <label>Slug (folder name, lowercase) <input name="slug" value="{{ form.slug }}" required pattern="[a-z0-9][a-z0-9-]*"></label>
-  <label>Full name <input name="full_name" value="{{ form.full_name }}" required></label>
-  <label>E-mail for applications <input name="email" type="email" value="{{ form.email }}" required></label>
-  <label>City <input name="city" value="{{ form.city }}" required></label>
-  <label>Country code (ISO, optional) <input name="country" value="{{ form.country }}" size="4"></label>
-  <label>Your language (ISO 639-1) <input name="pivot_language" value="{{ form.pivot_language or 'en' }}" size="4" pattern="[a-z]{2}"></label>
-  <label>Target roles, comma-separated <input name="target_roles" value="{{ form.target_roles }}" required placeholder="data-engineer, analytics-engineer"></label>
-  <button class="ok">Create</button>
+  <label>{{ t('Slug (folder name, lowercase)') }} <input name="slug" value="{{ form.slug }}" required pattern="[a-z0-9][a-z0-9-]*"></label>
+  <label>{{ t('Full name') }} <input name="full_name" value="{{ form.full_name }}" required></label>
+  <label>{{ t('E-mail for applications') }} <input name="email" type="email" value="{{ form.email }}" required></label>
+  <label>{{ t('City') }} <input name="city" value="{{ form.city }}" required></label>
+  <label>{{ t('Country code (ISO, optional)') }} <input name="country" value="{{ form.country }}" size="4"></label>
+  <label>{{ t('Your language (the language of your facts and questionnaires)') }}
+    <select name="pivot_language">{% for code, name in languages.items() %}<option value="{{ code }}"{% if code == (form.pivot_language or lang) %} selected{% endif %}>{{ name }}</option>{% endfor %}</select>
+  </label>
+  <label>{{ t('Target roles, comma-separated') }} <input name="target_roles" value="{{ form.target_roles }}" required placeholder="data-engineer, analytics-engineer"></label>
+  <button class="ok">{{ t('Create') }}</button>
 </form>
 {% endblock %}

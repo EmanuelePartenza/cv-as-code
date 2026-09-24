@@ -18,6 +18,7 @@ from flask import (
     Response,
     abort,
     flash,
+    g,
     redirect,
     render_template,
     request,
@@ -35,8 +36,18 @@ from ..resolve import resolve
 from ..specs import approve
 from ..validate import discover_all, validate_files
 from . import data, jobs, runs, views
+from .i18n import LANGUAGES, negotiate, t
 from .runs import RunManager
-from .state import UiState, current_root, recent_roots, state
+from .state import (
+    UiState,
+    browse,
+    current_root,
+    new_folder,
+    recent_roots,
+    save_language,
+    saved_language,
+    state,
+)
 
 FACT_ACTIONS = {"verify": "verified", "reject": "rejected"}
 MODES = ("draft", "final")
@@ -61,25 +72,42 @@ def _mode() -> str:
 def _render_message(out_name: str, pages: int, warnings: list[str]) -> str:
     for w in warnings:
         flash(w, "warn")
-    return f"rendered {out_name}: {pages} page(s)"
+    return t("rendered {name}: {pages} page(s)", name=out_name, pages=pages)
 
 
 def _register_pages(app: Flask) -> None:
     @app.route("/open", methods=["GET", "POST"])
     def open_root():
         if request.method == "POST":
+            action = request.form.get("action", "open")
+            where = request.form.get("dir") or request.form.get("path") or ""
             try:
-                root = state().open(
-                    request.form.get("path", ""), request.form.get("create") == "on"
-                )
+                if action == "new-folder":
+                    target = new_folder(where, request.form.get("name", ""))
+                    root = state().open(str(target), create=True)
+                else:
+                    create = action == "create" or request.form.get("create") == "on"
+                    root = state().open(request.form.get("path", ""), create)
             except CvacError as e:
                 flash(str(e), "error")
-                return render_template(
-                    "open.html", recent=recent_roots(), path=request.form.get("path", "")
-                )
-            flash(f"data root: {root.path}", "ok")
+                return redirect(url_for("open_root", dir=where or None))
+            flash(t("data root: {path}", path=root.path), "ok")
             return redirect(url_for("index"))
-        return render_template("open.html", recent=recent_roots(), path="")
+        try:
+            listing = browse(request.args.get("dir"))
+        except CvacError as e:
+            flash(str(e), "error")
+            listing = browse(None)
+        return render_template("open.html", recent=recent_roots(), listing=listing)
+
+    @app.post("/language")
+    def language() -> Response:
+        lang = request.form.get("lang", "")
+        if lang in LANGUAGES:
+            save_language(lang)
+        back = request.form.get("next") or url_for("index")
+        safe = back.startswith("/") and not back.startswith("//")
+        return redirect(back if safe else url_for("index"))
 
     @app.get("/")
     def index() -> str:
@@ -164,7 +192,10 @@ def _register_gates(app: Flask) -> None:
         root = current_root()
         d = views.spec_dir_of(root, user, kind, name)
         _flash_outcome(
-            lambda: f"approved on {approve(root, d / 'cv-spec.yaml')}; render the final when ready"
+            lambda: t(
+                "approved on {date}; render the final when ready",
+                date=approve(root, d / "cv-spec.yaml"),
+            )
         )
         return back_to_spec(user, kind, name)
 
@@ -186,9 +217,10 @@ def _register_gates(app: Flask) -> None:
         root = current_root()
         d = views.spec_dir_of(root, user, kind, name)
         _flash_outcome(
-            lambda: (
-                f"letter approved on {approve(root, d / 'letter.md')}; render the final when ready"
-            )
+            lambda: t(
+                "letter approved on {date}; render the final when ready",
+                date=approve(root, d / "letter.md"),
+            ),
         )
         return back_to_spec(user, kind, name)
 
@@ -217,21 +249,28 @@ def create_app(root: DataRoot | None = None) -> Flask:
             return redirect(url_for("open_root"))
         return None
 
+    @app.before_request
+    def _language() -> None:
+        g.lang = negotiate(saved_language())
+
     @app.context_processor
     def _globals() -> dict[str, object]:
         root = state().root
         return {
             "root_path": str(root.path) if root else None,
             "default_user": root.default_user if root else None,
+            "t": t,
+            "languages": LANGUAGES,
+            "lang": g.lang,
         }
 
     @app.errorhandler(views.NotFound)
     def _not_found(e: views.NotFound) -> tuple[str, int]:
-        return render_template("error.html", title="Not found", message=str(e)), 404
+        return render_template("error.html", title=t("Not found"), message=str(e)), 404
 
     @app.errorhandler(CvacError)
     def _cvac_error(e: CvacError) -> tuple[str, int]:
-        return render_template("error.html", title="Error", message=str(e)), 400
+        return render_template("error.html", title=t("Error"), message=str(e)), 400
 
     _register_pages(app)
     _register_gates(app)

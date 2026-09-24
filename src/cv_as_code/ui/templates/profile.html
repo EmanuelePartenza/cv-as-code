@@ -1,61 +1,62 @@
 {% extends "base.html" %}
-{% block title %}Profile · {{ p.user }}{% endblock %}
+{% block title %}{{ t('Profile') }} · {{ p.user }}{% endblock %}
 {% block content %}
 <h1>{{ p.full_name }} <code>{{ p.user }}</code></h1>
-<p class="muted">Pivot language <code>{{ p.pivot_language }}</code> · <a href="{{ url_for('cvs', user=p.user) }}">CVs and applications</a></p>
+<p class="muted">{{ t('Pivot language') }} <code>{{ p.pivot_language }}</code> · <a href="{{ url_for('cvs', user=p.user) }}">{{ t('CVs and applications') }}</a></p>
 
 <section class="two">
   <div>
-    <h2>Identity</h2>
+    <h2>{{ t('Identity') }}</h2>
     <table class="kv">
-      {% for key in ('full_name', 'email', 'phone', 'born') %}
-      <tr><th>{{ key }}</th><td>{{ p.identity.get(key) or '' }}</td></tr>
-      {% endfor %}
-      <tr><th>location</th><td>{% set loc = p.identity.get('location') or {} %}{{ loc.get('city', '') }}{% if loc.get('country') %}, {{ loc.country }}{% endif %}</td></tr>
-      <tr><th>links</th><td>{% for l in p.identity.get('links') or [] %}<a href="{{ l.url }}">{{ l.label or l.url }}</a>{% if not loop.last %} · {% endif %}{% endfor %}</td></tr>
+      <tr><th>{{ t('full name') }}</th><td>{{ p.identity.get('full_name') or '' }}</td></tr>
+      <tr><th>{{ t('e-mail') }}</th><td>{{ p.identity.get('email') or '' }}</td></tr>
+      <tr><th>{{ t('phone') }}</th><td>{{ p.identity.get('phone') or '' }}</td></tr>
+      <tr><th>{{ t('born') }}</th><td>{{ p.identity.get('born') or '' }}</td></tr>
+      <tr><th>{{ t('location') }}</th><td>{% set loc = p.identity.get('location') or {} %}{{ loc.get('city', '') }}{% if loc.get('country') %}, {{ loc.country }}{% endif %}</td></tr>
+      <tr><th>{{ t('links') }}</th><td>{% for l in p.identity.get('links') or [] %}<a href="{{ l.url }}">{{ l.label or l.url }}</a>{% if not loop.last %} · {% endif %}{% endfor %}</td></tr>
     </table>
   </div>
   <div>
-    <h2>Completeness</h2>
-    <p><span class="badge verified">{{ p.counts.verified }} verified</span> <span class="badge draft">{{ p.counts.draft }} draft</span> <span class="badge rejected">{{ p.counts.rejected }} rejected</span></p>
+    <h2>{{ t('Completeness') }}</h2>
+    <p><span class="badge verified">{{ p.counts.verified }} {{ t('verified') }}</span> <span class="badge draft">{{ p.counts.draft }} {{ t('draft') }}</span> <span class="badge rejected">{{ p.counts.rejected }} {{ t('rejected') }}</span></p>
     {% if p.todo %}
-    <ul class="todo">{% for t in p.todo %}<li>{{ t }}</li>{% endfor %}</ul>
+    <ul class="todo">{% for item in p.todo %}<li>{{ item }}</li>{% endfor %}</ul>
     {% else %}
-    <p class="muted">Nothing missing that the framework can see.</p>
+    <p class="muted">{{ t('Nothing missing that the framework can see.') }}</p>
     {% endif %}
   </div>
 </section>
 
-<h2>Facts</h2>
-<p class="muted">Verify a fact only when its evidence says what the claim says. Rejected facts are kept, never deleted.</p>
+<h2>{{ t('Facts') }}</h2>
+<p class="muted">{{ t('Verify a fact only when its evidence says what the claim says. Rejected facts are kept, never deleted.') }}</p>
 {% for e in p.entries %}
 <section class="entry">
   <h3><code>{{ e.id }}</code> — {{ e.role }}{% if e.company %}, {{ e.company }}{% endif %} <small class="muted">{{ e.dates }}</small></h3>
-  {% if not e.facts %}<p class="muted">No facts.</p>{% endif %}
+  {% if not e.facts %}<p class="muted">{{ t('No facts.') }}</p>{% endif %}
   {% for f in e.facts %}
   <article class="fact {{ f.status }}" id="{{ f.id }}">
     <div class="fact-head">
       <code>{{ f.id }}</code>
-      <span class="badge {{ f.status }}">{{ f.status }}</span>
+      <span class="badge {{ f.status }}">{{ t(f.status) }}</span>
       {% if f.verified_on %}<small class="muted">{{ f.verified_on }}</small>{% endif %}
       {% if f.metrics %}<span class="metrics">{% for k, v in f.metrics.items() %}<code>{{ k }}={{ v }}</code> {% endfor %}</span>{% endif %}
     </div>
     <p class="claim">{{ f.claim }}</p>
     <div class="evidence">
-      {% if not f.evidence %}<span class="bad">no evidence</span>{% endif %}
+      {% if not f.evidence %}<span class="bad">{{ t('no evidence') }}</span>{% endif %}
       {% for ev in f.evidence %}
         <details{% if not ev.exists %} class="bad"{% endif %}>
-          <summary>{{ ev.ref }}{% if not ev.exists %} — missing{% endif %}</summary>
-          {% if ev.quote %}<blockquote>{{ ev.quote }}</blockquote>{% elif ev.exists %}<p class="muted">No anchored passage; open the note.</p>{% endif %}
+          <summary>{{ ev.ref }}{% if not ev.exists %} — {{ t('missing') }}{% endif %}</summary>
+          {% if ev.quote %}<blockquote>{{ ev.quote }}</blockquote>{% elif ev.exists %}<p class="muted">{{ t('No anchored passage; open the note.') }}</p>{% endif %}
         </details>
       {% endfor %}
     </div>
     <div class="actions">
       {% if f.status != 'verified' %}
-      <form method="post" action="{{ url_for('fact_action', user=p.user, fact_id=f.id, action='verify') }}"><button class="ok" {% if not f.evidence_ok %}disabled title="verification needs evidence that exists"{% endif %}>Verify</button></form>
+      <form method="post" action="{{ url_for('fact_action', user=p.user, fact_id=f.id, action='verify') }}"><button class="ok" {% if not f.evidence_ok %}disabled title="{{ t('verification needs evidence that exists') }}"{% endif %}>{{ t('Verify') }}</button></form>
       {% endif %}
       {% if f.status != 'rejected' %}
-      <form method="post" action="{{ url_for('fact_action', user=p.user, fact_id=f.id, action='reject') }}"><button class="danger">Reject</button></form>
+      <form method="post" action="{{ url_for('fact_action', user=p.user, fact_id=f.id, action='reject') }}"><button class="danger">{{ t('Reject') }}</button></form>
       {% endif %}
     </div>
   </article>
@@ -65,20 +66,20 @@
 
 <section class="two">
   <div>
-    <h2>Skills</h2>
+    <h2>{{ t('Skills') }}</h2>
     <table>
-      <thead><tr><th>skill</th><th>category</th><th>evidence facts</th></tr></thead>
+      <thead><tr><th>{{ t('skill') }}</th><th>{{ t('category') }}</th><th>{{ t('evidence facts') }}</th></tr></thead>
       <tbody>
       {% for s in p.skills %}
-      <tr><td>{{ s.name }}</td><td>{{ s.category }}</td><td>{% if s.evidence_facts %}{% for x in s.evidence_facts %}<a href="#{{ x }}"><code>{{ x }}</code></a> {% endfor %}{% else %}<span class="bad">none</span>{% endif %}</td></tr>
+      <tr><td>{{ s.name }}</td><td>{{ s.category }}</td><td>{% if s.evidence_facts %}{% for x in s.evidence_facts %}<a href="#{{ x }}"><code>{{ x }}</code></a> {% endfor %}{% else %}<span class="bad">{{ t('none') }}</span>{% endif %}</td></tr>
       {% endfor %}
       </tbody>
     </table>
   </div>
   <div>
-    <h2>Education</h2>
+    <h2>{{ t('Education') }}</h2>
     <ul>{% for ed in p.education %}<li>{{ ed.degree }} — {{ ed.institution }} <small class="muted">{{ ed.dates }}</small></li>{% endfor %}</ul>
-    <h2>Languages</h2>
+    <h2>{{ t('Languages') }}</h2>
     <ul>{% for lg in p.languages %}<li><code>{{ lg.code }}</code> {{ lg.level }}{% if lg.note %} — {{ lg.note }}{% endif %}</li>{% endfor %}</ul>
   </div>
 </section>

@@ -1,0 +1,230 @@
+# UI chrome, Italian. Keys are the English strings (ADR-0016).
+? A posting enters verbatim as jobs/<id>/raw.txt; every step after that is a stage run by Claude and checked by the validator.
+: Un annuncio entra così com'è in jobs/<id>/raw.txt; ogni passo successivo è uno stadio eseguito da Claude e controllato dal validatore.
+Add a posting: Aggiungi un annuncio
+Apply to the profile (04): Applica al profilo (04)
+? 'Applying a note is deterministic: its facts are appended to profile.yaml as draft, each pointing at its passage, and nothing else in the file moves; nothing becomes verified here.'
+: 'Applicare una nota è deterministico: i suoi fatti vengono aggiunti a profile.yaml come bozze, ciascuno con il suo passaggio, e nient''altro nel file si muove; qui nulla diventa verificato.'
+Approve: Approva
+Approve letter: Approva la lettera
+Approve this CV as it is? This is your sign-off.: Approvare questo CV così com'è? È la tua firma.
+Approve this letter as it is? This is your sign-off.: Approvare questa lettera così com'è? È la tua firma.
+Back to the start: Torna all'inizio
+Back to where you started: Torna da dove sei partito
+Browse: Sfoglia
+CVs: CV
+CVs and applications: CV e candidature
+Cited facts: Fatti citati
+City: Città
+Claude is working in your data root; this page refreshes itself.: Claude sta lavorando nella tua cartella dati; questa pagina si aggiorna da sola.
+'Claude writes it in your language; you fill it in at your own pace (edit it here), set status: filled, then extract it.': 'Claude lo scrive nella tua lingua; lo compili con calma (modificalo qui), imposti status: filled, poi lo estrai.'
+Company: Azienda
+Completeness: Completezza
+Country code (ISO, optional): Codice paese (ISO, facoltativo)
+Cover letter: Lettera di presentazione
+Cover letter (60): Lettera di presentazione (60)
+Create: Crea
+Create it and start there: Creala e parti da lì
+Create the data root here: Crea qui la cartella dati
+Data files: File dati
+Data root: Cartella dati
+Date: Data
+Documents: Documenti
+E-mail for applications: E-mail per le candidature
+? Each run is Claude Code in print mode inside your data root, with file tools only; the result counts only if it validates. Approval of the CV and the letter stays on their page.
+: Ogni esecuzione è Claude Code in modalità print dentro la tua cartella dati, con soli strumenti sui file; il risultato conta solo se valida. L'approvazione del CV e della lettera resta sulla loro pagina.
+Education: Formazione
+Error: Errore
+Errors: Errori
+Evidence notes: Note di evidenza
+Extract (03): Estrai (03)
+Facts: Fatti
+? 'Facts enter the profile from documents: a filled questionnaire, an old CV, a review. Claude extracts them into an evidence note with the passage each fact rests on; they land as draft and you verify them on the profile.'
+: 'I fatti entrano nel profilo dai documenti: un questionario compilato, un vecchio CV, una valutazione. Claude li estrae in una nota di evidenza con il passaggio su cui ogni fatto si fonda; entrano come bozze e li verifichi nel profilo.'
+Folder name: Nome della cartella
+'Full event log:': 'Log completo degli eventi:'
+Full name: Nome e cognome
+Gap plan: Piano per le lacune
+Gap plan (40): Piano per le lacune (40)
+Generate with Claude (05): Genera con Claude (05)
+Go: Vai
+Identity: Identità
+Inbox: In arrivo
+Interview preparation: Preparazione al colloquio
+Interview preparation (70): Preparazione al colloquio (70)
+Jobs: Lavori
+Language: Lingua
+Languages: Lingue
+? Local UI over the same library as the cvac command. Every verify and approve here is your act; nothing is committed to git by this page.
+: Interfaccia locale sulla stessa libreria del comando cvac. Ogni verifica e approvazione qui è un tuo atto; questa pagina non committa nulla su git.
+Log: Log
+Match: Corrispondenza
+Match (20): Corrispondenza (20)
+Name: Nome
+New folder here: Nuova cartella qui
+New user: Nuovo utente
+'No PDF yet: render a draft.': 'Ancora nessun PDF: genera una bozza.'
+No anchored passage; open the note.: Nessun passaggio ancorato; apri la nota.
+No facts.: Nessun fatto.
+'No letter PDF yet: render a draft.': 'Ancora nessun PDF della lettera: genera una bozza.'
+No posting yet.: Ancora nessun annuncio.
+No run in this session.: Nessuna esecuzione in questa sessione.
+No user yet.: Ancora nessun utente.
+Normalise (10): Normalizza (10)
+Not a git repository (or git is not available).: Non è un repository git (o git non è disponibile).
+Not found: Non trovato
+'Not saved: validation errors': 'Non salvato: errori di validazione'
+Nothing here yet.: Ancora niente qui.
+Nothing missing that the framework can see.: Non manca nulla che il framework possa vedere.
+OK: OK
+Open a data root: Apri una cartella dati
+Open this data root: Apri questa cartella dati
+Pipeline: Pipeline
+Pivot language: Lingua pivot
+Posting: Annuncio
+Postings: Annunci
+Profile: Profilo
+Profile and facts: Profilo e fatti
+Questionnaire: Questionario
+Recent: Recenti
+Reject: Rifiuta
+Render draft: Genera bozza
+Render final: Genera versione finale
+Role title: Titolo del ruolo
+Run: Esecuzione
+Run with Claude: Esegui con Claude
+Runs: Esecuzioni
+Same rules as cvac validate --all.: Le stesse regole di cvac validate --all.
+Save the posting: Salva l'annuncio
+? Saving runs the same rules as cvac validate; a file that does not validate is not written. The statuses verified and approved are set from their buttons, not here.
+: Il salvataggio applica le stesse regole di cvac validate; un file che non valida non viene scritto. Gli stati verified e approved si impostano dai loro bottoni, non qui.
+Showing the {which} PDF.: 'PDF mostrato: {which}.'
+Skills: Competenze
+Slug (folder name, lowercase): Slug (nome della cartella, minuscolo)
+Sources (archived): Fonti (archiviate)
+Tailor the CV (30): Adatta il CV (30)
+Target roles, comma-separated: Ruoli cercati, separati da virgola
+The posting, pasted verbatim: L'annuncio, incollato così com'è
+This folder: Questa cartella
+This folder is neither a data root nor empty. Enter one of its folders, or create a new folder below.: Questa cartella non è né una cartella dati né vuota. Entra in una delle sue cartelle, o creane una nuova qui sotto.
+'This page never commits: review and commit from your terminal.': 'Questa pagina non committa mai: rivedi e committa dal terminale.'
+Upload a document: Carica un documento
+Upload to inbox: Carica in arrivo
+Users: Utenti
+Validate: Valida
+Validate and save: Valida e salva
+Validation errors: Errori di validazione
+Verify: Verifica
+Verify a fact only when its evidence says what the claim says. Rejected facts are kept, never deleted.: Verifica un fatto solo quando la sua evidenza dice ciò che dice l'affermazione. I fatti rifiutati restano, non vengono mai cancellati.
+Warnings: Avvisi
+Where is your data?: Dove sono i tuoi dati?
+Where you found it: Dove l'hai trovato
+? 'Writes profile.yaml and search.yaml under users/<slug>/, empty but valid. Career facts never come from this form: they enter through a questionnaire or a document, and you verify them one by one.'
+: 'Scrive profile.yaml e search.yaml sotto users/<slug>/, vuoti ma validi. I fatti di carriera non vengono mai da questo modulo: entrano da un questionario o da un documento, e li verifichi uno per uno.'
+Your language (the language of your facts and questionnaires): La tua lingua (la lingua dei tuoi fatti e questionari)
+'`{day}` is not a date (YYYY-MM-DD)': '`{day}` non è una data (AAAA-MM-GG)'
+'`{name}` is not a document under inbox/, sources/ or interviews/': '`{name}` non è un documento in inbox/, sources/ o interviews/'
+'`{name}` is not a note name (lowercase letters, digits and dashes)': '`{name}` non è un nome di nota (minuscole, cifre e trattini)'
+'`{name}` is not a questionnaire name (lowercase letters, digits and dashes)': '`{name}` non è un nome di questionario (minuscole, cifre e trattini)'
+'`{name}` is not an evidence note under notes/': '`{name}` non è una nota di evidenza in notes/'
+'`{name}`: unsupported type (allowed: {types})': '`{name}`: tipo non supportato (ammessi: {types})'
+? 'a slug, your name, your e-mail and where you live: the profile starts empty and fills through a questionnaire and the documents you drop in.'
+: 'uno slug, il tuo nome, la tua e-mail e dove vivi: il profilo parte vuoto e si riempie con un questionario e con i documenti che carichi.'
+application: candidatura
+applications: candidature
+applied: applicata
+apply: candidati
+approved: approvato
+approved on: approvato il
+approved on {date}; render the final when ready: approvato il {date}; genera la versione finale quando vuoi
+born: nascita
+but invalid: ma non valido
+careers page, LinkedIn, referral: pagina carriere, LinkedIn, segnalazione
+category: categoria
+change: cambia
+choose a file to upload: scegli un file da caricare
+clean working tree.: albero di lavoro pulito.
+company: azienda
+company and role must each contain at least one letter or digit: azienda e ruolo devono contenere almeno una lettera o cifra ciascuno
+cost: costo
+? cv-as-code keeps everything about you in a folder of your own, the data root, marked by a cvac.yaml file, and never anywhere else. Open an existing one, or create one in a new or empty folder.
+: cv-as-code tiene tutto ciò che ti riguarda in una cartella tua, la cartella dati, contrassegnata da un file cvac.yaml, e mai altrove. Aprine una esistente, o creane una in una cartella nuova o vuota.
+data root: cartella dati
+'data root: {path}': 'cartella dati: {path}'
+draft: bozza
+e-mail: e-mail
+edited as text, validated before saving.: modificati come testo, validati prima del salvataggio.
+empty: vuoto
+'engine: {error}': 'motore: {error}'
+evidence facts: fatti a supporto
+failed: fallito
+fill it in first: compilalo prima
+filled: compilato
+final: finale
+full name: nome e cognome
+gap plan: piano lacune
+headline: titolo
+inbox/{name} already exists; rename the file: inbox/{name} esiste già; rinomina il file
+inbox/{name} uploaded; extract it when ready (stage 03): inbox/{name} caricato; estrailo quando vuoi (stadio 03)
+invalid: non valido
+invalid match file: file di corrispondenza non valido
+job: lavoro
+jobs/{id}/ already exists; postings are never overwritten: jobs/{id}/ esiste già; gli annunci non vengono mai sovrascritti
+'jobs/{id}/raw.txt written; next: normalise it (stage 10)': 'jobs/{id}/raw.txt scritto; prossimo passo: normalizzalo (stadio 10)'
+language: lingua
+letter: lettera
+letter approved on {date}; render the final when ready: lettera approvata il {date}; genera la versione finale quando vuoi
+links: link
+location: luogo
+masters: master
+match: corrispondenza
+match first: prima la corrispondenza
+max {n} page(s): max {n} pagina/e
+missing: mancante
+name: nome
+needs a match and a master CV: servono una corrispondenza e un CV master
+'no': 'no'
+no data root open: nessuna cartella dati aperta
+no evidence: nessuna evidenza
+no folders here: nessuna cartella qui
+no raw.txt: manca raw.txt
+no result: nessun risultato
+none: nessuno
+none yet: ancora nessuna
+normalise first: prima normalizza
+normalised: normalizzato
+not yet: non ancora
+note name: nome della nota
+ok: ok
+'ok: {output} written and valid': 'ok: {output} scritto e valido'
+open: apri
+parameters: parametri
+paste the posting's text: incolla il testo dell'annuncio
+phone: telefono
+prep: colloquio
+proposed: proposta
+rejected: rifiutato
+'rendered {name}: {pages} page(s)': 'generato {name}: {pages} pagina/e'
+role: ruolo
+running: in corso
+saved: salvato
+skill: competenza
+skip: lascia perdere
+stage: stadio
+started: avviata
+status: stato
+stretch: al limite
+tailor the CV first: prima adatta il CV
+template: template
+to-fill: da compilare
+up: su
+'user `{slug}` created; next: a questionnaire, or documents to extract': 'utente `{slug}` creato; prossimo passo: un questionario, o documenti da estrarre'
+verification needs evidence that exists: la verifica richiede un'evidenza esistente
+verified: verificato
+written: scritto
+'yes': sì
+'{count} file(s) checked': '{count} file controllati'
+'{name} saved and valid': '{name} salvato e valido'
+'{n} error(s)': '{n} errori'
+'{n} warning(s)': '{n} avvisi'
+'{output} was not written': '{output} non è stato scritto'

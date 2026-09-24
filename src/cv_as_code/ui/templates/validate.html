@@ -1,14 +1,14 @@
 {% extends "base.html" %}
-{% block title %}Validate{% endblock %}
+{% block title %}{{ t('Validate') }}{% endblock %}
 {% block content %}
-<h1>Validate</h1>
-<p>{{ count }} file(s) checked — <strong class="{{ 'bad' if errors else 'good' }}">{{ errors|length }} error(s)</strong>, {{ warnings|length }} warning(s). Same rules as <code>cvac validate --all</code>.</p>
+<h1>{{ t('Validate') }}</h1>
+<p>{{ t('{count} file(s) checked', count=count) }} — <strong class="{{ 'bad' if errors else 'good' }}">{{ t('{n} error(s)', n=errors|length) }}</strong>, {{ t('{n} warning(s)', n=warnings|length) }}. {{ t('Same rules as cvac validate --all.') }}</p>
 {% if errors %}
-<h2>Errors</h2>
+<h2>{{ t('Errors') }}</h2>
 <ul class="report">{% for e in errors %}<li class="bad">{{ e }}</li>{% endfor %}</ul>
 {% endif %}
 {% if warnings %}
-<h2>Warnings</h2>
+<h2>{{ t('Warnings') }}</h2>
 <ul class="report">{% for w in warnings %}<li class="warn">{{ w }}</li>{% endfor %}</ul>
 {% endif %}
 {% endblock %}

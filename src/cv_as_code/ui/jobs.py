@@ -13,6 +13,7 @@ from ..dataroot import DataRoot
 from ..documents import load_document
 from ..errors import CvacError
 from . import views
+from .i18n import t
 from .state import current_root, state
 
 bp = Blueprint("jobs", __name__)
@@ -36,10 +37,10 @@ def job_id_for(day: str, company: str, title: str) -> str:
     try:
         stamp = date.fromisoformat(day).strftime("%Y%m%d")
     except ValueError as e:
-        raise CvacError(f"`{day}` is not a date (YYYY-MM-DD)") from e
+        raise CvacError(t("`{day}` is not a date (YYYY-MM-DD)", day=day)) from e
     job_id = f"{stamp}-{slug(company)}-{slug(title)}"
     if not JOB_ID_RE.match(job_id):
-        raise CvacError("company and role must each contain at least one letter or digit")
+        raise CvacError(t("company and role must each contain at least one letter or digit"))
     return job_id
 
 
@@ -59,11 +60,11 @@ def create_job(
     root: DataRoot, day: str, channel: str, company: str, title: str, url: str, text: str
 ) -> str:
     if not text.strip():
-        raise CvacError("paste the posting's text")
+        raise CvacError(t("paste the posting's text"))
     job_id = job_id_for(day, company, title)
     d = root.job_dir(job_id)
     if d.exists():
-        raise CvacError(f"jobs/{job_id}/ already exists; postings are never overwritten")
+        raise CvacError(t("jobs/{id}/ already exists; postings are never overwritten", id=job_id))
     d.mkdir(parents=True)
     (d / "raw.txt").write_text(raw_text(channel, company, title, url, day, text), "utf-8")
     return job_id
@@ -176,7 +177,7 @@ def new(user: str):
     except CvacError as e:
         flash(str(e), "error")
         return redirect(url_for("jobs.listing", user=user))
-    flash(f"jobs/{job_id}/raw.txt written; next: normalise it (stage 10)", "ok")
+    flash(t("jobs/{id}/raw.txt written; next: normalise it (stage 10)", id=job_id), "ok")
     return redirect(url_for("jobs.job", user=user, job_id=job_id))
 
 

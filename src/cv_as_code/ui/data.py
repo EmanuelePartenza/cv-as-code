@@ -15,6 +15,7 @@ from ..errors import CvacError
 from ..scaffold import init_user
 from ..validate import write_validated
 from . import views
+from .i18n import t
 from .state import current_root, state
 
 bp = Blueprint("data", __name__)
@@ -94,20 +95,25 @@ def upload(user: str):
     file = request.files.get("file")
     name = secure_filename(file.filename or "") if file else ""
     if not file or not name:
-        flash("choose a file to upload", "error")
+        flash(t("choose a file to upload"), "error")
         return redirect(back)
     if Path(name).suffix.lower() not in UPLOAD_SUFFIXES:
         flash(
-            f"`{name}`: unsupported type (allowed: {', '.join(sorted(UPLOAD_SUFFIXES))})", "error"
+            t(
+                "`{name}`: unsupported type (allowed: {types})",
+                name=name,
+                types=", ".join(sorted(UPLOAD_SUFFIXES)),
+            ),
+            "error",
         )
         return redirect(back)
     target = udir / "inbox" / name
     if target.exists():
-        flash(f"inbox/{name} already exists; rename the file", "error")
+        flash(t("inbox/{name} already exists; rename the file", name=name), "error")
         return redirect(back)
     target.parent.mkdir(parents=True, exist_ok=True)
     file.save(target)
-    flash(f"inbox/{name} uploaded; extract it when ready (stage 03)", "ok")
+    flash(t("inbox/{name} uploaded; extract it when ready (stage 03)", name=name), "ok")
     return redirect(back)
 
 
@@ -122,10 +128,16 @@ def extract(user: str):
         not re.match(r"^(inbox|sources|interviews)/[^/]+$", document)
         or not (udir / document).is_file()
     ):
-        flash(f"`{document}` is not a document under inbox/, sources/ or interviews/", "error")
+        flash(
+            t("`{name}` is not a document under inbox/, sources/ or interviews/", name=document),
+            "error",
+        )
         return redirect(back)
     if not NAME_RE.match(name):
-        flash(f"`{name}` is not a note name (lowercase letters, digits and dashes)", "error")
+        flash(
+            t("`{name}` is not a note name (lowercase letters, digits and dashes)", name=name),
+            "error",
+        )
         return redirect(back)
     try:
         r = state().runs.start(
@@ -144,7 +156,7 @@ def apply_note(user: str):
     back = url_for("data.documents", user=user)
     name = request.form.get("name", "").strip()
     if not NAME_RE.match(name) or not (udir / "notes" / f"{name}.md").is_file():
-        flash(f"`{name}` is not an evidence note under notes/", "error")
+        flash(t("`{name}` is not an evidence note under notes/", name=name), "error")
         return redirect(back)
     try:
         r = state().runs.start(root, "04_apply", {"user": user, "name": name}, back)
@@ -162,7 +174,11 @@ def questionnaire(user: str):
     name = request.form.get("name", "").strip()
     if not NAME_RE.match(name):
         flash(
-            f"`{name}` is not a questionnaire name (lowercase letters, digits and dashes)", "error"
+            t(
+                "`{name}` is not a questionnaire name (lowercase letters, digits and dashes)",
+                name=name,
+            ),
+            "error",
         )
         return redirect(back)
     try:
@@ -189,7 +205,7 @@ def edit(user: str, rel: str):
         for w in rep.warnings:
             flash(w, "warn")
         if not errors:
-            flash(f"{rel} saved and valid", "ok")
+            flash(t("{name} saved and valid", name=rel), "ok")
             return redirect(url_for("data.edit", user=user, rel=rel))
     return render_template("edit.html", user=user, rel=rel, text=text, errors=errors)
 
@@ -217,7 +233,11 @@ def new_user():
             flash(str(e), "error")
             return render_template("new_user.html", form=form)
         flash(
-            f"user `{form['slug']}` created; next: a questionnaire, or documents to extract", "ok"
+            t(
+                "user `{slug}` created; next: a questionnaire, or documents to extract",
+                slug=form["slug"],
+            ),
+            "ok",
         )
         return redirect(url_for("data.documents", user=form["slug"]))
     return render_template("new_user.html", form=form)

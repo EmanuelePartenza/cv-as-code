@@ -14,6 +14,7 @@ from ..errors import CvacError
 from ..runner import RunResult, find_claude, run_stage, summarise_event
 from ..stages import resolve_stage
 from . import views
+from .i18n import t
 from .state import state
 
 bp = Blueprint("runs", __name__)
@@ -35,21 +36,21 @@ class Run:
     @property
     def summary(self) -> str:
         if self.status == "running":
-            return "running"
+            return t("running")
         if self.error:
             return self.error
         r = self.result
         if r is None:
-            return "no result"
+            return t("no result")
         if r.ok:
-            return f"ok: {r.output_rel} written and valid"
+            return t("ok: {output} written and valid", output=r.output_rel)
         parts = []
         if r.engine_error:
-            parts.append(f"engine: {r.engine_error}")
+            parts.append(t("engine: {error}", error=r.engine_error))
         if not r.written:
-            parts.append(f"{r.output_rel} was not written")
+            parts.append(t("{output} was not written", output=r.output_rel))
         parts += r.errors
-        return "; ".join(parts) or "failed"
+        return "; ".join(parts) or t("failed")
 
 
 class RunManager:

@@ -21,7 +21,8 @@ The UI (decision D-07, taken 2026-09-24) is the bridge to a person's data: first
 open asks for the folder; new user; documents in (upload, extract, question-
 naire); an editor that saves only what validates; the jobs area with one
 button per stage; CV and letter gates; run logs. Every button is a library
-call; nothing verifies or approves without the person's click.
+call; nothing verifies or approves without the person's click. The UI speaks
+English, French, German or Italian (ADR-0016); German CV labels ship.
 
 The example user exercises stages 03, 40 and 70 through the real engine and
 04 through its code (two more documents extracted and applied; the gap plan
@@ -63,9 +64,9 @@ Details in [DEVLOG.md](DEVLOG.md), which is the source of truth.
 <!-- AUTO:COMMITS -->
 | Hash | Date | Message |
 |---|---|---|
+| `be5d403` | 2026-09-24 | feat(apply): stage 04 deterministic, a note into the profile by code |
 | `82565d9` | 2026-09-24 | feat(stages): 04_apply, an evidence note into the profile as a contract |
 | `0cc154e` | 2026-09-24 | test: keep the config directory visible to the boundary test |
 | `6bb159d` | 2026-09-24 | feat(example): Robin's gap plan and interview prep from the real engine |
 | `ae199c8` | 2026-09-24 | feat(example): Robin's gap plan and interview prep from the real engine |
-| `6b8d96e` | 2026-09-24 | feat(ui): the data-root chooser, jobs, documents, editor, runs |
 <!-- /AUTO:COMMITS -->

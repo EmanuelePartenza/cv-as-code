@@ -1,44 +1,44 @@
 {% extends "base.html" %}
-{% block title %}Jobs · {{ user }}{% endblock %}
+{% block title %}{{ t('Jobs') }} · {{ user }}{% endblock %}
 {% block content %}
-<h1>Jobs — <code>{{ user }}</code></h1>
-<p class="muted">A posting enters verbatim as <code>jobs/&lt;id&gt;/raw.txt</code>; every step after that is a stage run by Claude and checked by the validator.</p>
+<h1>{{ t('Jobs') }} — <code>{{ user }}</code></h1>
+<p class="muted">{{ t('A posting enters verbatim as jobs/<id>/raw.txt; every step after that is a stage run by Claude and checked by the validator.') }}</p>
 
-<h2>Add a posting</h2>
+<h2>{{ t('Add a posting') }}</h2>
 <form method="post" action="{{ url_for('jobs.new', user=user) }}" class="stack">
   <div class="row">
-    <label>Company <input name="company" required></label>
-    <label>Role title <input name="title" required></label>
-    <label>Date <input name="date" type="date" value="{{ today }}" required></label>
+    <label>{{ t('Company') }} <input name="company" required></label>
+    <label>{{ t('Role title') }} <input name="title" required></label>
+    <label>{{ t('Date') }} <input name="date" type="date" value="{{ today }}" required></label>
   </div>
   <div class="row">
-    <label>Where you found it <input name="channel" placeholder="careers page, LinkedIn, referral"></label>
+    <label>{{ t('Where you found it') }} <input name="channel" placeholder="{{ t('careers page, LinkedIn, referral') }}"></label>
     <label>URL <input name="url" type="url" placeholder="https://…"></label>
   </div>
-  <label>The posting, pasted verbatim <textarea name="text" rows="10" required></textarea></label>
-  <button class="ok">Save the posting</button>
+  <label>{{ t('The posting, pasted verbatim') }} <textarea name="text" rows="10" required></textarea></label>
+  <button class="ok">{{ t('Save the posting') }}</button>
 </form>
 
-<h2>Postings</h2>
+<h2>{{ t('Postings') }}</h2>
 {% if jobs %}
 <table>
-  <thead><tr><th>id</th><th>company</th><th>role</th><th>normalised</th><th>match</th><th>CV</th><th>letter</th><th>prep</th><th>gap plan</th></tr></thead>
+  <thead><tr><th>id</th><th>{{ t('company') }}</th><th>{{ t('role') }}</th><th>{{ t('normalised') }}</th><th>{{ t('match') }}</th><th>CV</th><th>{{ t('letter') }}</th><th>{{ t('prep') }}</th><th>{{ t('gap plan') }}</th></tr></thead>
   <tbody>
   {% for j in jobs %}
   <tr>
     <td><a href="{{ url_for('jobs.job', user=user, job_id=j.id) }}">{{ j.id }}</a></td>
     <td>{{ j.company or '' }}</td><td>{{ j.title or '' }}</td>
-    <td>{% if j.job %}yes{% else %}<span class="muted">no</span>{% endif %}</td>
-    <td>{% if j.verdict %}<span class="badge {{ j.verdict }}">{{ j.verdict }}</span>{% else %}<span class="muted">—</span>{% endif %}</td>
-    <td>{% if j.spec_status %}<span class="badge {{ j.spec_status }}">{{ j.spec_status }}</span>{% else %}<span class="muted">—</span>{% endif %}</td>
-    <td>{% if j.letter_status %}<span class="badge {{ j.letter_status }}">{{ j.letter_status }}</span>{% else %}<span class="muted">—</span>{% endif %}</td>
-    <td>{% if j.prep %}yes{% else %}<span class="muted">—</span>{% endif %}</td>
-    <td>{% if j.growth %}yes{% else %}<span class="muted">—</span>{% endif %}</td>
+    <td>{% if j.job %}{{ t('yes') }}{% else %}<span class="muted">{{ t('no') }}</span>{% endif %}</td>
+    <td>{% if j.verdict %}<span class="badge {{ j.verdict }}">{{ t(j.verdict) }}</span>{% else %}<span class="muted">—</span>{% endif %}</td>
+    <td>{% if j.spec_status %}<span class="badge {{ j.spec_status }}">{{ t(j.spec_status) }}</span>{% else %}<span class="muted">—</span>{% endif %}</td>
+    <td>{% if j.letter_status %}<span class="badge {{ j.letter_status }}">{{ t(j.letter_status) }}</span>{% else %}<span class="muted">—</span>{% endif %}</td>
+    <td>{% if j.prep %}{{ t('yes') }}{% else %}<span class="muted">—</span>{% endif %}</td>
+    <td>{% if j.growth %}{{ t('yes') }}{% else %}<span class="muted">—</span>{% endif %}</td>
   </tr>
   {% endfor %}
   </tbody>
 </table>
 {% else %}
-<p class="muted">No posting yet.</p>
+<p class="muted">{{ t('No posting yet.') }}</p>
 {% endif %}
 {% endblock %}

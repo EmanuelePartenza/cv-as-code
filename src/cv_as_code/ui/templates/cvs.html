@@ -1,29 +1,29 @@
 {% extends "base.html" %}
-{% block title %}CVs · {{ user }}{% endblock %}
+{% block title %}{{ t('CVs') }} · {{ user }}{% endblock %}
 {% block content %}
-<h1>CVs and applications — <code>{{ user }}</code></h1>
-<p class="muted"><a href="{{ url_for('profile', user=user) }}">Profile and facts</a></p>
+<h1>{{ t('CVs and applications') }} — <code>{{ user }}</code></h1>
+<p class="muted"><a href="{{ url_for('profile', user=user) }}">{{ t('Profile and facts') }}</a></p>
 {% for kind in ('masters', 'applications') %}
-<h2>{{ kind|capitalize }}</h2>
+<h2>{{ t(kind) }}</h2>
 {% set rows = specs|selectattr('kind', 'equalto', kind)|list %}
 {% if rows %}
 <table>
-  <thead><tr><th>name</th><th>headline</th><th>language</th><th>status</th><th>PDF</th>{% if kind == 'applications' %}<th>letter</th>{% endif %}</tr></thead>
+  <thead><tr><th>{{ t('name') }}</th><th>{{ t('headline') }}</th><th>{{ t('language') }}</th><th>{{ t('status') }}</th><th>PDF</th>{% if kind == 'applications' %}<th>{{ t('letter') }}</th>{% endif %}</tr></thead>
   <tbody>
   {% for s in rows %}
   <tr>
     <td><a href="{{ url_for('spec', user=user, kind=kind, name=s.name) }}">{{ s.name }}</a></td>
     <td>{{ s.headline }}</td>
     <td><code>{{ s.language }}</code></td>
-    <td><span class="badge {{ s.status }}">{{ s.status }}</span>{% if s.approved_on %} <small class="muted">{{ s.approved_on }}</small>{% endif %}</td>
-    <td>{% if s.pdf.final %}final{% endif %}{% if s.pdf.final and s.pdf.draft %} · {% endif %}{% if s.pdf.draft %}draft{% endif %}{% if not s.pdf.final and not s.pdf.draft %}<span class="muted">none</span>{% endif %}</td>
-    {% if kind == 'applications' %}<td>{% if s.letter %}<span class="badge {{ s.letter.status }}">{{ s.letter.status }}</span>{% else %}<span class="muted">none</span>{% endif %}</td>{% endif %}
+    <td><span class="badge {{ s.status }}">{{ t(s.status) }}</span>{% if s.approved_on %} <small class="muted">{{ s.approved_on }}</small>{% endif %}</td>
+    <td>{% if s.pdf.final %}{{ t('final') }}{% endif %}{% if s.pdf.final and s.pdf.draft %} · {% endif %}{% if s.pdf.draft %}{{ t('draft') }}{% endif %}{% if not s.pdf.final and not s.pdf.draft %}<span class="muted">{{ t('none') }}</span>{% endif %}</td>
+    {% if kind == 'applications' %}<td>{% if s.letter %}<span class="badge {{ s.letter.status }}">{{ t(s.letter.status) }}</span>{% else %}<span class="muted">{{ t('none') }}</span>{% endif %}</td>{% endif %}
   </tr>
   {% endfor %}
   </tbody>
 </table>
 {% else %}
-<p class="muted">No {{ kind }} yet.</p>
+<p class="muted">{{ t('Nothing here yet.') }}</p>
 {% endif %}
 {% endfor %}
 {% endblock %}

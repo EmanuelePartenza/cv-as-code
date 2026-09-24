@@ -1,36 +1,36 @@
 {% extends "base.html" %}
-{% block title %}Data root{% endblock %}
+{% block title %}{{ t('Data root') }}{% endblock %}
 {% block content %}
-<h1>Data root</h1>
+<h1>{{ t('Data root') }}</h1>
 <p><code>{{ root_path }}</code></p>
 
-<h2>Users</h2>
+<h2>{{ t('Users') }}</h2>
 {% if users %}
 <ul class="cards">
   {% for u in users %}
   <li class="card">
     <strong>{{ u.full_name }}</strong> <code>{{ u.slug }}</code><br>
-    <a href="{{ url_for('profile', user=u.slug) }}">Profile and facts</a> ·
-    <a href="{{ url_for('data.documents', user=u.slug) }}">Documents</a> ·
-    <a href="{{ url_for('jobs.listing', user=u.slug) }}">Jobs</a> ·
-    <a href="{{ url_for('cvs', user=u.slug) }}">CVs and applications</a>
+    <a href="{{ url_for('profile', user=u.slug) }}">{{ t('Profile and facts') }}</a> ·
+    <a href="{{ url_for('data.documents', user=u.slug) }}">{{ t('Documents') }}</a> ·
+    <a href="{{ url_for('jobs.listing', user=u.slug) }}">{{ t('Jobs') }}</a> ·
+    <a href="{{ url_for('cvs', user=u.slug) }}">{{ t('CVs and applications') }}</a>
   </li>
   {% endfor %}
 </ul>
 {% else %}
-<p class="muted">No user yet.</p>
+<p class="muted">{{ t('No user yet.') }}</p>
 {% endif %}
-<p><a href="{{ url_for('data.new_user') }}">New user</a> — a slug, your name, your e-mail and where you live: the profile starts empty and fills through a questionnaire and the documents you drop in.</p>
+<p><a href="{{ url_for('data.new_user') }}">{{ t('New user') }}</a> — {{ t('a slug, your name, your e-mail and where you live: the profile starts empty and fills through a questionnaire and the documents you drop in.') }}</p>
 
 <h2>Git</h2>
 {% if git.available %}
   {% if git.lines|length <= 1 %}
-    <p class="muted">{{ git.lines[0] if git.lines else '' }} — clean working tree.</p>
+    <p class="muted">{{ git.lines[0] if git.lines else '' }} — {{ t('clean working tree.') }}</p>
   {% else %}
     <pre>{{ git.lines|join('\n') }}</pre>
-    <p class="muted">This page never commits: review and commit from your terminal.</p>
+    <p class="muted">{{ t('This page never commits: review and commit from your terminal.') }}</p>
   {% endif %}
 {% else %}
-  <p class="muted">Not a git repository (or git is not available).</p>
+  <p class="muted">{{ t('Not a git repository (or git is not available).') }}</p>
 {% endif %}
 {% endblock %}

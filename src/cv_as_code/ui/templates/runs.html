@@ -1,15 +1,15 @@
 {% extends "base.html" %}
-{% block title %}Runs{% endblock %}
+{% block title %}{{ t('Runs') }}{% endblock %}
 {% block content %}
-<h1>Runs</h1>
+<h1>{{ t('Runs') }}</h1>
 {% if runs %}
 <table>
-  <thead><tr><th>started</th><th>stage</th><th>params</th><th>status</th></tr></thead>
+  <thead><tr><th>{{ t('started') }}</th><th>{{ t('stage') }}</th><th>{{ t('parameters') }}</th><th>{{ t('status') }}</th></tr></thead>
   <tbody>
   {% for r in runs %}
-  <tr><td><a href="{{ url_for('runs.run', run_id=r.id) }}">{{ r.started.strftime('%Y-%m-%d %H:%M') }}</a></td><td>{{ r.stage }}</td><td>{% for k, v in r.params.items() %}<code>{{ k }}={{ v }}</code> {% endfor %}</td><td><span class="badge {{ r.status }}">{{ r.status }}</span></td></tr>
+  <tr><td><a href="{{ url_for('runs.run', run_id=r.id) }}">{{ r.started.strftime('%Y-%m-%d %H:%M') }}</a></td><td>{{ r.stage }}</td><td>{% for k, v in r.params.items() %}<code>{{ k }}={{ v }}</code> {% endfor %}</td><td><span class="badge {{ r.status }}">{{ t(r.status) }}</span></td></tr>
   {% endfor %}
   </tbody>
 </table>
-{% else %}<p class="muted">No run in this session.</p>{% endif %}
+{% else %}<p class="muted">{{ t('No run in this session.') }}</p>{% endif %}
 {% endblock %}
