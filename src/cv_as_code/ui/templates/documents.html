@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Documents · {{ user }}{% endblock %}
+{% block content %}
+<h1>Documents — <code>{{ user }}</code></h1>
+<p class="muted">Facts enter the profile from documents: a filled questionnaire, an old CV, a review. Claude extracts them into an evidence note with the passage each fact rests on; they land as <em>draft</em> and you verify them on the <a href="{{ url_for('profile', user=user) }}">profile</a>.</p>
+
+<section class="two">
+  <div>
+    <h2>Questionnaire</h2>
+    <p class="muted">Claude writes it in your language; you fill it in at your own pace (edit it here), set <code>status: filled</code>, then extract it.</p>
+    <form method="post" action="{{ url_for('data.questionnaire', user=user) }}" class="inline">
+      <label>Name <input name="name" value="{{ next_name }}" pattern="[a-z0-9][a-z0-9-]*"></label>
+      <button>Generate with Claude (05)</button>
+    </form>
+    <ul>
+      {% for f in d.interviews %}
+      <li><a href="{{ url_for('data.edit', user=user, rel=f.rel) }}">{{ f.name }}</a> {% if f.status %}<span class="badge {{ f.status }}">{{ f.status }}</span>{% endif %}
+        <form method="post" action="{{ url_for('data.extract', user=user) }}" class="inline"><input type="hidden" name="document" value="{{ f.rel }}"><input type="hidden" name="name" value="{{ f.name[:-3] }}"><button {% if f.status != 'filled' %}disabled title="fill it in first"{% endif %}>Extract (03)</button></form>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div>
+    <h2>Upload a document</h2>
+    <form method="post" action="{{ url_for('data.upload', user=user) }}" enctype="multipart/form-data" class="inline">
+      <input type="file" name="file" required>
+      <button>Upload to inbox</button>
+    </form>
+    <h3>Inbox</h3>
+    <ul>
+      {% for f in d.inbox %}
+      <li>{{ f.name }}
+        <form method="post" action="{{ url_for('data.extract', user=user) }}" class="inline"><input type="hidden" name="document" value="{{ f.rel }}"><label>note name <input name="name" value="{{ f.name.rsplit('.', 1)[0]|lower|replace(' ', '-')|replace('_', '-') }}" size="18" pattern="[a-z0-9][a-z0-9-]*"></label><button>Extract (03)</button></form>
+      </li>
+      {% else %}<li class="muted">empty</li>{% endfor %}
+    </ul>
+    <h3>Sources (archived)</h3>
+    <ul>{% for f in d.sources %}<li>{{ f.name }}</li>{% else %}<li class="muted">none</li>{% endfor %}</ul>
+  </div>
+</section>
+
+<h2>Evidence notes</h2>
+<ul>
+  {% for f in d.notes %}<li><a href="{{ url_for('data.edit', user=user, rel=f.rel) }}">{{ f.name }}</a> {% if f.status %}<span class="badge {{ f.status }}">{{ f.status }}</span>{% endif %}</li>{% else %}<li class="muted">none yet</li>{% endfor %}
+</ul>
+
+<h2>Data files</h2>
+<p><a href="{{ url_for('data.edit', user=user, rel='profile.yaml') }}">profile.yaml</a> · <a href="{{ url_for('data.edit', user=user, rel='search.yaml') }}">search.yaml</a> — edited as text, validated before saving.</p>
+{% endblock %}

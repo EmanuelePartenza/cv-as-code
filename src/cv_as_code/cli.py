@@ -204,7 +204,10 @@ def cmd_fact(args: argparse.Namespace) -> int:
 
 
 def cmd_ui(args: argparse.Namespace) -> int:
-    root = DataRoot.locate(args.data_root)
+    try:
+        root: DataRoot | None = DataRoot.locate(args.data_root)
+    except CvacError:
+        root = None  # the UI's first screen asks for one
     try:
         from .ui import serve
     except ModuleNotFoundError as e:

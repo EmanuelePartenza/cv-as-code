@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Open a data root{% endblock %}
+{% block content %}
+<h1>Where is your data?</h1>
+<p>cv-as-code keeps everything about you in a folder of your own — the <em>data root</em>, marked by a <code>cvac.yaml</code> file — and never anywhere else. Point the UI at an existing one, or at an empty folder to create one.</p>
+<form method="post" class="stack">
+  <label>Folder <input type="text" name="path" value="{{ path }}" placeholder="/home/you/my-cv" required size="60"></label>
+  <label><input type="checkbox" name="create"> create it if it does not exist yet (or is empty)</label>
+  <button class="ok">Open</button>
+</form>
+{% if recent %}
+<h2>Recent</h2>
+<ul>
+  {% for r in recent %}
+  <li><form method="post" class="inline"><input type="hidden" name="path" value="{{ r }}"><button class="link">{{ r }}</button></form></li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Runs{% endblock %}
+{% block content %}
+<h1>Runs</h1>
+{% if runs %}
+<table>
+  <thead><tr><th>started</th><th>stage</th><th>params</th><th>status</th></tr></thead>
+  <tbody>
+  {% for r in runs %}
+  <tr><td><a href="{{ url_for('runs.run', run_id=r.id) }}">{{ r.started.strftime('%Y-%m-%d %H:%M') }}</a></td><td>{{ r.stage }}</td><td>{% for k, v in r.params.items() %}<code>{{ k }}={{ v }}</code> {% endfor %}</td><td><span class="badge {{ r.status }}">{{ r.status }}</span></td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}<p class="muted">No run in this session.</p>{% endif %}
+{% endblock %}

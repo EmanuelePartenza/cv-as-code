@@ -185,13 +185,21 @@ server-rendered web UI bound to the loopback interface and opens the browser
 ([ADR-0014](adr/0014-local-ui-thin-adapter.md)). It is a fourth adapter over
 the library, next to the CLI, the skills and `stage pack`: every screen reads
 through the same functions and every button calls the same gate the CLI
-exposes, with the same refusals. Slice 1, built: the profile with statuses,
-evidence quotes and the completeness checklist; verify and reject buttons;
-CVs and applications with draft and final render, PDF preview, approval of a
-spec or a letter; the validation report; the data root's git status (the UI
-never commits). A POST whose `Origin` or `Referer` is not the UI's own host is
-refused, so another page open in the browser cannot press a gate button.
-Slices 2 and 3 are roadmap (§10).
+exposes, with the same refusals. Built: the data-root chooser on first open
+(recent roots remembered in the user's config directory, never in a root; an
+empty or new folder becomes a data root on request); a new-user form that
+scaffolds a valid empty profile and search; the profile with statuses,
+evidence quotes and the completeness checklist, with verify and reject
+buttons; the documents area (upload to `inbox/`, extract with stage 03,
+generate a questionnaire with stage 05, an editor over `profile.yaml`,
+`search.yaml`, questionnaires, notes and gap plans that saves only what
+validates); the jobs area (a posting pasted verbatim into `raw.txt`, then
+stages 10, 20, 30, 60, 70 and 40 as buttons); CVs and applications with draft
+and final render, PDF preview, approval of a spec or a letter; every stage run
+as a thread over `cvac stage run` with a live log page; the validation
+report; the data root's git status (the UI never commits). A POST whose
+`Origin` or `Referer` is not the UI's own host is refused, so another page
+open in the browser cannot press a gate button.
 
 ## 6. Templates and rendering
 
@@ -252,8 +260,8 @@ README.
   today only `identity_fields` per language and per spec exists.
 - A deterministic `apply` of an evidence note into the profile (needs a
   format-preserving YAML writer); a photo asset for markets that expect one.
-- The UI's next slices (ADR-0014): the manual stage path in the browser
-  (pack, paste the answer, validate), then the stage screen over the API
-  runner.
+- In the UI: a form-based editor once a layout-preserving YAML writer
+  exists; the manual stage path (pack, paste the answer) for people without
+  Claude Code.
 - PyPI release; Claude Code plugin packaging of the skills.
 - A CI job on Windows.

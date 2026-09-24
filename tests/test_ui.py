@@ -32,9 +32,9 @@ def page(c: flask.testing.FlaskClient, url: str, status: int = 200) -> str:
     return r.get_data(as_text=True)
 
 
-def post(c: flask.testing.FlaskClient, url: str, **data: str) -> str:
-    r = c.post(url, data=data, follow_redirects=True)
-    assert r.status_code == 200, (url, r.status_code)
+def post(c: flask.testing.FlaskClient, _url: str, **data: str) -> str:
+    r = c.post(_url, data=data, follow_redirects=True)
+    assert r.status_code == 200, (_url, r.status_code)
     return r.get_data(as_text=True)
 
 
@@ -243,3 +243,231 @@ def test_cvac_ui_names_the_missing_extra(
     monkeypatch.setitem(sys.modules, "flask", None)
     assert main(["ui", "--no-browser", "--data-root", str(data_root.path)]) == 1
     assert "needs the `ui` extra" in capsys.readouterr().err
+
+
+# --- slice 2: the chooser, jobs, documents, the editor, runs -----------------------------------
+
+
+@pytest.fixture
+def ui_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "cfg"))
+    monkeypatch.setenv("XDG_CACHE_HOME", str(tmp_path / "cache"))
+    return tmp_path
+
+
+def test_without_a_root_every_page_leads_to_the_chooser(data_root: DataRoot, ui_env: Path) -> None:
+    app = create_app(None)
+    app.config["TESTING"] = True
+    c = app.test_client()
+    r = c.get("/")
+    assert r.status_code == 302 and r.headers["Location"].endswith("/open")
+    assert "Where is your data" in page(c, "/open")
+    body = post(c, "/open", path=str(data_root.path))
+    assert "Test User" in body and f"data root: {data_root.path}" in body
+    assert str(data_root.path) in (ui_env / "cfg" / "cvac" / "ui.yaml").read_text("utf-8")
+    assert str(data_root.path) in page(c, "/open")
+
+
+def test_chooser_creates_a_root_only_when_asked_and_refuses_other_directories(
+    ui_env: Path,
+) -> None:
+    app = create_app(None)
+    app.config["TESTING"] = True
+    c = app.test_client()
+    fresh = ui_env / "fresh"
+    assert "to scaffold a data root there" in post(c, "/open", path=str(fresh))
+    body = post(c, "/open", path=str(fresh), create="on")
+    assert (fresh / "cvac.yaml").is_file() and "No user yet" in body
+    other = ui_env / "other"
+    other.mkdir()
+    (other / "x.txt").write_text("x")
+    assert "is not a data root" in post(c, "/open", path=str(other), create="on")
+    assert "absolute path" in post(c, "/open", path="relative/dir")
+
+
+def test_new_user_form_scaffolds_a_valid_user(data_root: DataRoot, ui_env: Path) -> None:
+    c = client(data_root)
+    body = post(
+        c,
+        "/new-user",
+        slug="ada",
+        full_name="Ada Example",
+        email="ada@example.org",
+        city="Testville",
+        country="XX",
+        pivot_language="en",
+        target_roles="engineer, analyst",
+    )
+    assert "user `ada` created" in body and "Questionnaire" in body
+    assert data_root.profile_path("ada").is_file()
+    assert "0 error(s)" in page(c, "/validate")
+    assert "at least one target role" in post(
+        c, "/new-user", slug="bob", full_name="B", email="b@example.org", city="X", target_roles=""
+    )
+
+
+def test_jobs_area_saves_a_posting_verbatim_and_refuses_duplicates(
+    data_root: DataRoot, ui_env: Path
+) -> None:
+    c = client(data_root)
+    assert "No posting yet" in page(c, "/u/test/jobs")
+    form = {
+        "company": "Acme Widgets",
+        "title": "Widget Engineer",
+        "date": "2026-09-24",
+        "channel": "careers page",
+        "url": "https://example.com/jobs/1",
+        "text": "Widget Engineer wanted.\n\n3+ years of widgets.",
+    }
+    body = post(c, "/u/test/jobs/new", **form)
+    assert "jobs/20260924-acme-widgets-widget-engineer/raw.txt written" in body
+    raw = (
+        data_root.path / "jobs" / "20260924-acme-widgets-widget-engineer" / "raw.txt"
+    ).read_text()
+    assert raw.startswith(
+        "SOURCE: careers page\nCOMPANY: Acme Widgets\nTITLE: Widget Engineer\nURL: https://example.com/jobs/1\n"
+    )
+    assert raw.endswith("---\nWidget Engineer wanted.\n\n3+ years of widgets.\n")
+    assert "already exists" in post(c, "/u/test/jobs/new", **form)
+    assert "is not a date" in post(c, "/u/test/jobs/new", **{**form, "date": "yesterday"})
+    assert "paste the posting" in post(c, "/u/test/jobs/new", **{**form, "text": " "})
+    body = page(c, "/u/test/jobs/20260924-acme-widgets-widget-engineer")
+    assert "Normalise (10)" in body and "Widget Engineer wanted." in body
+    page(c, "/u/test/jobs/20260924-ghost", 404)
+
+
+def test_job_page_runs_a_stage_and_shows_its_log(
+    data_root: DataRoot, ui_env: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import stat
+
+    from test_runner import FAKE
+
+    write_job(data_root)
+    fake = ui_env / "fake-claude"
+    fake.write_text(FAKE, "utf-8")
+    fake.chmod(fake.stat().st_mode | stat.S_IXUSR)
+    monkeypatch.setenv("CVAC_CLAUDE_BIN", str(fake))
+    app = create_app(data_root)
+    app.config["TESTING"] = True
+    c = app.test_client()
+    r = c.post("/u/test/jobs/20260101-acme-widget/run/20_match")
+    assert r.status_code == 302 and "/runs/" in r.headers["Location"]
+    run_id = r.headers["Location"].rsplit("/", 1)[1]
+    run = app.extensions["cvac"].runs.wait(run_id)
+    assert run.status == "failed"
+    body = page(c, f"/runs/{run_id}")
+    assert "was not written" in body and "[Write]" in body and "Back to where" in body
+    assert "20_match" in page(c, "/runs")
+    assert c.post("/u/test/jobs/20260101-acme-widget/run/99_nope").status_code == 404
+    assert "is missing" in post(c, "/u/test/jobs/20260101-acme-widget/run/30_tailor", master="base")
+    page(c, "/runs/nope", 404)
+
+
+def test_documents_area_uploads_extracts_and_edits(
+    data_root: DataRoot, ui_env: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import io
+    import stat
+
+    from test_runner import FAKE
+
+    fake = ui_env / "fake-claude"
+    fake.write_text(FAKE, "utf-8")
+    fake.chmod(fake.stat().st_mode | stat.S_IXUSR)
+    monkeypatch.setenv("CVAC_CLAUDE_BIN", str(fake))
+    app = create_app(data_root)
+    app.config["TESTING"] = True
+    c = app.test_client()
+    body = page(c, "/u/test/documents")
+    assert "01-onboarding" in body and "profile.yaml" in body
+    r = c.post(
+        "/u/test/documents/upload",
+        data={"file": (io.BytesIO(b"I built widgets for years."), "Old CV.txt")},
+        content_type="multipart/form-data",
+        follow_redirects=True,
+    )
+    assert "inbox/Old_CV.txt uploaded" in r.get_data(as_text=True)
+    assert (data_root.path / "users" / "test" / "inbox" / "Old_CV.txt").is_file()
+    r = c.post(
+        "/u/test/documents/upload",
+        data={"file": (io.BytesIO(b"x"), "evil.exe")},
+        content_type="multipart/form-data",
+        follow_redirects=True,
+    )
+    assert "unsupported type" in r.get_data(as_text=True)
+    r = c.post("/u/test/documents/extract", data={"document": "inbox/Old_CV.txt", "name": "old-cv"})
+    assert r.status_code == 302 and "/runs/" in r.headers["Location"]
+    assert "is not a document" in post(c, "/u/test/documents/extract", document="../x", name="x")
+    assert "is not a note name" in post(
+        c, "/u/test/documents/extract", document="inbox/Old_CV.txt", name="Bad Name"
+    )
+    r = c.post("/u/test/documents/questionnaire", data={"name": "01-onboarding"})
+    assert r.status_code == 302 and "/runs/" in r.headers["Location"]
+
+
+def test_editor_saves_only_what_validates(data_root: DataRoot, ui_env: Path) -> None:
+    c = client(data_root)
+    search = data_root.path / "users" / "test" / "search.yaml"
+    before = search.read_text("utf-8")
+    assert "target_roles" in page(c, "/u/test/edit/search.yaml")
+    body = post(c, "/u/test/edit/search.yaml", text="kind: search\nuser: test\n")
+    assert "Not saved" in body and "required property" in body
+    assert search.read_text("utf-8") == before
+    body = post(
+        c,
+        "/u/test/edit/search.yaml",
+        text=before.replace("confidential: false", "confidential: true"),
+    )
+    assert "saved and valid" in body and "confidential: true" in search.read_text("utf-8")
+    note = data_root.path / "users" / "test" / "notes" / "fresh.md"
+    body = post(c, "/u/test/edit/notes/fresh.md", text="---\nkind: evidence\n---\n")
+    assert "Not saved" in body and not note.exists()
+    page(c, "/u/test/edit/../cvac.yaml", 404)
+    page(c, "/u/test/edit/masters/base/cv-spec.yaml", 404)
+
+
+def test_binary_inputs_do_not_break_the_pack(data_root: DataRoot) -> None:
+    from cv_as_code.stages import pack, resolve_stage
+
+    doc = data_root.path / "users" / "test" / "inbox" / "scan.pdf"
+    doc.parent.mkdir(parents=True, exist_ok=True)
+    doc.write_bytes(b"%PDF-1.4\n\xff\xfe\x00binary")
+    text = pack(
+        data_root,
+        resolve_stage(data_root, "03_extract", {"document": "inbox/scan.pdf", "name": "scan"}),
+    )
+    assert "binary document at `users/test/inbox/scan.pdf`" in text
+
+
+def test_a_successful_run_and_an_engine_failure_are_both_reported(
+    data_root: DataRoot, ui_env: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import stat
+
+    import yaml
+    from conftest import MATCH
+    from test_runner import FAKE
+
+    write_job(data_root)
+    fake = ui_env / "fake-claude"
+    fake.write_text(FAKE, "utf-8")
+    fake.chmod(fake.stat().st_mode | stat.S_IXUSR)
+    monkeypatch.setenv("CVAC_CLAUDE_BIN", str(fake))
+    out = ui_env / "match.yaml"
+    out.write_text(yaml.safe_dump(MATCH, sort_keys=False), "utf-8")
+    monkeypatch.setenv("FAKE_OUTPUT", str(out))
+    app = create_app(data_root)
+    app.config["TESTING"] = True
+    c = app.test_client()
+    r = c.post("/u/test/jobs/20260101-acme-widget/run/20_match")
+    run = app.extensions["cvac"].runs.wait(r.headers["Location"].rsplit("/", 1)[1])
+    assert run.status == "ok" and run.result is not None and run.result.ok
+    body = page(c, f"/runs/{run.id}")
+    assert "ok: users/test/matches" in body and "cost 0.0123" in body
+    assert "stretch" in page(c, "/u/test/jobs/20260101-acme-widget")
+    monkeypatch.setenv("FAKE_EXIT", "2")
+    r = c.post("/u/test/jobs/20260101-acme-widget/run/40_gap_plan")
+    run = app.extensions["cvac"].runs.wait(r.headers["Location"].rsplit("/", 1)[1])
+    assert run.status == "failed"
+    assert "engine: engine exited with code 2" in page(c, f"/runs/{run.id}")

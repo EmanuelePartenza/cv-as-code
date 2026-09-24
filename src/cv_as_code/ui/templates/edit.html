@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ rel }} · {{ user }}{% endblock %}
+{% block content %}
+<p class="muted"><a href="{{ url_for('data.documents', user=user) }}">Documents</a> › {{ rel }}</p>
+<h1><code>users/{{ user }}/{{ rel }}</code></h1>
+{% if errors %}
+<h2 class="bad">Not saved: validation errors</h2>
+<ul class="report">{% for e in errors %}<li class="bad">{{ e }}</li>{% endfor %}</ul>
+{% endif %}
+<form method="post" class="stack">
+  <textarea name="text" rows="32" class="code" spellcheck="false">{{ text }}</textarea>
+  <button class="ok">Validate and save</button>
+</form>
+<p class="muted">Saving runs the same rules as <code>cvac validate</code>; a file that does not validate is not written. Statuses <code>verified</code> and <code>approved</code> are set from their buttons, not here.</p>
+{% endblock %}

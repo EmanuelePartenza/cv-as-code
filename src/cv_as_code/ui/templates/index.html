@@ -11,13 +11,16 @@
   <li class="card">
     <strong>{{ u.full_name }}</strong> <code>{{ u.slug }}</code><br>
     <a href="{{ url_for('profile', user=u.slug) }}">Profile and facts</a> ·
+    <a href="{{ url_for('data.documents', user=u.slug) }}">Documents</a> ·
+    <a href="{{ url_for('jobs.listing', user=u.slug) }}">Jobs</a> ·
     <a href="{{ url_for('cvs', user=u.slug) }}">CVs and applications</a>
   </li>
   {% endfor %}
 </ul>
 {% else %}
-<p class="muted">No user yet: add <code>users/&lt;slug&gt;/profile.yaml</code>, or run the onboarding questionnaire (stage <code>05_interview</code>).</p>
+<p class="muted">No user yet.</p>
 {% endif %}
+<p><a href="{{ url_for('data.new_user') }}">New user</a> — a slug, your name, your e-mail and where you live: the profile starts empty and fills through a questionnaire and the documents you drop in.</p>
 
 <h2>Git</h2>
 {% if git.available %}

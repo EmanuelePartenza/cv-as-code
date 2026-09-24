@@ -12,11 +12,16 @@
   <nav>
     {% if default_user %}
       <a href="{{ url_for('profile', user=default_user) }}">Profile</a>
+      <a href="{{ url_for('data.documents', user=default_user) }}">Documents</a>
+      <a href="{{ url_for('jobs.listing', user=default_user) }}">Jobs</a>
       <a href="{{ url_for('cvs', user=default_user) }}">CVs</a>
     {% endif %}
-    <a href="{{ url_for('validate') }}">Validate</a>
+    {% if root_path %}
+      <a href="{{ url_for('runs.runs') }}">Runs</a>
+      <a href="{{ url_for('validate') }}">Validate</a>
+    {% endif %}
   </nav>
-  <span class="root" title="data root">{{ root_path }}</span>
+  <span class="root" title="data root">{% if root_path %}{{ root_path }} · <a href="{{ url_for('open_root') }}">change</a>{% else %}no data root open{% endif %}</span>
 </header>
 <main>
   {% with messages = get_flashed_messages(with_categories=true) %}

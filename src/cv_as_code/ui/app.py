@@ -34,10 +34,13 @@ from ..report import evidence_quote, profile_data
 from ..resolve import resolve
 from ..specs import approve
 from ..validate import discover_all, validate_files
-from . import views
+from . import data, jobs, runs, views
+from .runs import RunManager
+from .state import UiState, current_root, recent_roots, state
 
 FACT_ACTIONS = {"verify": "verified", "reject": "rejected"}
 MODES = ("draft", "final")
+OPEN_ENDPOINTS = {"open_root", "static"}
 
 
 def _flash_outcome(action: Callable[[], str]) -> None:
@@ -61,13 +64,31 @@ def _render_message(out_name: str, pages: int, warnings: list[str]) -> str:
     return f"rendered {out_name}: {pages} page(s)"
 
 
-def _register_pages(app: Flask, root: DataRoot) -> None:
+def _register_pages(app: Flask) -> None:
+    @app.route("/open", methods=["GET", "POST"])
+    def open_root():
+        if request.method == "POST":
+            try:
+                root = state().open(
+                    request.form.get("path", ""), request.form.get("create") == "on"
+                )
+            except CvacError as e:
+                flash(str(e), "error")
+                return render_template(
+                    "open.html", recent=recent_roots(), path=request.form.get("path", "")
+                )
+            flash(f"data root: {root.path}", "ok")
+            return redirect(url_for("index"))
+        return render_template("open.html", recent=recent_roots(), path="")
+
     @app.get("/")
     def index() -> str:
+        root = current_root()
         return render_template("index.html", users=views.users(root), git=views.git_status(root))
 
     @app.get("/validate")
     def validate() -> str:
+        root = current_root()
         files = discover_all(root)
         rep = validate_files(root, files)
         return render_template(
@@ -76,25 +97,26 @@ def _register_pages(app: Flask, root: DataRoot) -> None:
 
     @app.get("/u/<user>")
     def profile(user: str) -> str:
+        root = current_root()
         user_dir = views.user_dir_of(root, user)
-        data = profile_data(root, user)
-        for entry in data["entries"]:
+        pdata = profile_data(root, user)
+        for entry in pdata["entries"]:
             for fact in entry["facts"]:
                 for ev in fact["evidence"]:
                     ev["quote"] = evidence_quote(user_dir, ev["ref"]) if ev["exists"] else None
-        return render_template("profile.html", p=data)
+        return render_template("profile.html", p=pdata)
 
     @app.get("/u/<user>/cvs")
     def cvs(user: str) -> str:
-        return render_template("cvs.html", user=user, specs=views.specs(root, user))
+        return render_template("cvs.html", user=user, specs=views.specs(current_root(), user))
 
     @app.get("/u/<user>/<kind>/<name>")
     def spec(user: str, kind: str, name: str) -> str:
-        return render_template("spec.html", s=views.spec_detail(root, user, kind, name))
+        return render_template("spec.html", s=views.spec_detail(current_root(), user, kind, name))
 
     @app.get("/u/<user>/<kind>/<name>/pdf/<which>")
     def pdf(user: str, kind: str, name: str, which: str) -> Response:
-        s = views.spec_detail(root, user, kind, name)
+        s = views.spec_detail(current_root(), user, kind, name)
         letter, _, variant = which.rpartition("-") if "-" in which else ("", "", which)
         pdfs = (s["letter"] or {}).get("pdf", {}) if letter == "letter" else s["pdf"]
         path = pdfs.get(variant)
@@ -103,7 +125,7 @@ def _register_pages(app: Flask, root: DataRoot) -> None:
         return send_file(path, mimetype="application/pdf", as_attachment=False, max_age=0)
 
 
-def _register_gates(app: Flask, root: DataRoot) -> None:
+def _register_gates(app: Flask) -> None:
     """POST handlers: the person's acts, each bound to one button."""
 
     def back_to_spec(user: str, kind: str, name: str) -> Response:
@@ -111,6 +133,7 @@ def _register_gates(app: Flask, root: DataRoot) -> None:
 
     @app.post("/u/<user>/fact/<fact_id>/<action>")
     def fact_action(user: str, fact_id: str, action: str) -> Response:
+        root = current_root()
         views.user_dir_of(root, user)
         if action not in FACT_ACTIONS:
             raise views.NotFound(f"no action `{action}`")
@@ -124,6 +147,7 @@ def _register_gates(app: Flask, root: DataRoot) -> None:
 
     @app.post("/u/<user>/<kind>/<name>/render")
     def render_spec(user: str, kind: str, name: str) -> Response:
+        root = current_root()
         d = views.spec_dir_of(root, user, kind, name)
         mode = _mode()
 
@@ -137,6 +161,7 @@ def _register_gates(app: Flask, root: DataRoot) -> None:
 
     @app.post("/u/<user>/<kind>/<name>/approve")
     def approve_spec(user: str, kind: str, name: str) -> Response:
+        root = current_root()
         d = views.spec_dir_of(root, user, kind, name)
         _flash_outcome(
             lambda: f"approved on {approve(root, d / 'cv-spec.yaml')}; render the final when ready"
@@ -145,6 +170,7 @@ def _register_gates(app: Flask, root: DataRoot) -> None:
 
     @app.post("/u/<user>/<kind>/<name>/letter/render")
     def render_letter_of(user: str, kind: str, name: str) -> Response:
+        root = current_root()
         d = views.spec_dir_of(root, user, kind, name)
         mode = _mode()
 
@@ -157,6 +183,7 @@ def _register_gates(app: Flask, root: DataRoot) -> None:
 
     @app.post("/u/<user>/<kind>/<name>/letter/approve")
     def approve_letter_of(user: str, kind: str, name: str) -> Response:
+        root = current_root()
         d = views.spec_dir_of(root, user, kind, name)
         _flash_outcome(
             lambda: (
@@ -166,11 +193,12 @@ def _register_gates(app: Flask, root: DataRoot) -> None:
         return back_to_spec(user, kind, name)
 
 
-def create_app(root: DataRoot) -> Flask:
+def create_app(root: DataRoot | None = None) -> Flask:
+    """The application on a data root, or on none: then every page leads to the chooser."""
     app = Flask(__name__)
     # Flashes are the only session content; a fresh key per process is right for a local tool.
     app.config["SECRET_KEY"] = secrets.token_hex(16)
-    app.config["DATA_ROOT"] = str(root.path)
+    app.extensions["cvac"] = UiState(root, RunManager())
 
     @app.before_request
     def _same_origin_posts() -> None:
@@ -183,9 +211,19 @@ def create_app(root: DataRoot) -> Flask:
         if origin and urlsplit(origin).netloc != request.host:
             abort(403)
 
+    @app.before_request
+    def _need_a_root():
+        if state().root is None and request.endpoint not in OPEN_ENDPOINTS:
+            return redirect(url_for("open_root"))
+        return None
+
     @app.context_processor
     def _globals() -> dict[str, object]:
-        return {"root_path": str(root.path), "default_user": root.default_user}
+        root = state().root
+        return {
+            "root_path": str(root.path) if root else None,
+            "default_user": root.default_user if root else None,
+        }
 
     @app.errorhandler(views.NotFound)
     def _not_found(e: views.NotFound) -> tuple[str, int]:
@@ -195,18 +233,22 @@ def create_app(root: DataRoot) -> Flask:
     def _cvac_error(e: CvacError) -> tuple[str, int]:
         return render_template("error.html", title="Error", message=str(e)), 400
 
-    _register_pages(app, root)
-    _register_gates(app, root)
+    _register_pages(app)
+    _register_gates(app)
+    app.register_blueprint(runs.bp)
+    app.register_blueprint(jobs.bp)
+    app.register_blueprint(data.bp)
     return app
 
 
 def serve(
-    root: DataRoot, host: str = "127.0.0.1", port: int = 8765, open_browser: bool = True
+    root: DataRoot | None, host: str = "127.0.0.1", port: int = 8765, open_browser: bool = True
 ) -> None:
     """Run the UI until interrupted; the browser opens once the server is up."""
     app = create_app(root)
     url = f"http://{host}:{port}/"
     if open_browser:
         threading.Timer(0.8, webbrowser.open, args=(url,)).start()
-    print(f"cvac ui at {url}  (data root: {root.path}) - Ctrl-C to stop")
+    where = f"data root: {root.path}" if root else "no data root yet: the browser asks for one"
+    print(f"cvac ui at {url}  ({where}) - Ctrl-C to stop")
     app.run(host=host, port=port, debug=False, use_reloader=False)

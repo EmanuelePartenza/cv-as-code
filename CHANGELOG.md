@@ -13,6 +13,19 @@ Tags: `arch`, `perf`, `ui`, `test`, `docs`, `fix`, `cleanup`, `sec`.
 
 ## 2026-09-24
 
+### feat(ui): the UI as the bridge to a person's data (D-07) [ui, arch]
+
+- First open asks for the data folder (recent roots in the user's config
+  directory; an empty or new folder becomes a data root on request); a
+  new-user form scaffolds a valid empty profile and search.
+- Documents: upload to `inbox/`, extract with Claude (stage 03), generate a
+  questionnaire (stage 05), an editor over the data files that saves only
+  what validates.
+- Jobs: a posting pasted verbatim into `raw.txt`; stages 10, 20, 30, 60, 70
+  and 40 as buttons, each a run of `cvac stage run` in a thread with a live
+  log page; the CV and letter gates unchanged.
+- Files: `src/cv_as_code/ui/{state,runs,jobs,data}.py`, templates, tests.
+
 ### feat(runner): cvac stage run over Claude Code, stages 40 and 70, user scaffold [arch]
 
 - `cvac stage run <stage> …` executes a stage with Claude Code in print mode

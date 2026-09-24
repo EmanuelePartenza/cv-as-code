@@ -32,7 +32,8 @@ cvac validate --all                                                     # 0 erro
 cvac cv users/robin/masters/port-operations-en --mode final
 #   → users/robin/masters/port-operations-en/Robin_Ashcombe_Port_Operations_EN.pdf, one page
 uv tool install "cv-as-code[ui] @ git+https://github.com/EmanuelePartenza/cv-as-code" && cvac ui
-#   → the same data root in your browser: facts with their evidence, verify/reject, draft and final renders, approval
+#   → your data in the browser: choose the folder, drop documents, paste postings, run each stage
+#     with Claude Code, verify facts, approve CVs and letters, preview PDFs
 ```
 
 No external binary: the Typst compiler comes from PyPI and the fonts are vendored. `example/` is a complete data root — Robin Ashcombe, a fictional lighthouse keeper applying for a port job — produced through the framework's own stages; example/README.md says what each file shows, and has two commands that make the gates fail on purpose.
@@ -84,7 +85,7 @@ The framework's surface — code, messages, docs, stage instructions — is Engl
 - It does not scrape job platforms or automate a browser. Postings are pasted.
 - It does not predict page overflow; the page budget is checked after rendering.
 - It does not track applications yet, and it does not call any model itself.
-- The UI (`cvac ui`) is local and single-user: no authentication, no network exposure by default, no chat; it never commits to git.
+- The UI (`cvac ui`) is local and single-user: no authentication, no network exposure by default, no chat; it never commits to git. Its "run with Claude" buttons need Claude Code installed and logged in.
 
 ## Status
 

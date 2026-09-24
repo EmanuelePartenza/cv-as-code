@@ -174,8 +174,18 @@ def pack(root: DataRoot, rs: ResolvedStage) -> str:
                 parts += ["", f"## Input {rel}", "", "_(absent; this input is optional)_"]
                 continue
             raise CvacError(f"stage {rs.stage.name}: input {rel} is missing (from `{template}`)")
+        try:
+            body = path.read_text("utf-8").rstrip()
+        except UnicodeDecodeError:
+            parts += [
+                "",
+                f"## Input {rel}",
+                "",
+                f"_(binary document at `{rel}`: read it from disk)_",
+            ]
+            continue
         fence = "yaml" if path.suffix in {".yaml", ".yml"} else "text"
-        parts += ["", f"## Input {rel}", "", f"```{fence}", path.read_text("utf-8").rstrip(), "```"]
+        parts += ["", f"## Input {rel}", "", f"```{fence}", body, "```"]
     parts += [
         "",
         "---",

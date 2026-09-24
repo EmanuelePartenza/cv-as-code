@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}{{ j.id }}{% endblock %}
+{% macro run_button(stage, label, enabled, hint) -%}
+  <form method="post" action="{{ url_for('jobs.run', user=j.user, job_id=j.id, stage=stage) }}" class="inline">
+    {{ caller() if caller }}
+    <button {% if not enabled %}disabled title="{{ hint }}"{% endif %}>{{ label }}</button>
+  </form>
+{%- endmacro %}
+{% block content %}
+<p class="muted"><a href="{{ url_for('jobs.listing', user=j.user) }}">Jobs</a> › {{ j.id }}</p>
+<h1>{{ j.title or j.id }}{% if j.company %} <small class="muted">{{ j.company }}</small>{% endif %}</h1>
+
+<h2>Pipeline</h2>
+<ol class="pipeline">
+  <li><strong>Posting</strong> — <code>jobs/{{ j.id }}/raw.txt</code>{% if j.raw %} (saved){% endif %}</li>
+  <li><strong>Normalise (10)</strong> — {% if j.job %}<code>job.yaml</code> written{% if j.job.invalid %} <span class="bad">but invalid</span>{% endif %}{% else %}<span class="muted">not yet</span>{% endif %}
+    {% call run_button('10_normalize', 'Run with Claude', j.raw, 'no raw.txt') %}{% endcall %}</li>
+  <li><strong>Match (20)</strong> — {% if j.verdict %}<span class="badge {{ j.verdict }}">{{ j.verdict }}</span>{% elif j.match %}<span class="bad">invalid match file</span>{% else %}<span class="muted">not yet</span>{% endif %}
+    {% call run_button('20_match', 'Run with Claude', j.job and not j.job.invalid, 'normalise first') %}{% endcall %}</li>
+  <li><strong>Tailor the CV (30)</strong> — {% if j.spec_status %}<a href="{{ url_for('spec', user=j.user, kind='applications', name=j.id) }}">application</a> <span class="badge {{ j.spec_status }}">{{ j.spec_status }}</span>{% else %}<span class="muted">not yet</span>{% endif %}
+    {% call run_button('30_tailor', 'Run with Claude', j.match and masters, 'needs a match and a master CV') %}
+      <select name="master">{% for m in masters %}<option value="{{ m }}">{{ m }}</option>{% endfor %}</select>
+    {% endcall %}</li>
+  <li><strong>Cover letter (60)</strong> — {% if j.letter_status %}<span class="badge {{ j.letter_status }}">{{ j.letter_status }}</span>{% else %}<span class="muted">not yet</span>{% endif %}
+    {% call run_button('60_letter', 'Run with Claude', j.spec, 'tailor the CV first') %}{% endcall %}</li>
+  <li><strong>Interview preparation (70)</strong> — {% if j.prep %}written{% else %}<span class="muted">not yet</span>{% endif %}
+    {% call run_button('70_interview_prep', 'Run with Claude', j.spec, 'tailor the CV first') %}{% endcall %}</li>
+  <li><strong>Gap plan (40)</strong> — {% if j.growth %}written (<a href="{{ url_for('data.edit', user=j.user, rel='growth/' + j.id + '.md') }}">open</a>){% else %}<span class="muted">not yet</span>{% endif %}
+    {% call run_button('40_gap_plan', 'Run with Claude', j.match, 'match first') %}{% endcall %}</li>
+</ol>
+<p class="muted">Each run is Claude Code in print mode inside your data root, with file tools only; the result counts only if it validates. Approval of the CV and the letter stays on their page.</p>
+
+{% if j.texts.match %}<h2>Match</h2><pre>{{ j.texts.match }}</pre>{% endif %}
+{% if j.texts.prep %}<h2>Interview preparation</h2><pre>{{ j.texts.prep }}</pre>{% endif %}
+{% if j.texts.growth %}<h2>Gap plan</h2><pre>{{ j.texts.growth }}</pre>{% endif %}
+{% if j.raw %}<h2>Posting</h2><pre>{{ j.raw }}</pre>{% endif %}
+{% endblock %}
