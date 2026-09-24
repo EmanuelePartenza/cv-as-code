@@ -11,6 +11,24 @@ Tags: `arch`, `perf`, `ui`, `test`, `docs`, `fix`, `cleanup`, `sec`.
 
 ---
 
+## 2026-09-24
+
+### feat(runner): cvac stage run over Claude Code, stages 40 and 70, user scaffold [arch]
+
+- `cvac stage run <stage> …` executes a stage with Claude Code in print mode
+  as a confined subprocess (allow-listed tools, `acceptEdits`, turn and spend
+  caps, the data root as working directory); the prompt is the pack plus an
+  engine note; the run succeeds only if the output validates. Log of every
+  event under `~/.cache/cvac/runs/`. ADR-0015. Verified on the bundled
+  binary of the VS Code extension, found as a fallback.
+- `40_gap_plan` and `70_interview_prep` as contracts with schemas
+  (`gap-plan`, `interview-prep`), validator rules and skills; the trigger of
+  plan D24 and ADR-0005 was the maintainer's request (D-07).
+- `scaffold.init_user`: a new user's valid `profile.yaml` and `search.yaml`;
+  `cvac init` moved to `scaffold.py`.
+- Files: `src/cv_as_code/runner.py`, `scaffold.py`, `pipeline/40_gap_plan/`,
+  `pipeline/70_interview_prep/`, `schemas/`, `skills/gap-plan/`, tests.
+
 ## 2026-09-23
 
 ### feat(ui): a local web UI for the gates and views, cvac ui [arch, ui]

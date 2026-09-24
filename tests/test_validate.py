@@ -432,3 +432,93 @@ def test_free_form_notes_without_kind_are_skipped_silently(data_root: DataRoot) 
     p.write_text("---\ntype: evidence\n---\nfree text\n")
     rep = validate_files(data_root, [p])
     assert rep.errors == [] and rep.warnings == []
+
+
+# --- gap plans and interview preparation ---------------------------------------------------
+
+
+def _md(path: Path, fm: dict, body: str = "\n# body\n") -> Path:
+    import yaml
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("---\n" + yaml.safe_dump(fm, sort_keys=False) + "---\n" + body, "utf-8")
+    return path
+
+
+def test_gap_plan_needs_its_match_and_cites_existing_facts(data_root: DataRoot) -> None:
+    from conftest import JOB_ID, write_job, write_match
+
+    write_job(data_root)
+    fm = {
+        "schema_version": 1,
+        "kind": "gap-plan",
+        "user": "test",
+        "job_id": JOB_ID,
+        "created": "2026-01-03",
+        "gaps": [
+            {
+                "requirement": "Experience with gadgets",
+                "kind": "nice",
+                "adjacent_facts": ["exp-acme.f01"],
+                "path": [
+                    {
+                        "deliverable": "Build a gadget",
+                        "artefact": "a repository",
+                        "effort": "2 weeks",
+                    }
+                ],
+                "candidate_facts": ["Built a gadget that counts widgets"],
+            }
+        ],
+    }
+    p = _md(data_root.path / "users" / "test" / "growth" / f"{JOB_ID}.md", fm)
+    assert any("no match verdict" in e for e in errors_of(data_root, p))
+    write_match(data_root)
+    assert errors_of(data_root, p) == []
+    assert p in discover_all(data_root)
+    fm["gaps"][0]["adjacent_facts"] = ["exp-acme.f77"]
+    _md(p, fm)
+    assert any("gaps[0] cites unknown fact `exp-acme.f77`" in e for e in errors_of(data_root, p))
+    fm["gaps"][0]["path"] = [{"deliverable": "x"}]
+    _md(p, fm)
+    assert any("'artefact' is a required property" in e for e in errors_of(data_root, p))
+    _md(data_root.path / "users" / "test" / "growth" / "other.md", {**fm, "gaps": []})
+    assert any(
+        "does not match the file name" in e
+        for e in errors_of(data_root, data_root.path / "users" / "test" / "growth" / "other.md")
+    )
+
+
+def test_interview_prep_lives_in_its_application_and_cites_facts(data_root: DataRoot) -> None:
+    from conftest import JOB_ID, write_job
+
+    write_job(data_root)
+    fm = {
+        "schema_version": 1,
+        "kind": "interview-prep",
+        "user": "test",
+        "job_id": JOB_ID,
+        "language": "en",
+        "created": "2026-02-03",
+        "stories": [{"title": "The pipeline", "source_facts": ["exp-acme.f01"]}],
+        "gaps_addressed": ["Experience with gadgets"],
+    }
+    p = _md(data_root.path / "users" / "test" / "applications" / JOB_ID / "interview-prep.md", fm)
+    assert errors_of(data_root, p) == [] and p in discover_all(data_root)
+    fm["stories"][0]["source_facts"] = ["prj-tool.f09"]
+    _md(p, fm)
+    assert any("stories[0] cites unknown fact `prj-tool.f09`" in e for e in errors_of(data_root, p))
+    wrong = _md(
+        data_root.path
+        / "users"
+        / "test"
+        / "applications"
+        / "20260101-other-job"
+        / "interview-prep.md",
+        fm,
+    )
+    assert any("does not match the application directory" in e for e in errors_of(data_root, wrong))
+    _md(p, {**fm, "stories": []})
+    assert any(
+        "[] should be non-empty" in e or "is too short" in e for e in errors_of(data_root, p)
+    )

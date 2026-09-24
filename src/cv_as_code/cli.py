@@ -18,91 +18,15 @@ from .letter import render_letter
 from .render import render
 from .report import write_report
 from .resolve import resolve
+from .runner import run_stage, summarise_event
+from .scaffold import init_data_root
 from .skills import install, list_skills
 from .stages import describe, list_stages, load_stage, pack, resolve_stage
 from .validate import discover_all, validate_files
 
-INIT_GITIGNORE = """\
-# Rendering products are regenerated: commit only what you deliberately deliver.
-*-DRAFT.pdf
-build/
-*.report.md
-
-# Raw document inbox: nothing enters git until it is archived in users/<slug>/sources/.
-users/*/inbox/*
-!users/*/inbox/README.md
-
-# Agent-local configuration and session ephemera.
-.claude/project.conf
-.claude/settings.local.json
-.claude/edit-log.jsonl
-.claude/edit-log-archive/
-"""
-
-INIT_README = """\
-# A cv-as-code data root
-
-This directory holds *data only*: your profile, your search parameters, your
-CVs and applications. The framework that reads it is the `cv-as-code` package
-(https://github.com/EmanuelePartenza/cv-as-code); the `cvac.yaml` marker is
-what tells it where the data root is.
-
-```
-cvac.yaml                 marker: schema_version, kind, default_user
-users/<slug>/profile.yaml career facts, each with an id, a status and evidence
-users/<slug>/search.yaml  target roles, markets, constraints
-users/<slug>/masters/     generic CVs (cv-spec.yaml + rendered PDF)
-users/<slug>/applications/<job_id>/   tailored CV, cover letter
-users/<slug>/notes/       evidence notes cited by facts
-users/<slug>/sources/     original documents (CVs, reviews), read-only
-users/<slug>/inbox/       drop raw documents here for extraction (gitignored)
-jobs/<job_id>/            postings: raw.txt verbatim + job.yaml normalised
-i18n/, templates/         optional overrides of the package's labels and templates
-```
-
-Run `cvac validate --all` after every change; `cvac cv <spec-dir> --mode draft`
-for a watermarked preview; `--mode final` only renders an approved spec that
-cites verified facts.
-"""
-
-INBOX_README = """\
-# Inbox
-
-Drop raw documents here (old CVs, reviews, notes). They are extracted into
-draft facts with an evidence note, then archived under `sources/`. Nothing in
-this directory is tracked by git except this file.
-"""
-
 
 def cmd_init(args: argparse.Namespace) -> int:
-    target = Path(args.dir).expanduser().resolve()
-    marker = target / MARKER
-    if marker.exists():
-        raise CvacError(f"{marker} already exists; refusing to overwrite a data root")
-    target.mkdir(parents=True, exist_ok=True)
-    lines = [
-        "# cv-as-code data root - https://github.com/EmanuelePartenza/cv-as-code",
-        "schema_version: 1",
-        "kind: data-root",
-    ]
-    lines.append(f"default_user: {args.user}" if args.user else "# default_user: <slug>")
-    marker.write_text("\n".join(lines) + "\n", "utf-8")
-    (target / "users").mkdir(exist_ok=True)
-    (target / "jobs").mkdir(exist_ok=True)
-    (target / "jobs" / ".gitkeep").touch()
-    gitignore = target / ".gitignore"
-    if not gitignore.exists():
-        gitignore.write_text(INIT_GITIGNORE, "utf-8")
-    readme = target / "README.md"
-    if not readme.exists():
-        readme.write_text(INIT_README, "utf-8")
-    if args.user:
-        udir = target / "users" / args.user
-        for sub in ("notes", "sources", "interviews", "inbox", "masters", "applications"):
-            (udir / sub).mkdir(parents=True, exist_ok=True)
-        (udir / "inbox" / "README.md").write_text(INBOX_README, "utf-8")
-    else:
-        (target / "users" / ".gitkeep").touch()
+    target = init_data_root(Path(args.dir).expanduser().resolve(), args.user)
     print(f"initialised data root {target}")
     print("next: add users/<slug>/profile.yaml and search.yaml, then `cvac validate --all`")
     return 0
@@ -202,6 +126,39 @@ def cmd_stage_show(args: argparse.Namespace) -> int:
     root = DataRoot.locate(args.data_root)
     print(describe(root, resolve_stage(root, args.stage, _stage_params(args))))
     return 0
+
+
+def cmd_stage_run(args: argparse.Namespace) -> int:
+    root = DataRoot.locate(args.data_root)
+    rs = resolve_stage(root, args.stage, _stage_params(args))
+
+    def echo(line: str) -> None:
+        text = summarise_event(line)
+        if text:
+            print(text)
+
+    result = run_stage(
+        root,
+        rs,
+        engine=args.engine,
+        max_turns=args.max_turns,
+        model=args.model,
+        budget_usd=args.max_budget_usd,
+        on_line=echo if not args.quiet else None,
+    )
+    print(f"log: {result.log}")
+    for w in result.warnings:
+        print(f"WARN  {w}")
+    for e in result.errors:
+        print(f"ERROR {e}")
+    if result.engine_error:
+        print(f"ERROR engine: {result.engine_error}")
+    if not result.written:
+        print(f"ERROR the engine did not write {result.output_rel}")
+    if result.ok:
+        print(f"ok: {result.output_rel} written and valid")
+        return 0
+    return 1
 
 
 def cmd_stage_pack(args: argparse.Namespace) -> int:
@@ -313,12 +270,13 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p.set_defaults(func=cmd_letter)
     p = sub.add_parser("stage", parents=[common], help="stage contracts: list, show, pack")
-    ssub = p.add_subparsers(dest="stage_command", required=True, metavar="<list|show|pack>")
+    ssub = p.add_subparsers(dest="stage_command", required=True, metavar="<list|show|pack|run>")
     q = ssub.add_parser("list", parents=[common], help="the stages shipped in the package")
     q.set_defaults(func=cmd_stage_list)
     for name, func, doc in (
         ("show", cmd_stage_show, "resolved inputs, output and gate for a data root"),
         ("pack", cmd_stage_pack, "one markdown bundle for any chat engine, on stdout"),
+        ("run", cmd_stage_run, "run the stage with an engine (Claude Code in print mode)"),
     ):
         q = ssub.add_parser(name, parents=[common], help=doc)
         q.add_argument("stage")
@@ -329,6 +287,12 @@ def build_parser() -> argparse.ArgumentParser:
         q.add_argument("--document", help="a document path relative to users/<user>/")
         q.add_argument("--name", help="output file name without extension")
         q.add_argument("-p", "--param", action="append", default=[], metavar="KEY=VALUE")
+        if name == "run":
+            q.add_argument("--engine", default="claude-code", choices=["claude-code"])
+            q.add_argument("--max-turns", type=int, default=40)
+            q.add_argument("--model", help="engine model (default: the account's default)")
+            q.add_argument("--max-budget-usd", type=float, help="spend cap for this run")
+            q.add_argument("--quiet", action="store_true", help="log only, no event echo")
         q.set_defaults(func=func)
     p = sub.add_parser("skills", parents=[common], help="the domain skills for Claude Code")
     ksub = p.add_subparsers(dest="skills_command", required=True, metavar="<list|install>")

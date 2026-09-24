@@ -54,6 +54,7 @@ The intelligent steps are file contracts under `pipeline/`. The same two files s
 | --- | --- |
 | **Claude Code** | `cvac skills install` puts `/job-ingest`, `/cv-tailor`, `/cover-letter`, `/cv-master` into your data root; each sequences a stage and asks you for the gate |
 | **Any chat** | `cvac stage pack 20_match --job <id> > bundle.md`; paste it, save the answer where it says, `cvac validate` — docs/manual-path.md |
+| **`cvac stage run`** | `cvac stage run 20_match --job <id>` executes the stage with Claude Code in print mode, as a confined subprocess using your own login; the result counts only if it validates (ADR-0015) |
 | **An API runner** | roadmap: the pack is its input |
 
 ## The data contracts
@@ -87,7 +88,7 @@ The framework's surface — code, messages, docs, stage instructions — is Engl
 
 ## Status
 
-`v0.2` — the CLI, six stage contracts, the skills, the example, the profile report and the fact gate, a local web UI for the gates and views (`cvac ui`), the tests and CI exist. Roadmap (designed, not built): an API runner, a gap-closing stage that turns a match's gaps into an evidence plan, interview preparation as a stage, market conventions beyond language, connectors for posting APIs, application tracking. See docs/ARCHITECTURE.md §10 and the ADRs.
+`v0.2` — the CLI, eight stage contracts, the skills, the example, the profile report and the fact gate, a local web UI (`cvac ui`), a stage runner over Claude Code (`cvac stage run`), the tests and CI exist. Roadmap (designed, not built): an API runner for people without Claude Code, market conventions beyond language, connectors for posting APIs, application tracking, a deterministic apply of an evidence note into the profile. See docs/ARCHITECTURE.md §10 and the ADRs.
 
 Nothing personal is in this repository, by construction: [CONTRIBUTING.md](CONTRIBUTING.md) explains the publication boundary.
 

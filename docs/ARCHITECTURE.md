@@ -40,6 +40,8 @@ src/cv_as_code/
 ├── render.py       resolved JSON → PDF via Typst in a transient build/ directory
 ├── letter.py       letter.md × profile × labels → PDF in the CV's style
 ├── stages.py       stage contracts: list, resolve against a data root, pack for any engine
+├── runner.py       `cvac stage run`: a stage executed by an engine (Claude Code in print mode, ADR-0015)
+├── scaffold.py     `cvac init` and a new user's first files (profile, search), never overwriting
 ├── skills.py       the Claude Code adapter: `cvac skills install` copies skills/ into a data root
 ├── report.py       `cvac profile report`: a generated Markdown view with a completeness checklist
 ├── facts.py        `cvac fact verify|reject`: the human gate on facts, layout-preserving
@@ -48,10 +50,11 @@ src/cv_as_code/
 ├── documents.py    YAML and markdown-with-frontmatter documents; dates normalised to strings
 ├── errors.py       CvacError > ValidationError, RenderError
 ├── schemas/        profile · search · cv-spec · cv-resolved · labels · data-root · job · match ·
-│                   cover-letter · evidence · questionnaire · stage-io
-├── pipeline/       03_extract · 05_interview · 10_normalize · 20_match · 30_tailor · 60_letter
-│                   (INSTRUCTIONS.md + io.yaml each; 05 also ships the questionnaire skeleton)
-├── skills/         cv-master · job-ingest · cv-tailor · cover-letter · onboard · interview-prep
+│                   cover-letter · evidence · questionnaire · gap-plan · interview-prep · stage-io
+├── pipeline/       03_extract · 05_interview · 10_normalize · 20_match · 30_tailor · 40_gap_plan ·
+│                   60_letter · 70_interview_prep (INSTRUCTIONS.md + io.yaml each; 05 also ships
+│                   the questionnaire skeleton)
+├── skills/         cv-master · job-ingest · cv-tailor · cover-letter · gap-plan · interview-prep · onboard
 ├── i18n/           labels.it.yaml · labels.fr.yaml · labels.en.yaml
 └── templates/      classic/{template,letter}.typ · lib/common.typ · fonts/ (Lato, OFL)
 ```
@@ -96,6 +99,8 @@ Tags and categories are free-form: matching is semantic, on the LLM side.
 | `cover-letter` | frontmatter of `letter.md` | built | `source_facts`, status, approval date |
 | `evidence` | frontmatter of `notes/<name>.md` | built | facts proposed by `03_extract`, each with the verbatim passage it rests on |
 | `questionnaire` | frontmatter of `interviews/<name>.md` | built | the profile interview of `05_interview`; the body is free text |
+| `gap-plan` | frontmatter of `growth/<job_id>.md` | built | per gap: adjacent facts cited, a path whose steps name their artefact, candidate facts as future claims; internal |
+| `interview-prep` | frontmatter of `applications/<job_id>/interview-prep.md` | built | STAR stories citing `source_facts`, gap scripts; internal (ADR-0005) |
 
 Every kind above is validated by `cvac validate`; a markdown document
 (`letter.md`) is validated through its YAML frontmatter.
@@ -113,7 +118,8 @@ posting (text)
   │                 a non-approved spec, a missing label
   ▼ render          deterministic: Typst → clean PDF; page budget checked
   ▼ [60 letter]     LLM (optional) → letter.md with source_facts → human gate → render
-  ▼ [70 prep]       LLM, at a real interview → interview-prep.md, internal (ADR-0005)
+  ▼ [70 prep]       LLM → interview-prep.md, internal (ADR-0005)
+  ╰ [40 gap plan]   LLM, from a match's gaps → growth/<job_id>.md, internal; candidate facts never enter the profile
 ```
 
 Upstream of the profile, two more stages bring data *in*: `03_extract` (a
@@ -128,9 +134,12 @@ prompt: inputs, outputs, rules; it never names an engine) and `io.yaml` (the
 contract: inputs with placeholders, output path and schema, `gate`, output
 language). Three engines consume the same files: a Claude Code skill in
 session, `cvac stage pack` for any chat (paste the bundle, paste the answer
-back, validate — see [manual-path.md](manual-path.md)), and an API runner
-(roadmap). `cvac stage list` and `cvac stage show` print the contracts
-resolved against a data root.
+back, validate — see [manual-path.md](manual-path.md)), and `cvac stage run`,
+which executes the stage with Claude Code in print mode as a confined
+subprocess and accepts the result only if it validates
+([ADR-0015](adr/0015-claude-code-headless-engine.md)); an API runner for
+people without Claude Code is roadmap. `cvac stage list` and `cvac stage show`
+print the contracts resolved against a data root.
 
 | Stage | Gate | Status |
 |---|---|---|
@@ -139,8 +148,9 @@ resolved against a data root.
 | `10_normalize` | none | built |
 | `20_match` | none | built |
 | `30_tailor` | human | built |
+| `40_gap_plan` | none (internal) | built; exercised by the example |
 | `60_letter` | human | built |
-| `70_interview_prep` | none (internal) | roadmap, at a user's first interview |
+| `70_interview_prep` | none (internal) | built; exercised by the example |
 
 Deterministic today: `resolve` (draft: any facts, stamps `meta.draft`; final:
 approved spec, verified facts), `render` (DRAFT watermark and `-DRAFT` suffix
@@ -160,8 +170,8 @@ contracts, they never duplicate a stage's rules.
 | Skill | Status | What it does |
 |---|---|---|
 | `/verify`, `/wrap`, `/decide`, `/adr` | built | the working method (gates, session close, decision queue, ADRs) |
-| `cv-master`, `job-ingest`, `cv-tailor`, `cover-letter` | built | run a stage through `cvac stage show`, preview, ask for the gate, render |
-| `onboard`, `interview-prep` | built as written procedures | scaffold + interview + extraction + verification; the preparation document (ADR-0005) by hand until stage 70 exists |
+| `cv-master`, `job-ingest`, `cv-tailor`, `cover-letter`, `gap-plan`, `interview-prep` | built | run a stage through `cvac stage show`, preview, ask for the gate where there is one, render |
+| `onboard` | built as a written procedure | scaffold + interview + extraction + verification |
 
 Domain skills ship in the package (`src/cv_as_code/skills/`) and are installed
 into a data root by `cvac skills install`, because Claude Code loads skills from
@@ -234,10 +244,8 @@ own stages ([ADR-0008](adr/0008-example-user-is-a-user.md)).
 Each line is roadmap: designed or intended, not built, and not claimed in the
 README.
 
-- `cvac stage run` — an API runner consuming the same stage contracts.
-- `40_gap_plan` — from a match's declared gaps, an internal plan whose
-  deliverables are evidence, never facts; built at a user's first real use.
-- `70_interview_prep` — the stage of ADR-0005, at a user's first interview.
+- An API runner as a second engine of `cvac stage run`, for people without
+  Claude Code.
 - Connectors for posting aggregators with public APIs; `dedup_key`.
 - Application tracking (`application.yaml`, a generated index).
 - `i18n/markets/` — market conventions beyond language (photo, address shape);

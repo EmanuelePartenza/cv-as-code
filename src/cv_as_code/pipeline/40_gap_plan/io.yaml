@@ -1,0 +1,15 @@
+stage: 40_gap_plan
+version: 1
+engine: llm
+gate: none
+output_language: pivot
+params: [user, job_id]
+inputs:
+  - path: users/{user}/matches/{job_id}.yaml
+  - path: jobs/{job_id}/job.yaml
+  - path: users/{user}/profile.yaml
+  - path: users/{user}/search.yaml
+output:
+  path: users/{user}/growth/{job_id}.md
+  format: markdown-frontmatter
+  schema: gap-plan.schema.json

@@ -325,6 +325,32 @@ def check_questionnaire(root: DataRoot, doc: dict, path: Path, where: str, rep: 
         rep.error(where, f"user `{user}` has no users/{user}/ directory")
 
 
+def check_gap_plan(root: DataRoot, doc: dict, path: Path, where: str, rep: Report) -> None:
+    job_id = str(doc.get("job_id") or "")
+    if job_id != path.stem:
+        rep.error(where, f"job_id `{job_id}` does not match the file name `{path.stem}`")
+    match = root.user_dir(str(doc.get("user"))) / "matches" / f"{job_id}.yaml"
+    if not match.is_file():
+        rep.error(where, f"no match verdict {root.rel(match)} to plan from")
+    for i, gap in enumerate(doc.get("gaps") or []):
+        if _cited_facts(root, doc, where, rep, gap.get("adjacent_facts"), f"gaps[{i}]") is None:
+            return
+
+
+def check_interview_prep(root: DataRoot, doc: dict, path: Path, where: str, rep: Report) -> None:
+    job_id = str(doc.get("job_id") or "")
+    if path.parent.name != job_id:
+        rep.error(
+            where,
+            f"job_id `{job_id}` does not match the application directory `{path.parent.name}`",
+        )
+    if job_id and not root.job_dir(job_id).is_dir():
+        rep.error(where, f"job_id `{job_id}` has no jobs/{job_id}/ directory")
+    for i, story in enumerate(doc.get("stories") or []):
+        if _cited_facts(root, doc, where, rep, story.get("source_facts"), f"stories[{i}]") is None:
+            return
+
+
 CHECKS = {
     "profile": check_profile,
     "cv-spec": check_cvspec,
@@ -336,6 +362,8 @@ CHECKS = {
     "cover-letter": check_letter,
     "evidence": check_evidence,
     "questionnaire": check_questionnaire,
+    "gap-plan": check_gap_plan,
+    "interview-prep": check_interview_prep,
 }
 
 
@@ -378,6 +406,8 @@ def discover_all(root: DataRoot) -> list[Path]:
         "users/*/masters/*/cv-spec.yaml",
         "users/*/applications/*/cv-spec.yaml",
         "users/*/applications/*/letter.md",
+        "users/*/applications/*/interview-prep.md",
+        "users/*/growth/*.md",
         "users/*/notes/*.md",
         "users/*/interviews/*.md",
         "users/*/matches/*.yaml",

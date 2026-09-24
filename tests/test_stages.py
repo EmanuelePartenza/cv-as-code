@@ -11,15 +11,32 @@ from cv_as_code.errors import CvacError
 from cv_as_code.stages import describe, fill, list_stages, load_stage, pack, resolve_stage
 
 
-def test_the_six_stages_ship() -> None:
+def test_the_eight_stages_ship() -> None:
     assert list_stages() == [
         "03_extract",
         "05_interview",
         "10_normalize",
         "20_match",
         "30_tailor",
+        "40_gap_plan",
         "60_letter",
+        "70_interview_prep",
     ]
+
+
+def test_gap_plan_and_interview_prep_resolve_their_inputs(data_root: DataRoot) -> None:
+    write_job(data_root)
+    rs = resolve_stage(data_root, "40_gap_plan", {"job_id": JOB_ID})
+    assert rs.output == data_root.path / "users" / "test" / "growth" / f"{JOB_ID}.md"
+    assert f"users/test/matches/{JOB_ID}.yaml  [MISSING]" in describe(data_root, rs)
+    rs = resolve_stage(data_root, "70_interview_prep", {"job_id": JOB_ID})
+    assert (
+        rs.output
+        == data_root.path / "users" / "test" / "applications" / JOB_ID / "interview-prep.md"
+    )
+    assert (
+        load_stage("40_gap_plan").gate == "none" and load_stage("70_interview_prep").gate == "none"
+    )
 
 
 def test_every_contract_validates_and_points_to_a_shipped_schema() -> None:

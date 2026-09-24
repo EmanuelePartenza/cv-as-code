@@ -177,8 +177,8 @@ Defined in `.claude/skills/<name>/SKILL.md`:
 
 "Only you" is `disable-model-invocation: true`: they have side effects — they write
 documents, propose commits — so they never start on Claude's initiative. The domain
-skills — `/cv-master`, `/job-ingest`, `/cv-tailor`, `/cover-letter`, and the
-written procedures `/onboard` and `/interview-prep` — ship in
+skills — `/cv-master`, `/job-ingest`, `/cv-tailor`, `/cover-letter`,
+`/gap-plan`, `/interview-prep`, and the written procedure `/onboard` — ship in
 `src/cv_as_code/skills/` and are installed into a data root (and into this
 repository's `.claude/skills/`) by `cvac skills install`; they sequence the
 stage contracts and never restate their rules.

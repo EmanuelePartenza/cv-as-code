@@ -14,7 +14,9 @@ test enforces that on the whole repository.
 | `test_letter.py` | frontmatter gate, language-aware date from the labels' months, paragraph collapsing, the header follows the labels' identity fields |
 | `test_dataroot.py` | flag > env > discovery, error messages, display paths, asset lookup order |
 | `test_stages.py` | every `io.yaml` validates and names a shipped schema; placeholders resolve; `pack` carries instructions, inputs, attachments and the output language; missing inputs and params are named |
-| `test_skills.py` | the six domain skills ship with frontmatter, install into a data root, and the repository's copies equal the sources |
+| `test_skills.py` | the seven domain skills ship with frontmatter, install into a data root, and the repository's copies equal the sources |
+| `test_runner.py` | `cvac stage run` with a fake `claude` executable: the prompt is the pack plus the engine note, the command confines the engine, success only when the output exists and validates, engine errors and exit codes surface, the executable is found or the message says how to install it |
+| `test_scaffold.py` | a new data root and a new user: valid from the first file, default user set once, never overwriting |
 | `test_end_to_end.py` | the example data root validates clean, renders three one-page CVs and a letter, packs every stage, and the gates refuse a draft fact in an approved spec and a final render of a draft |
 | `test_data_in.py` | the profile report (sections, counts, completeness checklist) and `cvac fact verify\|reject` (only the status lines change, unknown ids and facts without evidence refused) |
 | `test_cli.py` | exit codes 0/1/2, `--data-root` before or after the subcommand, `cvac init` |
@@ -29,7 +31,8 @@ test enforces that on the whole repository.
   statuses allow, nothing more (ADR-0001).
 - **What a model writes.** `pipeline/*/INSTRUCTIONS.md` are prompts; tests
   check the contracts and the packs, not an engine's output. The example user
-  is the one worked output, and it was reviewed by hand.
+  is the one worked output, and it was reviewed by hand. `cvac stage run` is
+  tested with a fake engine; the real Claude Code binary is exercised by hand.
 - **Typographic overflow.** The page budget is checked after rendering; there
   is no prediction of line breaks.
 - **Fonts other than the vendored ones.** System fonts are ignored by design; a

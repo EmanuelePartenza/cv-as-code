@@ -40,6 +40,7 @@ maintainer, the decision is opened first, then — once taken — formalised in 
 | [0012](0012-rendering-reproducibility.md) | Rendering reproducibility: Typst from PyPI, vendored fonts | accepted |
 | [0013](0013-data-in.md) | Data in: extraction and interview stages, facts enter as draft, verification is a command | accepted |
 | [0014](0014-local-ui-thin-adapter.md) | A local, server-rendered UI as a thin adapter over the library | accepted |
+| [0015](0015-claude-code-headless-engine.md) | Claude Code in print mode as the first engine that runs a stage | accepted |
 
 Numbers 0001–0005 were first recorded in the maintainer's private working
 repository, from which this framework was extracted; they are re-authored here

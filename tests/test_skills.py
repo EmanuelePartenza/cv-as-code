@@ -9,10 +9,18 @@ from cv_as_code.dataroot import DataRoot
 from cv_as_code.skills import NOTICE, install, list_skills, rendered
 
 REPO = Path(__file__).resolve().parents[1]
-DOMAIN = ["cover-letter", "cv-master", "cv-tailor", "interview-prep", "job-ingest", "onboard"]
+DOMAIN = [
+    "cover-letter",
+    "cv-master",
+    "cv-tailor",
+    "gap-plan",
+    "interview-prep",
+    "job-ingest",
+    "onboard",
+]
 
 
-def test_the_six_domain_skills_ship_with_frontmatter() -> None:
+def test_the_seven_domain_skills_ship_with_frontmatter() -> None:
     assert list_skills() == DOMAIN
     for name in DOMAIN:
         text = rendered(name)
