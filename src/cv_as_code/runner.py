@@ -171,11 +171,12 @@ def run_stage(
     timeout: float = 1800,
     on_line: Callable[[str], None] | None = None,
     log_path: Path | None = None,
+    binary: Path | None = None,
 ) -> RunResult:
     """Run one resolved stage to completion; the log holds every engine event."""
     if engine not in ENGINES:
         raise CvacError(f"unknown engine `{engine}` (known: {', '.join(ENGINES)})")
-    binary = find_claude()
+    binary = binary or find_claude()
     prompt = build_prompt(root, rs)
     log = log_path or _log_path(rs.stage.name)
     assert rs.output is not None

@@ -11,7 +11,7 @@ from flask import Blueprint, render_template
 
 from ..dataroot import DataRoot
 from ..errors import CvacError
-from ..runner import RunResult, run_stage, summarise_event
+from ..runner import RunResult, find_claude, run_stage, summarise_event
 from ..stages import resolve_stage
 from . import views
 from .state import state
@@ -62,11 +62,16 @@ class RunManager:
         for _, path, optional in rs.inputs:
             if not path.is_file() and not optional:
                 raise CvacError(f"stage {stage}: input {root.rel(path)} is missing")
+        # Resolved here, in the request, so a missing engine is an immediate message and the
+        # thread never looks the executable up under an environment that has moved on.
+        binary = find_claude()
         run = Run(id=uuid.uuid4().hex[:10], stage=stage, params=rs.params, back_url=back_url)
 
         def work() -> None:
             try:
-                run.result = run_stage(root, rs, on_line=lambda line: self._collect(run, line))
+                run.result = run_stage(
+                    root, rs, on_line=lambda line: self._collect(run, line), binary=binary
+                )
                 run.status = "ok" if run.result.ok else "failed"
             except CvacError as e:
                 run.error = str(e)

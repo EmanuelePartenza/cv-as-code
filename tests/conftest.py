@@ -8,6 +8,7 @@ three statuses, one evidenced skill and one without evidence.
 from __future__ import annotations
 
 import copy
+import os
 from pathlib import Path
 from typing import Any
 
@@ -280,3 +281,29 @@ def write_letter_md(root: DataRoot, **overrides: Any) -> Path:
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(text, "utf-8")
     return p
+
+
+# --- no test may reach the real engine ------------------------------------------------------
+
+FORBIDDEN_ENGINE = """#!/bin/sh
+echo '{"type":"result","is_error":true,"result":"the real engine is forbidden in tests"}'
+exit 9
+"""
+
+
+@pytest.fixture(autouse=True)
+def _no_real_engine(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Point the runner at a script that fails, and every cache or config write at tmp_path."""
+    guard = tmp_path / "forbidden-claude"
+    guard.write_text(FORBIDDEN_ENGINE, "utf-8")
+    guard.chmod(0o755)
+    monkeypatch.setenv("CVAC_CLAUDE_BIN", str(guard))
+    # The publication-boundary test reads the maintainer's denylist key from the config
+    # directory; carry it over as the environment variable before the directory moves.
+    real_key = (
+        Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "cvac" / "denylist.key"
+    )
+    if not os.environ.get("CVAC_DENYLIST_KEY") and real_key.is_file():
+        monkeypatch.setenv("CVAC_DENYLIST_KEY", real_key.read_text("utf-8").strip())
+    monkeypatch.setenv("XDG_CACHE_HOME", str(tmp_path / "xdg-cache"))
+    monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "xdg-config"))

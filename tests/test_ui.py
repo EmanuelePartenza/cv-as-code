@@ -402,8 +402,10 @@ def test_documents_area_uploads_extracts_and_edits(
     assert "is not a note name" in post(
         c, "/u/test/documents/extract", document="inbox/Old_CV.txt", name="Bad Name"
     )
+    app.extensions["cvac"].runs.wait(r.headers["Location"].rsplit("/", 1)[1])
     r = c.post("/u/test/documents/questionnaire", data={"name": "01-onboarding"})
     assert r.status_code == 302 and "/runs/" in r.headers["Location"]
+    app.extensions["cvac"].runs.wait(r.headers["Location"].rsplit("/", 1)[1])
 
 
 def test_editor_saves_only_what_validates(data_root: DataRoot, ui_env: Path) -> None:
@@ -471,3 +473,14 @@ def test_a_successful_run_and_an_engine_failure_are_both_reported(
     run = app.extensions["cvac"].runs.wait(r.headers["Location"].rsplit("/", 1)[1])
     assert run.status == "failed"
     assert "engine: engine exited with code 2" in page(c, f"/runs/{run.id}")
+
+
+def test_a_missing_engine_is_an_immediate_message_not_a_thread(
+    data_root: DataRoot, ui_env: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    write_job(data_root)
+    monkeypatch.setenv("CVAC_CLAUDE_BIN", str(ui_env / "no-such-claude"))
+    c = client(data_root)
+    body = post(c, "/u/test/jobs/20260101-acme-widget/run/20_match")
+    assert "is not a file" in body
+    assert c.application.extensions["cvac"].runs.listing() == []
