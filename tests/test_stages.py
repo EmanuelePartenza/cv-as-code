@@ -11,8 +11,9 @@ from cv_as_code.errors import CvacError
 from cv_as_code.stages import describe, fill, list_stages, load_stage, pack, resolve_stage
 
 
-def test_the_nine_stages_ship() -> None:
+def test_the_ten_stages_ship() -> None:
     assert list_stages() == [
+        "02_triage",
         "03_extract",
         "04_apply",
         "05_interview",

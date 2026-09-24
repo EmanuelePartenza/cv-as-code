@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from werkzeug.utils import secure_filename
 
+from ..apply import archive_batch
 from ..dataroot import DataRoot
 from ..documents import load_document
 from ..errors import CvacError
@@ -46,7 +48,11 @@ def listing(root: DataRoot, user: str) -> dict[str, Any]:
             return []
         out = []
         for p in sorted(base.iterdir()):
-            if not p.is_file() or p.name == "README.md" and sub == "inbox":
+            if (
+                not p.is_file()
+                or p.name.startswith(".")
+                or (p.name == "README.md" and sub == "inbox")
+            ):
                 continue
             if suffixes and p.suffix.lower() not in suffixes:
                 continue
@@ -61,16 +67,37 @@ def listing(root: DataRoot, user: str) -> dict[str, Any]:
 
     notes = files("notes", {".md"})
     sources_of_notes = {_source_of(udir / "notes" / n["name"], root) for n in notes}
-    inbox = files("inbox")
-    for f in inbox:
-        f["extracted"] = f["rel"] in sources_of_notes
+    index = sources_index(root, user)
+    inbox, sources = files("inbox"), files("sources")
+    for f in inbox + sources:
+        entry = index.get(f["rel"]) or {}
+        f["kind"] = entry.get("kind")
+        f["about"] = entry.get("about")
+        f["duplicate_of"] = entry.get("duplicate_of")
+        f["extracted"] = f["rel"] in sources_of_notes or bool(entry.get("note"))
+        f["pending"] = not f["extracted"] and f["kind"] in (None, "evidence")
     return {
         "inbox": inbox,
-        "sources": files("sources"),
+        "sources": sources,
         "interviews": files("interviews", {".md"}),
         "notes": notes,
         "growth": files("growth", {".md"}),
+        "triaged": bool(index),
     }
+
+
+def sources_index(root: DataRoot, user: str) -> dict[str, dict[str, Any]]:
+    """The triage's verdict per document path, empty when there is no (valid) index yet."""
+    path = root.user_dir(user) / "sources.yaml"
+    if not path.is_file():
+        return {}
+    try:
+        doc = load_document(path, root.rel(path))
+    except CvacError:
+        return {}
+    if not isinstance(doc, dict):
+        return {}
+    return {str(d.get("path")): d for d in doc.get("documents") or [] if d.get("path")}
 
 
 def _source_of(note: Path, root: DataRoot) -> str | None:
@@ -177,27 +204,70 @@ def extract(user: str):
     return redirect(url_for("runs.run", run_id=r.id))
 
 
+def _free_note_name(root: DataRoot, user: str, filename: str, taken: set[str]) -> str:
+    name = note_name_for(filename)
+    while name in taken or (root.user_dir(user) / "notes" / f"{name}.md").exists():
+        name = (
+            name + "-2"
+            if not re.search(r"-\d+$", name)
+            else re.sub(r"-(\d+)$", lambda m: f"-{int(m.group(1)) + 1}", name)
+        )
+    taken.add(name)
+    return name
+
+
+def plan_extractions(user: str) -> Callable[[DataRoot], list[Any]]:
+    """After the triage: extract and apply every evidence document of the inbox without a note."""
+
+    def planner(root: DataRoot) -> list[Any]:
+        steps: list[Any] = []
+        taken: set[str] = set()
+        for rel, entry in sources_index(root, user).items():
+            if entry.get("kind") != "evidence" or entry.get("note") or not rel.startswith("inbox/"):
+                continue
+            if not (root.user_dir(user) / rel).is_file():
+                continue
+            steps += extraction_steps(user, rel, _free_note_name(root, user, rel, taken))
+        return steps
+
+    return planner
+
+
+def _archive_step(user: str) -> tuple[str, str, Callable[[DataRoot], list[str]]]:
+    return (
+        "code",
+        "archive",
+        lambda root: archive_batch(root, user) or ["nothing left to archive"],
+    )
+
+
+@bp.post("/u/<user>/documents/triage")
+def triage(user: str):
+    """Sort the inbox with Claude (stage 02): what is evidence, context, duplicate, irrelevant."""
+    root = current_root()
+    views.user_dir_of(root, user)
+    back = url_for("data.documents", user=user)
+    if not [f for f in listing(root, user)["inbox"]]:
+        flash(t("the inbox is empty"), "error")
+        return redirect(back)
+    try:
+        r = state().runs.start(root, "02_triage", {"user": user}, back)
+    except CvacError as e:
+        flash(str(e), "error")
+        return redirect(back)
+    return redirect(url_for("runs.run", run_id=r.id))
+
+
 @bp.post("/u/<user>/documents/extract-all")
 def extract_all(user: str):
-    """Every document in the inbox without a note yet, one run: extract and apply each in turn."""
+    """One run: sort the inbox (02), extract and apply every evidence document, archive the rest."""
     root = current_root()
+    views.user_dir_of(root, user)
     back = url_for("data.documents", user=user)
-    pending = [f for f in listing(root, user)["inbox"] if not f["extracted"]]
-    if not pending:
+    if not [f for f in listing(root, user)["inbox"] if f["pending"] or not f["extracted"]]:
         flash(t("nothing to extract: every document in the inbox has its note"), "error")
         return redirect(back)
-    steps: list[tuple[str, dict[str, str]]] = []
-    taken: set[str] = set()
-    for f in pending:
-        name = note_name_for(f["name"])
-        while name in taken or (root.user_dir(user) / "notes" / f"{name}.md").exists():
-            name = (
-                name + "-2"
-                if not re.search(r"-\d+$", name)
-                else re.sub(r"-(\d+)$", lambda m: f"-{int(m.group(1)) + 1}", name)
-            )
-        taken.add(name)
-        steps += extraction_steps(user, f["rel"], name)
+    steps: list[Any] = [("02_triage", {"user": user}), plan_extractions(user), _archive_step(user)]
     try:
         r = state().runs.start_steps(root, steps, back)
     except CvacError as e:

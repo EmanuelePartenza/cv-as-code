@@ -34,7 +34,19 @@ Facts you propose here are **not yet in the profile**. They enter it as
    thing, do not propose it again; if the document adds precision (a number,
    a date) to an existing fact, propose the precision as a new fact and say
    in the body which existing fact it sharpens.
-6. **Questionnaires are documents too.** A filled questionnaire is extracted
+6. **The other documents.** If `sources.yaml` exists (stage 02), obey it:
+   a document it marks `duplicate` or `context` or `irrelevant` is never
+   extracted on its own — say so and stop if you were given one. For the
+   document you extract, read the `context` documents that name it in
+   `context_for` (they are under `inbox/` or `sources/`; read them from disk
+   or ask for them): they tell you how the organisation names the role, the
+   team, the systems, so that a claim says "operated the SAP MM stock module"
+   and not "used a system". They never supply a fact about the person: a
+   responsibility listed in a role description is not something the person
+   did unless the document you extract says so. List the document's
+   `duplicate`s (from the index) under `duplicates:` in the frontmatter: the
+   facts are extracted once, from this primary, and quoted from it.
+7. **Questionnaires are documents too.** A filled questionnaire is extracted
    like any other document: its answers are the quotes. Its answers to
    section G (what the user is looking for) are not facts: list them in the
    body under "Search parameters" for the user to carry into `search.yaml`.

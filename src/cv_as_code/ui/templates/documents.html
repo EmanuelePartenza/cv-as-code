@@ -33,14 +33,21 @@
       <button>{{ t('Upload to inbox') }}</button>
     </form>
     <h3>{{ t('Inbox') }}</h3>
-    {% set pending = d.inbox|rejectattr('extracted')|list %}
-    {% if pending|length > 1 %}
-    <form method="post" action="{{ url_for('data.extract_all', user=user) }}" class="inline"><button class="ok">{{ t('Extract all with Claude ({n} documents)', n=pending|length) }}</button></form>
+    {% set pending = d.inbox|selectattr('pending')|list %}
+    {% if d.inbox %}
+    <div class="actions">
+      <form method="post" action="{{ url_for('data.extract_all', user=user) }}"><button class="ok">{{ t('Sort, extract and apply everything with Claude ({n} documents)', n=d.inbox|length) }}</button></form>
+      <form method="post" action="{{ url_for('data.triage', user=user) }}"><button>{{ t('Only sort them (02)') }}</button></form>
+    </div>
+    <p class="muted">{{ t('The documents are read together: a role description gives context to a review, three versions of one CV are extracted once, what has nothing for a CV is set aside. Each document gets a verdict you can read below.') }}</p>
     {% endif %}
-    <ul>
+    <ul class="docs">
       {% for f in d.inbox %}
-      <li>{{ f.name }}
-        {% if f.extracted %}<span class="badge verified">{{ t('extracted') }}</span>{% else %}
+      <li><strong>{{ f.name }}</strong>
+        {% if f.kind %}<span class="badge {{ f.kind }}">{{ t(f.kind) }}</span>{% endif %}
+        {% if f.extracted %}<span class="badge verified">{{ t('extracted') }}</span>{% endif %}
+        {% if f.about %}<br><small class="muted">{{ f.about }}{% if f.duplicate_of %} → {{ f.duplicate_of }}{% endif %}</small>{% endif %}
+        {% if f.pending %}
         <form method="post" action="{{ url_for('data.extract', user=user) }}" class="inline"><input type="hidden" name="document" value="{{ f.rel }}"><label>{{ t('note name') }} <input name="name" value="{{ f.name.rsplit('.', 1)[0]|lower|replace(' ', '-')|replace('_', '-') }}" size="18" pattern="[a-z0-9][a-z0-9-]*"></label><button>{{ t('Extract with Claude (03)') }}</button></form>
         {% endif %}
       </li>
@@ -48,7 +55,7 @@
     </ul>
     <p class="muted">{{ t('Extraction proposes the facts and applies them to your profile as drafts; the document is then archived under sources/. You confirm each fact in the Review area.') }}</p>
     <h3>{{ t('Sources (archived)') }}</h3>
-    <ul>{% for f in d.sources %}<li>{{ f.name }}</li>{% else %}<li class="muted">{{ t('none') }}</li>{% endfor %}</ul>
+    <ul class="docs">{% for f in d.sources %}<li>{{ f.name }} {% if f.kind %}<span class="badge {{ f.kind }}">{{ t(f.kind) }}</span>{% endif %}{% if f.about %}<br><small class="muted">{{ f.about }}{% if f.duplicate_of %} → {{ f.duplicate_of }}{% endif %}</small>{% endif %}</li>{% else %}<li class="muted">{{ t('none') }}</li>{% endfor %}</ul>
   </div>
 </section>
 

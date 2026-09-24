@@ -85,13 +85,13 @@ The framework's surface — code, messages, docs, stage instructions — is Engl
 - It does not scrape job platforms or automate a browser. Postings are pasted.
 - It does not predict page overflow; the page budget is checked after rendering.
 - It does not track applications yet, and it does not call any model itself.
-- The UI guides the data in: upload several documents, extract and apply in one run, review each proposed fact next to its passage, fill the questionnaire over several sittings — in any order.
+- The UI guides the data in: upload several documents, have them sorted together (evidence, context, duplicates, irrelevant), extract and apply in one run, review each proposed fact next to its passage, fill the questionnaire over several sittings — in any order.
 - The UI speaks English, French, German or Italian (its own chrome; the validator's findings stay English), and CVs render in any language with a labels file — the same four ship.
 - The UI (`cvac ui`) is local and single-user: no authentication, no network exposure by default, no chat; it never commits to git. Its "run with Claude" buttons need Claude Code installed and logged in.
 
 ## Status
 
-`v0.2` — the CLI, nine stage contracts, the skills, the example, the profile report and the fact gate, a local web UI (`cvac ui`), a stage runner over Claude Code (`cvac stage run`), the tests and CI exist. Roadmap (designed, not built): an API runner for people without Claude Code, market conventions beyond language, connectors for posting APIs, application tracking. See docs/ARCHITECTURE.md §10 and the ADRs.
+`v0.2` — the CLI, ten stage contracts, the skills, the example, the profile report and the fact gate, a local web UI (`cvac ui`), a stage runner over Claude Code (`cvac stage run`), the tests and CI exist. Roadmap (designed, not built): an API runner for people without Claude Code, market conventions beyond language, connectors for posting APIs, application tracking. See docs/ARCHITECTURE.md §10 and the ADRs.
 
 Nothing personal is in this repository, by construction: [CONTRIBUTING.md](CONTRIBUTING.md) explains the publication boundary.
 

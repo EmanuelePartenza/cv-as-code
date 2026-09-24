@@ -13,6 +13,20 @@ Tags: `arch`, `perf`, `ui`, `test`, `docs`, `fix`, `cleanup`, `sec`.
 
 ## 2026-09-25
 
+### feat(stages): 02_triage — documents read together [arch]
+
+- Stage `02_triage`: the whole inbox, with what is archived and the profile,
+  → `sources.yaml`, one verdict per document (evidence, context, duplicate
+  of which, irrelevant) with the reason; schema and validator rules.
+- Stage contracts accept directory inputs (`path/`): every document packed.
+- `03_extract` reads the index: context documents inform naming, never
+  facts; duplicates are extracted once through their primary and listed.
+- The UI's *Sort, extract and apply everything*: one run that sorts, extracts
+  only the evidence, applies, archives every document with its verdict shown;
+  *Only sort them* for a look first. Runs may hold planners and code steps.
+- Files: `pipeline/02_triage/`, `schemas/sources.schema.json`, `stages.py`,
+  `apply.py`, `ui/runs.py`, `ui/data.py`, `tests/test_triage.py`.
+
 ### feat(ui): the guided path — start page, review, questionnaire form [ui]
 
 - Several documents at once; extraction chained to apply in one run (the

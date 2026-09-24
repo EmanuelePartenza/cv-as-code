@@ -24,6 +24,10 @@ STATUS_WORDS = {
     "final",
     "Position",
     "Project",
+    "evidence",
+    "context",
+    "duplicate",
+    "irrelevant",
 }  # fmt: skip
 
 

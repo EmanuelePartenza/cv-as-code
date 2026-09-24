@@ -68,3 +68,5 @@ p.path code { font-size: 13px; }
 .door { background: white; border: 1px solid var(--line); border-radius: 6px; padding: 12px 16px; } .door h2 { margin-top: 4px; } .door .state { min-height: 24px; }
 a.button { display: inline-block; padding: 5px 12px; border: 1px solid var(--accent); border-radius: 4px; text-decoration: none; margin-right: 6px; }
 .actions.sticky { position: sticky; bottom: 0; background: var(--bg); padding: 8px 0; border-top: 1px solid var(--line); }
+.badge.evidence { background: #d1fae5; color: #065f46; } .badge.context { background: #dbeafe; color: #1e3a8a; } .badge.duplicate { background: #ede9fe; color: #5b21b6; } .badge.irrelevant { background: #e5e7eb; color: #374151; }
+ul.docs li { margin: 6px 0; }

@@ -257,6 +257,82 @@ def archive_source(root: DataRoot, user: str, note_path: Path) -> str | None:
     return f"sources/{dst.name}"
 
 
+def _rewrite_index_paths(index_path: Path, moves: dict[str, str], notes: dict[str, str]) -> None:
+    """Textual update of sources.yaml: moved paths and the notes extracted from documents."""
+    if not index_path.is_file() or not (moves or notes):
+        return
+    lines = index_path.read_text("utf-8").splitlines()
+    current: str | None = None
+    for i, line in enumerate(lines):
+        m = re.match(r"^(\s*-\s+)?(\s*)(path|duplicate_of|note):\s*(.*)$", line)
+        if not m:
+            continue
+        prefix, key, value = (
+            (m.group(1) or "") + m.group(2),
+            m.group(3),
+            m.group(4).strip().strip("'\""),
+        )
+        if key == "path":
+            current = moves.get(value, value)
+            lines[i] = f"{prefix}path: {current}"
+        elif key == "duplicate_of" and value in moves:
+            lines[i] = f"{prefix}duplicate_of: {moves[value]}"
+        elif key == "note" and current in notes:
+            lines[i] = f"{prefix}note: {notes[current]}"
+    # a document without a note line yet: add it under its path line
+    for rel, note in notes.items():
+        for i, line in enumerate(lines):
+            if re.match(rf"^\s*-\s+path:\s*{re.escape(rel)}\s*$", line):
+                indent = len(line) - len(line.lstrip()) + 2
+                block_end = i + 1
+                while (
+                    block_end < len(lines)
+                    and lines[block_end].strip()
+                    and not lines[block_end].lstrip().startswith("- ")
+                ):
+                    if re.match(r"^\s*note:", lines[block_end]):
+                        break
+                    block_end += 1
+                else:
+                    lines.insert(block_end, " " * indent + f"note: {note}")
+                break
+    for i, line in enumerate(lines):
+        m = re.match(r"^(\s*-\s+)?(\s*)context_for:\s*\[(.*)\]\s*$", line)
+        if m:
+            items = [moves.get(x.strip(), x.strip()) for x in m.group(3).split(",") if x.strip()]
+            lines[i] = f"{(m.group(1) or '') + m.group(2)}context_for: [{', '.join(items)}]"
+    index_path.write_text("\n".join(lines) + "\n", "utf-8")
+
+
+def archive_batch(root: DataRoot, user: str) -> list[str]:
+    """Move every indexed document still in inbox/ to sources/ and repoint the index."""
+    udir = root.user_dir(user)
+    index_path = udir / "sources.yaml"
+    if not index_path.is_file():
+        return []
+    index = load_document(index_path, root.rel(index_path))
+    moves: dict[str, str] = {}
+    for d in index.get("documents") or []:
+        rel = str(d.get("path") or "")
+        if not rel.startswith("inbox/"):
+            continue
+        src, dst = udir / rel, udir / "sources" / rel[len("inbox/") :]
+        if not src.is_file() or dst.exists():
+            continue
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        src.rename(dst)
+        moves[rel] = f"sources/{dst.name}"
+    _rewrite_index_paths(index_path, moves, {})
+    for note in (udir / "notes").glob("*.md") if (udir / "notes").is_dir() else []:
+        text = note.read_text("utf-8")
+        for old, new in moves.items():
+            if f"\nsource: {old}\n" in text:
+                note.write_text(
+                    text.replace(f"\nsource: {old}\n", f"\nsource: {new}\n", 1), "utf-8"
+                )
+    return [f"{old} → {new}" for old, new in moves.items()]
+
+
 def apply_note(root: DataRoot, user: str, name: str, archive: bool = True) -> ApplyResult:
     """Apply notes/<name>.md to the user's profile; refuses what would not validate."""
     note_path = root.user_dir(user) / "notes" / f"{name}.md"
@@ -314,12 +390,19 @@ def apply_note(root: DataRoot, user: str, name: str, archive: bool = True) -> Ap
             "the profile would not validate; nothing written:\n  - " + "\n  - ".join(rep.errors)
         )
     _set_note_applied(note_path)
+    source_before = str(note.get("source") or "")
+    moved: str | None = None
     if archive:
         try:
             if moved := archive_source(root, user, note_path):
                 result.notes.append(f"document archived as {moved}")
         except CvacError as e:
             result.notes.append(f"not archived: {e}")
+    _rewrite_index_paths(
+        root.user_dir(user) / "sources.yaml",
+        {source_before: moved} if moved else {},
+        {moved or source_before: name},
+    )
     body = note_path.read_text("utf-8").split("\n---\n", 1)[-1]
     if hint := _search_parameters_note(body):
         result.notes.append(hint)

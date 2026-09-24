@@ -8,6 +8,8 @@ inputs:
   - path: users/{user}/{document}
   - path: users/{user}/profile.yaml
     optional: true
+  - path: users/{user}/sources.yaml
+    optional: true
 output:
   path: users/{user}/notes/{name}.md
   format: markdown-frontmatter

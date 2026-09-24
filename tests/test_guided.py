@@ -45,6 +45,7 @@ def ui_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.setenv("CVAC_CLAUDE_BIN", str(fake))
     monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "cfg"))
     monkeypatch.delenv("FAKE_OUTPUT", raising=False)
+    monkeypatch.delenv("FAKE_OUTPUTS", raising=False)
     return tmp_path
 
 
@@ -144,7 +145,9 @@ def test_many_documents_upload_at_once_and_bad_ones_are_named(
     assert "2 document(s) uploaded" in body and "unsupported type" in body
     inbox = data_root.path / "users" / "test" / "inbox"
     assert (inbox / "old_cv.txt").is_file() and (inbox / "review_2024.md").is_file()
-    assert "Extract all with Claude (2 documents)" in page(c, "/u/test/documents")
+    assert "Sort, extract and apply everything with Claude (2 documents)" in page(
+        c, "/u/test/documents"
+    )
 
 
 def test_extract_chains_to_apply_and_archives(
@@ -185,7 +188,7 @@ def test_extract_all_queues_every_pending_document(data_root: DataRoot, ui_env: 
     c = client(data_root)
     r = c.post("/u/test/documents/extract-all")
     run = c.application.extensions["cvac"].runs.wait(r.headers["Location"].rsplit("/", 1)[1])
-    assert run.stage == "03_extract → 04_apply → 03_extract → 04_apply"
+    assert run.stage.startswith("02_triage") and "archive" in run.stage
     assert run.status == "failed" and "was not written" in run.summary
 
 

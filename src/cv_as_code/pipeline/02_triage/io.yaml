@@ -1,0 +1,18 @@
+stage: 02_triage
+version: 1
+engine: llm
+gate: none
+output_language: pivot
+params: [user]
+inputs:
+  - path: users/{user}/inbox/
+  - path: users/{user}/sources/
+    optional: true
+  - path: users/{user}/sources.yaml
+    optional: true
+  - path: users/{user}/profile.yaml
+    optional: true
+output:
+  path: users/{user}/sources.yaml
+  format: yaml
+  schema: sources.schema.json

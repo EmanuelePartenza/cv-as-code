@@ -15,6 +15,7 @@
     "extracted_on": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
     "language": { "type": "string", "pattern": "^[a-z]{2}$", "description": "Language of the document" },
     "status": { "enum": ["proposed", "applied"], "description": "applied once the facts have been added to the profile as draft" },
+    "duplicates": { "type": "array", "items": { "type": "string" }, "description": "Other documents carrying the same content (another language or format), extracted once through this one" },
     "new_parents": {
       "type": "array",
       "items": {

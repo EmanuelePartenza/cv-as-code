@@ -24,7 +24,8 @@ button per stage; CV and letter gates; run logs. Every button is a library
 call; nothing verifies or approves without the person's click. The UI speaks
 English, French, German or Italian (ADR-0016); German CV labels ship. The
 guided path (Start, Documents with many uploads and chained extraction,
-Review with passages, the questionnaire as a form) is the UI's centre.
+Review with passages, the questionnaire as a form) is the UI's centre; stage
+`02_triage` reads the documents together (context, duplicates, irrelevant).
 
 The example user exercises stages 03, 40 and 70 through the real engine and
 04 through its code (two more documents extracted and applied; the gap plan
@@ -66,9 +67,9 @@ Details in [DEVLOG.md](DEVLOG.md), which is the source of truth.
 <!-- AUTO:COMMITS -->
 | Hash | Date | Message |
 |---|---|---|
+| `c67a605` | 2026-09-24 | feat(ui): the guided path — start page, review, questionnaire as a form |
 | `9bc9562` | 2026-09-24 | feat(ui): four languages for the UI, a folder browser in the chooser |
 | `be5d403` | 2026-09-24 | feat(apply): stage 04 deterministic, a note into the profile by code |
 | `82565d9` | 2026-09-24 | feat(stages): 04_apply, an evidence note into the profile as a contract |
 | `0cc154e` | 2026-09-24 | test: keep the config directory visible to the boundary test |
-| `6bb159d` | 2026-09-24 | feat(example): Robin's gap plan and interview prep from the real engine |
 <!-- /AUTO:COMMITS -->

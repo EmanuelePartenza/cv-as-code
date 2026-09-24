@@ -72,7 +72,7 @@
         "properties": {
           "path": {
             "type": "string",
-            "description": "Data-root-relative path with placeholders"
+            "description": "Data-root-relative path with placeholders; a trailing / names a directory whose regular files are all inputs"
           },
           "optional": {
             "type": "boolean",

@@ -47,7 +47,6 @@ Error: Errore
 Errors: Errori
 Evidence notes: Note di evidenza
 Extract (03): Estrai (03)
-Extract all with Claude ({n} documents): Estrai tutto con Claude ({n} documenti)
 Extract my answers (03): Estrai le mie risposte (03)
 Extract with Claude (03): Estrai con Claude (03)
 ? Extraction proposes the facts and applies them to your profile as drafts; the document is then archived under sources/. You confirm each fact in the Review area.
@@ -99,6 +98,7 @@ OK: OK
 Old CVs, performance reviews, project reports, certificates. Several files at once.: Vecchi CV, valutazioni, relazioni di progetto, certificati. Più file insieme.
 ? 'Old CVs, performance reviews, project reports, certificates: drop them in, and Claude proposes the facts they support, each with the passage it rests on.'
 : 'Vecchi CV, valutazioni, relazioni di progetto, certificati: caricali, e Claude propone i fatti che supportano, ciascuno con il passaggio su cui si fonda.'
+Only sort them (02): Solo ordinali (02)
 Open a data root: Apri una cartella dati
 Open this data root: Apri questa cartella dati
 Pipeline: Pipeline
@@ -132,12 +132,15 @@ Save the wording: Salva la formulazione
 Showing the {which} PDF.: 'PDF mostrato: {which}.'
 Skills: Competenze
 Slug (folder name, lowercase): Slug (nome della cartella, minuscolo)
+Sort, extract and apply everything with Claude ({n} documents): Ordina, estrai e applica tutto con Claude ({n} documenti)
 Sources (archived): Fonti (archiviate)
 Start: Inizio
 Start a questionnaire: Inizia un questionario
 Start from the standard questionnaire (English): Parti dal questionario standard (in inglese)
 Tailor the CV (30): Adatta il CV (30)
 Target roles, comma-separated: Ruoli cercati, separati da virgola
+? 'The documents are read together: a role description gives context to a review, three versions of one CV are extracted once, what has nothing for a CV is set aside. Each document gets a verdict you can read below.'
+: 'I documenti vengono letti insieme: una descrizione del ruolo dà contesto a una valutazione, tre versioni dello stesso CV vengono estratte una sola volta, ciò che non serve a un CV viene messo da parte. Ogni documento riceve un verdetto che leggi qui sotto.'
 The fact, in your words: Il fatto, con parole tue
 The passage it rests on: Il passaggio su cui si fonda
 The posting, pasted verbatim: L'annuncio, incollato così com'è
@@ -191,16 +194,19 @@ choose a file to upload: scegli un file da caricare
 clean working tree.: albero di lavoro pulito.
 company: azienda
 company and role must each contain at least one letter or digit: azienda e ruolo devono contenere almeno una lettera o cifra ciascuno
+context: contesto
 cost: costo
 ? cv-as-code keeps everything about you in a folder of your own, the data root, marked by a cvac.yaml file, and never anywhere else. Open an existing one, or create one in a new or empty folder.
 : cv-as-code tiene tutto ciò che ti riguarda in una cartella tua, la cartella dati, contrassegnata da un file cvac.yaml, e mai altrove. Aprine una esistente, o creane una in una cartella nuova o vuota.
 data root: cartella dati
 'data root: {path}': 'cartella dati: {path}'
 draft: bozza
+duplicate: duplicato
 e-mail: e-mail
 edited as text, validated before saving.: modificati come testo, validati prima del salvataggio.
 empty: vuoto
 'engine: {error}': 'motore: {error}'
+evidence: evidenza
 evidence facts: fatti a supporto
 extracted: estratto
 failed: fallito
@@ -214,6 +220,7 @@ inbox/{name} already exists; rename the file: inbox/{name} esiste già; rinomina
 interviews/{name}.md already exists: interviews/{name}.md esiste già
 invalid: non valido
 invalid match file: file di corrispondenza non valido
+irrelevant: irrilevante
 job: lavoro
 jobs/{id}/ already exists; postings are never overwritten: jobs/{id}/ esiste già; gli annunci non vengono mai sovrascritti
 'jobs/{id}/raw.txt written; next: normalise it (stage 10)': 'jobs/{id}/raw.txt scritto; prossimo passo: normalizzalo (stadio 10)'
@@ -267,6 +274,7 @@ status: stato
 stretch: al limite
 tailor the CV first: prima adatta il CV
 template: template
+the inbox is empty: la posta in arrivo è vuota
 to-fill: da compilare
 up: su
 'user `{slug}` created; next: a questionnaire, or documents to extract': 'utente `{slug}` creato; prossimo passo: un questionario, o documenti da estrarre'

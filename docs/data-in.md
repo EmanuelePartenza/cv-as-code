@@ -17,6 +17,24 @@ You fill it in at your own pace, in your own words, and set `status: filled`.
 With an existing profile the stage works in **update mode**: it asks only for
 what is missing or thin, pre-filling what it knows.
 
+## 1b. Sorting the documents (stage `02_triage`)
+
+People upload everything: three versions of one CV, a role description, a
+review, a timetable. Stage 02 reads the whole inbox together with what is
+already archived and writes `users/<slug>/sources.yaml`, one verdict per
+document: `evidence` (about you: extracted), `context` (about the role or the
+company: read while extracting so that roles and systems are named as the
+organisation names them, never a source of facts), `duplicate` (the same
+content as another document, in another language or format: extracted once,
+through the primary it names) or `irrelevant` (nothing for a CV), with one
+line saying why. The UI's *Sort, extract and apply everything* button runs
+02, then 03 and 04 on each evidence document, then archives every document
+under `sources/` with its verdict on record.
+
+```bash
+cvac stage run 02_triage --user <slug>
+```
+
 ## 2. Extraction (stage `03_extract`)
 
 Any document — the filled questionnaire, an old CV, a review, a logbook —

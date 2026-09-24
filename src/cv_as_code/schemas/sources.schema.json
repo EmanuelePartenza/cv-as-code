@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "sources.schema.json",
+  "title": "Index of a user's documents (users/<slug>/sources.yaml)",
+  "description": "Output of stage 02_triage: what each uploaded document is, read together with the others. evidence: about the person, to extract; context: about the organisation or the role, read while extracting, never a source of facts; duplicate: the same content as another document (another language, another format), extracted once through the primary; irrelevant: nothing a CV could use. Kept as the record of why a document was or was not extracted.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kind", "user", "updated", "documents"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "kind": { "const": "sources" },
+    "user": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "updated": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "documents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "kind", "about"],
+        "properties": {
+          "path": { "type": "string", "pattern": "^(inbox|sources)/[^/]+$", "description": "Relative to the user's directory" },
+          "kind": { "enum": ["evidence", "context", "duplicate", "irrelevant"] },
+          "language": { "type": ["string", "null"], "pattern": "^[a-z]{2}$" },
+          "title": { "type": ["string", "null"] },
+          "about": { "type": "string", "minLength": 1, "description": "One line: what the document is and why it got this kind" },
+          "duplicate_of": { "type": ["string", "null"], "pattern": "^(inbox|sources)/[^/]+$", "description": "The primary document, for a duplicate" },
+          "context_for": { "type": "array", "items": { "type": "string" }, "description": "Documents or experience ids this context informs" },
+          "note": { "type": ["string", "null"], "pattern": "^[a-z0-9][a-z0-9-]*$", "description": "The evidence note extracted from it, once it exists" }
+        }
+      }
+    }
+  }
+}

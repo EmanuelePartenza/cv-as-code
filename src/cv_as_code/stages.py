@@ -89,6 +89,25 @@ class ResolvedStage:
     output: Path | None = None
     output_rel: str = ""
 
+    @staticmethod
+    def is_dir_input(template: str) -> bool:
+        """An input whose path ends with `/` is a directory: each regular file in it is an input."""
+        return template.endswith("/")
+
+    def present(self, path: Path, template: str) -> bool:
+        return path.is_dir() if self.is_dir_input(template) else path.is_file()
+
+
+def files_in(directory: Path) -> list[Path]:
+    """The documents of a directory input: regular files, hidden and README left out, sorted."""
+    if not directory.is_dir():
+        return []
+    return sorted(
+        p
+        for p in directory.iterdir()
+        if p.is_file() and not p.name.startswith(".") and p.name.lower() != "readme.md"
+    )
+
 
 def resolve_stage(root: DataRoot, name: str, params: dict[str, str]) -> ResolvedStage:
     stage = load_stage(name)
@@ -114,8 +133,14 @@ def describe(root: DataRoot, rs: ResolvedStage) -> str:
         f"params:          {', '.join(f'{k}={v}' for k, v in rs.params.items()) or '-'}",
         "inputs:",
     ]
-    for _, path, optional in rs.inputs:
-        mark = "present" if path.is_file() else ("absent, optional" if optional else "MISSING")
+    for template, path, optional in rs.inputs:
+        if rs.is_dir_input(template):
+            n = len(files_in(path))
+            mark = (
+                f"{n} file(s)" if path.is_dir() else ("absent, optional" if optional else "MISSING")
+            )
+        else:
+            mark = "present" if path.is_file() else ("absent, optional" if optional else "MISSING")
         lines.append(f"  - {root.rel(path)}  [{mark}]")
     out = c["output"]
     lines.append(f"output:          {rs.output_rel}  ({out['format']}, schema {out['schema']})")
@@ -139,6 +164,15 @@ def language_note(root: DataRoot, rs: ResolvedStage) -> str:
     if rule == "posting":
         return "Keep the posting's own language and wording."
     return "Write in English."
+
+
+def _fenced(rel: str, path: Path) -> list[str]:
+    try:
+        body = path.read_text("utf-8").rstrip()
+    except UnicodeDecodeError:
+        return ["", f"## Input {rel}", "", f"_(binary document at `{rel}`: read it from disk)_"]
+    fence = "yaml" if path.suffix in {".yaml", ".yml"} else "text"
+    return ["", f"## Input {rel}", "", f"```{fence}", body, "```"]
 
 
 def pack(root: DataRoot, rs: ResolvedStage) -> str:
@@ -169,23 +203,17 @@ def pack(root: DataRoot, rs: ResolvedStage) -> str:
     parts += ["", "---", "", "# Inputs"]
     for template, path, optional in rs.inputs:
         rel = root.rel(path)
-        if not path.is_file():
+        if not rs.present(path, template):
             if optional:
                 parts += ["", f"## Input {rel}", "", "_(absent; this input is optional)_"]
                 continue
             raise CvacError(f"stage {rs.stage.name}: input {rel} is missing (from `{template}`)")
-        try:
-            body = path.read_text("utf-8").rstrip()
-        except UnicodeDecodeError:
-            parts += [
-                "",
-                f"## Input {rel}",
-                "",
-                f"_(binary document at `{rel}`: read it from disk)_",
-            ]
-            continue
-        fence = "yaml" if path.suffix in {".yaml", ".yml"} else "text"
-        parts += ["", f"## Input {rel}", "", f"```{fence}", body, "```"]
+        files = files_in(path) if rs.is_dir_input(template) else [path]
+        if rs.is_dir_input(template):
+            listing = "\n".join(f"- `{root.rel(f)}`" for f in files) or "_(no document)_"
+            parts += ["", f"## Input {rel} ({len(files)} document(s))", "", listing]
+        for f in files:
+            parts += _fenced(root.rel(f), f)
     parts += [
         "",
         "---",

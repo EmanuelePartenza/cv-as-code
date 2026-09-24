@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import threading
 import uuid
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 
@@ -18,6 +19,20 @@ from .i18n import t
 from .state import state
 
 bp = Blueprint("runs", __name__)
+
+StageStep = tuple[str, dict[str, str]]
+CodeStep = tuple[str, str, Callable[[DataRoot], list[str]]]  # ("code", label, action)
+Planner = Callable[[DataRoot], list["Step"]]
+Step = StageStep | CodeStep | Planner
+
+
+def label_of(steps: list[Step]) -> str:
+    names = []
+    for s in steps:
+        if callable(s):
+            continue
+        names.append(s[1] if s[0] == "code" else s[0])
+    return " → ".join(dict.fromkeys(names))
 
 
 @dataclass
@@ -61,36 +76,58 @@ class RunManager:
     def start(self, root: DataRoot, stage: str, params: dict[str, str], back_url: str) -> Run:
         return self.start_steps(root, [(stage, params)], back_url)
 
-    def start_steps(
-        self, root: DataRoot, steps: list[tuple[str, dict[str, str]]], back_url: str
-    ) -> Run:
-        """One run of several stages in sequence; a step may consume an earlier step's output."""
-        first_stage, first_params = steps[0]
-        rs = resolve_stage(root, first_stage, first_params)
-        for _, path, optional in rs.inputs:
-            if not path.is_file() and not optional:
-                raise CvacError(f"stage {first_stage}: input {root.rel(path)} is missing")
+    def start_steps(self, root: DataRoot, steps: list[Step], back_url: str) -> Run:
+        """One run of several steps in sequence: stages, code actions, or planners that add steps.
+
+        A planner runs when reached and returns the steps to insert (what to extract is known
+        only once the triage has written its index); a code action runs a library function.
+        """
+        first = steps[0]
+        if not isinstance(first, tuple) or first[0] == "code":
+            raise CvacError("a run starts with a stage")
+        rs = resolve_stage(root, first[0], first[1])
+        for template, path, optional in rs.inputs:
+            if not rs.present(path, template) and not optional:
+                raise CvacError(f"stage {first[0]}: input {root.rel(path)} is missing")
         needs_engine = any(
-            load_stage(stage).contract.get("engine") != "deterministic" for stage, _ in steps
-        )
+            isinstance(s, tuple)
+            and s[0] != "code"
+            and load_stage(s[0]).contract.get("engine") != "deterministic"
+            for s in steps
+        ) or any(callable(s) for s in steps)
         # Resolved here, in the request, so a missing engine is an immediate message and the
         # thread never looks the executable up under an environment that has moved on.
         binary = find_claude() if needs_engine else None
-        label = " → ".join(stage for stage, _ in steps)
-        run = Run(id=uuid.uuid4().hex[:10], stage=label, params=rs.params, back_url=back_url)
+        run = Run(
+            id=uuid.uuid4().hex[:10], stage=label_of(steps), params=rs.params, back_url=back_url
+        )
 
         def work() -> None:
+            queue: list[Step] = list(steps)
+            order: list[Step] = list(steps)  # the steps in execution order, planners expanded
+            ok = True
             try:
-                for stage, params in steps:
-                    step = resolve_stage(root, stage, params)
-                    if len(steps) > 1:
-                        run.lines.append(f"── {stage}")
+                while queue and ok:
+                    step = queue.pop(0)
+                    if callable(step):
+                        added = step(root)
+                        queue[0:0] = added
+                        at = order.index(step)
+                        order[at : at + 1] = added
+                        run.stage = label_of(order)
+                        continue
+                    if step[0] == "code":
+                        run.lines.append(f"── {step[1]}")
+                        run.lines.extend(step[2](root))
+                        continue
+                    stage, params = step
+                    resolved = resolve_stage(root, stage, params)
+                    run.lines.append(f"── {stage}")
                     run.result = run_stage(
-                        root, step, on_line=lambda line: self._collect(run, line), binary=binary
+                        root, resolved, on_line=lambda line: self._collect(run, line), binary=binary
                     )
-                    if not run.result.ok:
-                        break
-                run.status = "ok" if run.result is not None and run.result.ok else "failed"
+                    ok = run.result.ok
+                run.status = "ok" if ok and run.result is not None else "failed"
             except CvacError as e:
                 run.error = str(e)
                 run.status = "failed"

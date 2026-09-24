@@ -351,6 +351,34 @@ def check_interview_prep(root: DataRoot, doc: dict, path: Path, where: str, rep:
             return
 
 
+def check_sources(root: DataRoot, doc: dict, path: Path, where: str, rep: Report) -> None:
+    user_dir = path.parent
+    if user_dir.name != str(doc.get("user")):
+        rep.error(where, f"user `{doc.get('user')}` does not match the directory `{user_dir.name}`")
+    kinds = {d.get("path"): d.get("kind") for d in doc.get("documents") or []}
+    seen: set[str] = set()
+    for i, d in enumerate(doc.get("documents") or []):
+        rel = str(d.get("path"))
+        if rel in seen:
+            rep.error(where, f"documents[{i}] `{rel}` is listed twice")
+        seen.add(rel)
+        if not (user_dir / rel).is_file():
+            rep.error(where, f"documents[{i}] `{rel}` does not exist under {root.rel(user_dir)}")
+        primary = d.get("duplicate_of")
+        if d.get("kind") == "duplicate":
+            if not primary:
+                rep.error(where, f"documents[{i}] `{rel}` is a duplicate without duplicate_of")
+            elif primary not in kinds:
+                rep.error(where, f"documents[{i}] duplicate_of `{primary}` is not in the index")
+            elif kinds[primary] == "duplicate":
+                rep.error(where, f"documents[{i}] duplicate_of `{primary}` is itself a duplicate")
+        elif primary:
+            rep.error(where, f"documents[{i}] `{rel}` has duplicate_of but is `{d.get('kind')}`")
+        note = d.get("note")
+        if note and not (user_dir / "notes" / f"{note}.md").is_file():
+            rep.error(where, f"documents[{i}] note `{note}` does not exist under notes/")
+
+
 CHECKS = {
     "profile": check_profile,
     "cv-spec": check_cvspec,
@@ -362,6 +390,7 @@ CHECKS = {
     "cover-letter": check_letter,
     "evidence": check_evidence,
     "questionnaire": check_questionnaire,
+    "sources": check_sources,
     "gap-plan": check_gap_plan,
     "interview-prep": check_interview_prep,
 }
@@ -403,6 +432,7 @@ def discover_all(root: DataRoot) -> list[Path]:
     patterns = [
         "users/*/profile.yaml",
         "users/*/search.yaml",
+        "users/*/sources.yaml",
         "users/*/masters/*/cv-spec.yaml",
         "users/*/applications/*/cv-spec.yaml",
         "users/*/applications/*/letter.md",

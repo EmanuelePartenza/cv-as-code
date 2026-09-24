@@ -52,10 +52,11 @@ src/cv_as_code/
 ├── documents.py    YAML and markdown-with-frontmatter documents; dates normalised to strings
 ├── errors.py       CvacError > ValidationError, RenderError
 ├── schemas/        profile · search · cv-spec · cv-resolved · labels · data-root · job · match ·
-│                   cover-letter · evidence · questionnaire · gap-plan · interview-prep · stage-io
-├── pipeline/       03_extract · 04_apply · 05_interview · 10_normalize · 20_match · 30_tailor ·
-│                   40_gap_plan · 60_letter · 70_interview_prep (INSTRUCTIONS.md + io.yaml each;
-│                   05 also ships the questionnaire skeleton)
+│                   cover-letter · evidence · questionnaire · sources · gap-plan · interview-prep ·
+│                   stage-io
+├── pipeline/       02_triage · 03_extract · 04_apply · 05_interview · 10_normalize · 20_match ·
+│                   30_tailor · 40_gap_plan · 60_letter · 70_interview_prep (INSTRUCTIONS.md +
+│                   io.yaml each; 05 also ships the questionnaire skeleton)
 ├── skills/         cv-master · job-ingest · cv-tailor · cover-letter · gap-plan · interview-prep · onboard
 ├── i18n/           labels.en.yaml · labels.fr.yaml · labels.de.yaml · labels.it.yaml
 └── templates/      classic/{template,letter}.typ · lib/common.typ · fonts/ (Lato, OFL)
@@ -99,7 +100,8 @@ Tags and categories are free-form: matching is semantic, on the LLM side.
 | `job` | `jobs/<id>/job.yaml` | built | normalised posting; requirements quoted verbatim, never paraphrased |
 | `match` | `users/<u>/matches/<id>.yaml` | built | `verdict: apply \| stretch \| skip`, strengths with fact refs, gaps, angle; no numeric score |
 | `cover-letter` | frontmatter of `letter.md` | built | `source_facts`, status, approval date |
-| `evidence` | frontmatter of `notes/<name>.md` | built | facts proposed by `03_extract`, each with the verbatim passage it rests on |
+| `sources` | `users/<u>/sources.yaml` | built | the triage's verdict per document: evidence, context, duplicate (of which), irrelevant; the note each one produced |
+| `evidence` | frontmatter of `notes/<name>.md` | built | facts proposed by `03_extract`, each with the verbatim passage it rests on; `duplicates` it stands for |
 | `questionnaire` | frontmatter of `interviews/<name>.md` | built | the profile interview of `05_interview`; the body is free text |
 | `gap-plan` | frontmatter of `growth/<job_id>.md` | built | per gap: adjacent facts cited, a path whose steps name their artefact, candidate facts as future claims; internal |
 | `interview-prep` | frontmatter of `applications/<job_id>/interview-prep.md` | built | STAR stories citing `source_facts`, gap scripts; internal (ADR-0005) |
@@ -124,8 +126,12 @@ posting (text)
   ╰ [40 gap plan]   LLM, from a match's gaps → growth/<job_id>.md, internal; candidate facts never enter the profile
 ```
 
-Upstream of the profile, three more stages bring data *in*: `03_extract` (a
-document or a filled questionnaire → an evidence note with proposed facts),
+Upstream of the profile, four more stages bring data *in*: `02_triage` (every
+document of the inbox read together → `sources.yaml`: evidence to extract,
+context that informs extraction but never yields a fact, duplicates extracted
+once through their primary, irrelevant documents set aside), `03_extract` (a
+document or a filled questionnaire → an evidence note with proposed facts,
+read with the context the index names),
 `04_apply` (deterministic: the note's facts appended to `profile.yaml` as
 `draft`, every existing line untouched, the note marked `applied`) and `05_interview` (profile + search → a questionnaire in the
 user's language, only the missing items in update mode). Facts always enter as `draft`; `cvac fact
@@ -134,7 +140,8 @@ verify|reject` is the gate and `cvac profile report` the view
 
 An LLM stage is a directory `pipeline/<NN_name>/` with `INSTRUCTIONS.md` (the
 prompt: inputs, outputs, rules; it never names an engine) and `io.yaml` (the
-contract: inputs with placeholders, output path and schema, `gate`, output
+contract: inputs with placeholders — a path ending in `/` is a directory whose
+every document is an input — output path and schema, `gate`, output
 language). Three engines consume the same files: a Claude Code skill in
 session, `cvac stage pack` for any chat (paste the bundle, paste the answer
 back, validate — see [manual-path.md](manual-path.md)), and `cvac stage run`,
@@ -148,6 +155,7 @@ print the contracts resolved against a data root.
 
 | Stage | Gate | Status |
 |---|---|---|
+| `02_triage` | none | built; exercised by the example |
 | `03_extract` | none (facts land as draft) | built; exercised by the example |
 | `04_apply` | none (facts land as draft) | built, deterministic (code, no model); exercised by the example |
 | `05_interview` | none | built; exercised by the example |

@@ -47,7 +47,6 @@ Error: Fehler
 Errors: Fehler
 Evidence notes: Belegnotizen
 Extract (03): Extrahieren (03)
-Extract all with Claude ({n} documents): Alles mit Claude extrahieren ({n} Dokumente)
 Extract my answers (03): Meine Antworten extrahieren (03)
 Extract with Claude (03): Mit Claude extrahieren (03)
 ? Extraction proposes the facts and applies them to your profile as drafts; the document is then archived under sources/. You confirm each fact in the Review area.
@@ -99,6 +98,7 @@ OK: OK
 Old CVs, performance reviews, project reports, certificates. Several files at once.: Alte Lebensläufe, Beurteilungen, Projektberichte, Zertifikate. Mehrere Dateien auf einmal.
 ? 'Old CVs, performance reviews, project reports, certificates: drop them in, and Claude proposes the facts they support, each with the passage it rests on.'
 : 'Alte Lebensläufe, Beurteilungen, Projektberichte, Zertifikate: legen Sie sie ab, und Claude schlägt die Fakten vor, die sie belegen, jeden mit der Textstelle, auf der er beruht.'
+Only sort them (02): Nur sortieren (02)
 Open a data root: Datenordner öffnen
 Open this data root: Diesen Datenordner öffnen
 Pipeline: Pipeline
@@ -132,12 +132,15 @@ Save the wording: Formulierung speichern
 Showing the {which} PDF.: 'Angezeigtes PDF: {which}.'
 Skills: Kompetenzen
 Slug (folder name, lowercase): Slug (Ordnername, Kleinbuchstaben)
+Sort, extract and apply everything with Claude ({n} documents): Alles mit Claude sortieren, extrahieren und übernehmen ({n} Dokumente)
 Sources (archived): Quellen (archiviert)
 Start: Start
 Start a questionnaire: Fragebogen beginnen
 Start from the standard questionnaire (English): Mit dem Standardfragebogen beginnen (Englisch)
 Tailor the CV (30): Lebenslauf zuschneiden (30)
 Target roles, comma-separated: Zielpositionen, durch Kommas getrennt
+? 'The documents are read together: a role description gives context to a review, three versions of one CV are extracted once, what has nothing for a CV is set aside. Each document gets a verdict you can read below.'
+: 'Die Dokumente werden zusammen gelesen: eine Stellenbeschreibung gibt einer Beurteilung Kontext, drei Fassungen eines Lebenslaufs werden einmal extrahiert, was nichts für einen Lebenslauf hergibt, wird beiseitegelegt. Jedes Dokument erhält ein Urteil, unten nachzulesen.'
 The fact, in your words: Der Fakt, in Ihren Worten
 The passage it rests on: Die Textstelle, auf der er beruht
 The posting, pasted verbatim: Die Stellenanzeige, wörtlich eingefügt
@@ -191,16 +194,19 @@ choose a file to upload: wählen Sie eine Datei zum Hochladen
 clean working tree.: sauberer Arbeitsbaum.
 company: Unternehmen
 company and role must each contain at least one letter or digit: Unternehmen und Stellenbezeichnung müssen je mindestens einen Buchstaben oder eine Ziffer enthalten
+context: Kontext
 cost: Kosten
 ? cv-as-code keeps everything about you in a folder of your own, the data root, marked by a cvac.yaml file, and never anywhere else. Open an existing one, or create one in a new or empty folder.
 : cv-as-code bewahrt alles über Sie in einem eigenen Ordner auf, dem Datenordner, markiert durch eine Datei cvac.yaml, und nirgendwo sonst. Öffnen Sie einen bestehenden oder legen Sie einen in einem neuen oder leeren Ordner an.
 data root: Datenordner
 'data root: {path}': 'Datenordner: {path}'
 draft: Entwurf
+duplicate: Duplikat
 e-mail: E-Mail
 edited as text, validated before saving.: als Text bearbeitet, vor dem Speichern validiert.
 empty: leer
 'engine: {error}': 'Engine: {error}'
+evidence: Beleg
 evidence facts: Belegfakten
 extracted: extrahiert
 failed: fehlgeschlagen
@@ -214,6 +220,7 @@ inbox/{name} already exists; rename the file: inbox/{name} existiert bereits; be
 interviews/{name}.md already exists: interviews/{name}.md existiert bereits
 invalid: ungültig
 invalid match file: ungültige Abgleichdatei
+irrelevant: unerheblich
 job: Stelle
 jobs/{id}/ already exists; postings are never overwritten: jobs/{id}/ existiert bereits; Stellenanzeigen werden nie überschrieben
 'jobs/{id}/raw.txt written; next: normalise it (stage 10)': 'jobs/{id}/raw.txt geschrieben; als Nächstes: normalisieren (Stufe 10)'
@@ -267,6 +274,7 @@ status: Status
 stretch: grenzwertig
 tailor the CV first: zuerst den Lebenslauf zuschneiden
 template: Vorlage
+the inbox is empty: der Eingang ist leer
 to-fill: auszufüllen
 up: nach oben
 'user `{slug}` created; next: a questionnaire, or documents to extract': 'Benutzer `{slug}` angelegt; als Nächstes: ein Fragebogen oder Dokumente zum Extrahieren'

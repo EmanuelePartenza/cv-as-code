@@ -29,11 +29,15 @@ import json, os, re, sys
 prompt = sys.stdin.read()
 m = re.search(r"`DONE (.+?)`", prompt)
 out = m.group(1) if m else None
+stage = prompt.split("\\n", 1)[0].replace("# Stage ", "").strip()
 print(json.dumps({"type": "system", "subtype": "init", "session_id": "s-1"}))
 print(json.dumps({"type": "assistant", "message": {"content": [
     {"type": "text", "text": "Reading the inputs."},
     {"type": "tool_use", "name": "Write", "input": {"file_path": out}}]}}))
 content = os.environ.get("FAKE_OUTPUT")
+for pair in os.environ.get("FAKE_OUTPUTS", "").split(","):
+    if pair.startswith(stage + "="):
+        content = pair.split("=", 1)[1]
 if content is not None and out:
     os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
     with open(out, "w", encoding="utf-8") as h:
@@ -57,6 +61,7 @@ def fake_claude(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.setenv("CVAC_CLAUDE_BIN", str(script))
     monkeypatch.setenv("XDG_CACHE_HOME", str(tmp_path / "cache"))
     monkeypatch.delenv("FAKE_OUTPUT", raising=False)
+    monkeypatch.delenv("FAKE_OUTPUTS", raising=False)
     monkeypatch.delenv("FAKE_EXIT", raising=False)
     monkeypatch.delenv("FAKE_IS_ERROR", raising=False)
     monkeypatch.delenv("FAKE_DENY", raising=False)
