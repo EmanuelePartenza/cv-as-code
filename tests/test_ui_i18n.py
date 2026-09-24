@@ -22,6 +22,8 @@ STATUS_WORDS = {
     "verified", "draft", "rejected", "approved", "proposed", "applied", "filled", "to-fill",
     "invalid", "running", "ok", "failed", "apply", "stretch", "skip", "masters", "applications",
     "final",
+    "Position",
+    "Project",
 }  # fmt: skip
 
 

@@ -387,7 +387,7 @@ def test_documents_area_uploads_extracts_and_edits(
         content_type="multipart/form-data",
         follow_redirects=True,
     )
-    assert "inbox/Old_CV.txt uploaded" in r.get_data(as_text=True)
+    assert "1 document(s) uploaded" in r.get_data(as_text=True)
     assert (data_root.path / "users" / "test" / "inbox" / "Old_CV.txt").is_file()
     r = c.post(
         "/u/test/documents/upload",
@@ -500,6 +500,9 @@ def test_apply_button_runs_stage_04_on_a_proposed_note_only(
     c = app.test_client()
     body = page(c, "/u/test/documents")
     assert body.count("Apply to the profile (04)") == 1
+    r = c.post("/u/test/documents/apply", data={"name": "done"})
+    run = app.extensions["cvac"].runs.wait(r.headers["Location"].rsplit("/", 1)[1])
+    assert run.status == "failed" and "already applied" in page(c, f"/runs/{run.id}")
     r = c.post("/u/test/documents/apply", data={"name": "fresh"})
     assert r.status_code == 302 and "/runs/" in r.headers["Location"]
     run = app.extensions["cvac"].runs.wait(r.headers["Location"].rsplit("/", 1)[1])
@@ -508,6 +511,3 @@ def test_apply_button_runs_stage_04_on_a_proposed_note_only(
     assert "exp-acme.f04" in page(c, "/u/test")
     assert "is not an evidence note" in post(c, "/u/test/documents/apply", name="ghost")
     assert "is not an evidence note" in post(c, "/u/test/documents/apply", name="../profile")
-    r = c.post("/u/test/documents/apply", data={"name": "done"})
-    run = app.extensions["cvac"].runs.wait(r.headers["Location"].rsplit("/", 1)[1])
-    assert run.status == "failed" and "already applied" in page(c, f"/runs/{run.id}")

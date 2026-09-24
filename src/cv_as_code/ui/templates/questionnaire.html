@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}{{ t('Questionnaire') }} · {{ name }}{% endblock %}
+{% block content %}
+<p class="muted"><a href="{{ url_for('data.documents', user=user) }}">{{ t('Documents') }}</a> › interviews/{{ name }}.md</p>
+<h1>{{ t('Questionnaire') }} <span class="badge {{ q.status }}">{{ t(q.status) }}</span> <small class="muted">{{ t('{answered} of {total} questions answered', answered=q.answered[0], total=q.answered[1]) }}</small></h1>
+<p class="muted">{{ t('Answer in your own words and language, as plainly as you like; "I do not know" is a valid answer. Save whenever you want and come back later. Nothing here reaches a CV before you have confirmed it, fact by fact.') }}</p>
+<form method="post" class="stack" id="qf">
+  {% for section in q.sections %}
+  <h2>{{ section.heading }}</h2>
+  {% for block in section.blocks %}
+    {% set bi = loop.index0 %}
+    {% if block.title %}<h3>{{ block.title }}</h3>{% endif %}
+    {% for item in block.items %}
+      {% if item.code %}
+      <label><strong>{{ item.code }}.</strong> {{ item.text }}
+        <textarea name="a:{{ section.letter }}:{{ bi }}:{{ item.code }}" rows="{{ 3 if item.answer|length < 200 else 6 }}">{{ item.answer }}</textarea>
+      </label>
+      {% elif item.text.strip() %}
+      <p class="muted">{{ item.text }}</p>
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
+  {% if section.letter in repeatable %}
+  <p><button name="action" value="add:{{ section.letter }}">{{ t('Add another') }} {{ t(repeatable[section.letter]) }}</button></p>
+  {% endif %}
+  {% endfor %}
+  <div class="actions sticky">
+    <button name="action" value="save" class="ok">{{ t('Save') }}</button>
+    {% if q.status != 'filled' %}
+    <button name="action" value="filled">{{ t('Save and mark as filled') }}</button>
+    {% else %}
+    <button name="action" value="to-fill">{{ t('Reopen for editing') }}</button>
+    <button class="ok" form="extract-form">{{ t('Extract my answers (03)') }}</button>
+    {% endif %}
+  </div>
+</form>
+{% if q.status == 'filled' %}
+<form method="post" action="{{ url_for('data.extract', user=user) }}" id="extract-form"><input type="hidden" name="document" value="interviews/{{ name }}.md"><input type="hidden" name="name" value="{{ name }}"></form>
+{% endif %}
+{% endblock %}

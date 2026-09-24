@@ -11,8 +11,10 @@
   <a class="brand" href="{{ url_for('index') }}">cv-as-code</a>
   <nav>
     {% if default_user %}
-      <a href="{{ url_for('profile', user=default_user) }}">{{ t('Profile') }}</a>
+      <a href="{{ url_for('start.start', user=default_user) }}">{{ t('Start') }}</a>
       <a href="{{ url_for('data.documents', user=default_user) }}">{{ t('Documents') }}</a>
+      <a href="{{ url_for('review.review', user=default_user) }}">{{ t('Review') }}</a>
+      <a href="{{ url_for('profile', user=default_user) }}">{{ t('Profile') }}</a>
       <a href="{{ url_for('jobs.listing', user=default_user) }}">{{ t('Jobs') }}</a>
       <a href="{{ url_for('cvs', user=default_user) }}">{{ t('CVs') }}</a>
     {% endif %}

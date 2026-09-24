@@ -232,7 +232,32 @@ def _set_note_applied(path: Path) -> None:
     raise CvacError(f"{path.name}: no `status: proposed` line in the frontmatter")
 
 
-def apply_note(root: DataRoot, user: str, name: str) -> ApplyResult:
+def archive_source(root: DataRoot, user: str, note_path: Path) -> str | None:
+    """Move the note's document from inbox/ to sources/ and repoint the note; None if elsewhere."""
+    note = load_document(note_path, root.rel(note_path))
+    source = str(note.get("source") or "")
+    if not source.startswith("inbox/"):
+        return None
+    udir = root.user_dir(user)
+    src, dst = udir / source, udir / "sources" / source[len("inbox/") :]
+    if not src.is_file():
+        return None
+    if dst.exists():
+        raise CvacError(f"cannot archive {source}: sources/{dst.name} already exists")
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    lines = note_path.read_text("utf-8").splitlines()
+    for i in range(1, len(lines)):
+        if lines[i].strip() == "---":
+            break
+        if lines[i].startswith("source:"):
+            lines[i] = f"source: sources/{dst.name}"
+            break
+    src.rename(dst)
+    note_path.write_text("\n".join(lines) + "\n", "utf-8")
+    return f"sources/{dst.name}"
+
+
+def apply_note(root: DataRoot, user: str, name: str, archive: bool = True) -> ApplyResult:
     """Apply notes/<name>.md to the user's profile; refuses what would not validate."""
     note_path = root.user_dir(user) / "notes" / f"{name}.md"
     profile_path = root.profile_path(user)
@@ -289,6 +314,12 @@ def apply_note(root: DataRoot, user: str, name: str) -> ApplyResult:
             "the profile would not validate; nothing written:\n  - " + "\n  - ".join(rep.errors)
         )
     _set_note_applied(note_path)
+    if archive:
+        try:
+            if moved := archive_source(root, user, note_path):
+                result.notes.append(f"document archived as {moved}")
+        except CvacError as e:
+            result.notes.append(f"not archived: {e}")
     body = note_path.read_text("utf-8").split("\n---\n", 1)[-1]
     if hint := _search_parameters_note(body):
         result.notes.append(hint)

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{{ t('Start') }} · {{ o.user }}{% endblock %}
+{% block content %}
+<h1>{{ o.full_name }} <code>{{ o.user }}</code></h1>
+<p class="muted">{{ t('Four doors, in any order and at any time. Everything you enter stays in your data folder; nothing becomes part of a CV before you have confirmed it, fact by fact.') }}</p>
+
+<section class="doors">
+  <div class="door">
+    <h2>1 · {{ t('Documents') }}</h2>
+    <p>{{ t('Old CVs, performance reviews, project reports, certificates: drop them in, and Claude proposes the facts they support, each with the passage it rests on.') }}</p>
+    <p class="state">
+      {% if o.documents.pending %}<span class="badge draft">{{ t('{n} to extract', n=o.documents.pending|length) }}</span>{% endif %}
+      {% if o.documents.extracted %}<span class="badge verified">{{ t('{n} extracted', n=o.documents.extracted|length) }}</span>{% endif %}
+      {% if not o.documents.pending and not o.documents.extracted %}<span class="muted">{{ t('none yet') }}</span>{% endif %}
+    </p>
+    <a class="button" href="{{ url_for('data.documents', user=o.user) }}">{{ t('Upload and extract') }}</a>
+  </div>
+  <div class="door">
+    <h2>2 · {{ t('Questionnaire') }}</h2>
+    <p>{{ t('What documents do not say: your positions, your numbers, what you would rather leave out, what you are looking for. Fill it in over several sittings; extract it when it is done.') }}</p>
+    <p class="state">
+      {% if o.questionnaire.to_fill %}<span class="badge draft">{{ t('{n} in progress', n=o.questionnaire.to_fill|length) }}</span>{% endif %}
+      {% if o.questionnaire.filled %}<span class="badge verified">{{ t('{n} filled', n=o.questionnaire.filled|length) }}</span>{% endif %}
+      {% if not o.questionnaire.any %}<span class="muted">{{ t('none yet') }}</span>{% endif %}
+    </p>
+    {% if o.questionnaire.to_fill %}
+      <a class="button" href="{{ url_for('questionnaire.form', user=o.user, name=o.questionnaire.to_fill[0].name[:-3]) }}">{{ t('Continue the questionnaire') }}</a>
+    {% else %}
+      <a class="button" href="{{ url_for('data.documents', user=o.user) }}#questionnaire">{{ t('Start a questionnaire') }}</a>
+    {% endif %}
+  </div>
+  <div class="door">
+    <h2>3 · {{ t('Review') }}</h2>
+    <p>{{ t('What was proposed from your documents and answers: read each fact next to its passage, confirm it, reword it or reject it. Only confirmed facts can reach a CV.') }}</p>
+    <p class="state">
+      {% if o.facts.draft %}<span class="badge draft">{{ t('{n} to review', n=o.facts.draft) }}</span>{% endif %}
+      <span class="badge verified">{{ t('{n} confirmed', n=o.facts.verified) }}</span>
+      {% if o.facts.rejected %}<span class="badge rejected">{{ t('{n} rejected', n=o.facts.rejected) }}</span>{% endif %}
+    </p>
+    <a class="button" href="{{ url_for('review.review', user=o.user) }}">{{ t('Review the facts') }}</a>
+  </div>
+  <div class="door">
+    <h2>4 · {{ t('Jobs and CVs') }}</h2>
+    <p>{{ t('A master CV from your confirmed facts, then postings: match, tailored CV, letter, interview preparation, gap plan.') }}</p>
+    <p class="state">
+      <span class="badge">{{ t('{n} master CV(s)', n=o.masters|length) }}</span>
+      <span class="badge">{{ t('{n} posting(s)', n=o.jobs) }}</span>
+    </p>
+    <a class="button" href="{{ url_for('jobs.listing', user=o.user) }}">{{ t('Jobs') }}</a>
+    <a class="button" href="{{ url_for('cvs', user=o.user) }}">{{ t('CVs') }}</a>
+  </div>
+</section>
+
+{% if o.todo %}
+<h2>{{ t('What is still missing') }}</h2>
+<ul class="todo">{% for item in o.todo[:12] %}<li>{{ item }}</li>{% endfor %}{% if o.todo|length > 12 %}<li class="muted">{{ t('and {n} more on the profile page', n=o.todo|length - 12) }}</li>{% endif %}</ul>
+{% endif %}
+{% endblock %}

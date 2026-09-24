@@ -63,3 +63,8 @@ form.lang { display: inline-flex; gap: 4px; margin-left: 12px; } form.lang selec
 ul.folders { list-style: none; padding: 0; max-height: 50vh; overflow: auto; border: 1px solid var(--line); background: white; border-radius: 4px; }
 ul.folders li { padding: 4px 10px; border-bottom: 1px solid var(--line); } ul.folders li:last-child { border-bottom: none; }
 p.path code { font-size: 13px; }
+
+.doors { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; } @media (max-width: 800px) { .doors { grid-template-columns: 1fr; } }
+.door { background: white; border: 1px solid var(--line); border-radius: 6px; padding: 12px 16px; } .door h2 { margin-top: 4px; } .door .state { min-height: 24px; }
+a.button { display: inline-block; padding: 5px 12px; border: 1px solid var(--accent); border-radius: 4px; text-decoration: none; margin-right: 6px; }
+.actions.sticky { position: sticky; bottom: 0; background: var(--bg); padding: 8px 0; border-top: 1px solid var(--line); }

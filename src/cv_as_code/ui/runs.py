@@ -12,7 +12,7 @@ from flask import Blueprint, render_template
 from ..dataroot import DataRoot
 from ..errors import CvacError
 from ..runner import RunResult, find_claude, run_stage, summarise_event
-from ..stages import resolve_stage
+from ..stages import load_stage, resolve_stage
 from . import views
 from .i18n import t
 from .state import state
@@ -59,21 +59,38 @@ class RunManager:
         self._lock = threading.Lock()
 
     def start(self, root: DataRoot, stage: str, params: dict[str, str], back_url: str) -> Run:
-        rs = resolve_stage(root, stage, params)
+        return self.start_steps(root, [(stage, params)], back_url)
+
+    def start_steps(
+        self, root: DataRoot, steps: list[tuple[str, dict[str, str]]], back_url: str
+    ) -> Run:
+        """One run of several stages in sequence; a step may consume an earlier step's output."""
+        first_stage, first_params = steps[0]
+        rs = resolve_stage(root, first_stage, first_params)
         for _, path, optional in rs.inputs:
             if not path.is_file() and not optional:
-                raise CvacError(f"stage {stage}: input {root.rel(path)} is missing")
+                raise CvacError(f"stage {first_stage}: input {root.rel(path)} is missing")
+        needs_engine = any(
+            load_stage(stage).contract.get("engine") != "deterministic" for stage, _ in steps
+        )
         # Resolved here, in the request, so a missing engine is an immediate message and the
         # thread never looks the executable up under an environment that has moved on.
-        binary = find_claude()
-        run = Run(id=uuid.uuid4().hex[:10], stage=stage, params=rs.params, back_url=back_url)
+        binary = find_claude() if needs_engine else None
+        label = " → ".join(stage for stage, _ in steps)
+        run = Run(id=uuid.uuid4().hex[:10], stage=label, params=rs.params, back_url=back_url)
 
         def work() -> None:
             try:
-                run.result = run_stage(
-                    root, rs, on_line=lambda line: self._collect(run, line), binary=binary
-                )
-                run.status = "ok" if run.result.ok else "failed"
+                for stage, params in steps:
+                    step = resolve_stage(root, stage, params)
+                    if len(steps) > 1:
+                        run.lines.append(f"── {stage}")
+                    run.result = run_stage(
+                        root, step, on_line=lambda line: self._collect(run, line), binary=binary
+                    )
+                    if not run.result.ok:
+                        break
+                run.status = "ok" if run.result is not None and run.result.ok else "failed"
             except CvacError as e:
                 run.error = str(e)
                 run.status = "failed"

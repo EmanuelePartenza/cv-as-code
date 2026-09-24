@@ -85,6 +85,7 @@ The framework's surface — code, messages, docs, stage instructions — is Engl
 - It does not scrape job platforms or automate a browser. Postings are pasted.
 - It does not predict page overflow; the page budget is checked after rendering.
 - It does not track applications yet, and it does not call any model itself.
+- The UI guides the data in: upload several documents, extract and apply in one run, review each proposed fact next to its passage, fill the questionnaire over several sittings — in any order.
 - The UI speaks English, French, German or Italian (its own chrome; the validator's findings stay English), and CVs render in any language with a labels file — the same four ship.
 - The UI (`cvac ui`) is local and single-user: no authentication, no network exposure by default, no chat; it never commits to git. Its "run with Claude" buttons need Claude Code installed and logged in.
 

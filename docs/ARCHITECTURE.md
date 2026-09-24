@@ -215,6 +215,17 @@ directory, the browser's language before a choice; library messages
 the machine's folders, opens a data root, creates one in an empty folder or
 in a new folder it makes.
 
+The guided path (2026-09-25): a user's *Start* page with four independent
+doors and their state — documents (several files at once; extraction chains
+stage 03 to stage 04, so proposed facts land as drafts in one run and the
+document is archived under `sources/`), the questionnaire as a form saved
+over several sittings (the file stays the stage's markdown; positions and
+projects repeat; the shipped skeleton starts one without an engine), the
+*Review* page (each draft fact next to its passage: confirm, reword, reject,
+singly or selected; rewording a verified fact returns it to draft), jobs and
+CVs. Every act is still a library call and nothing becomes verified except
+by the person's click.
+
 ## 6. Templates and rendering
 
 - One template = one directory exporting `cv(data)` (and `letter(data)`);

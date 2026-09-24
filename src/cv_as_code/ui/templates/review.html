@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{{ t('Review') }} · {{ user }}{% endblock %}
+{% block content %}
+<h1>{{ t('Review') }} — <code>{{ user }}</code></h1>
+<p class="muted">{{ t('Each fact below was proposed from one of your documents or answers. Read it next to its passage: confirm it if the passage says what the fact says, reword it if the wording is off, reject it if it is not true or not yours. Rejected facts are kept, never deleted.') }}</p>
+<p><span class="badge draft">{{ t('{n} to review', n=counts.draft) }}</span> <span class="badge verified">{{ t('{n} confirmed', n=counts.verified) }}</span> <span class="badge rejected">{{ t('{n} rejected', n=counts.rejected) }}</span> · <a href="{{ url_for('profile', user=user) }}">{{ t('Profile and facts') }}</a></p>
+
+{% if groups %}
+<form method="post" id="batch">
+{% for g in groups %}
+<section class="entry">
+  <h2>{% if g.note %}{{ t('From') }} <a href="{{ url_for('data.edit', user=user, rel=g.note) }}"><code>{{ g.note }}</code></a>{% else %}{{ t('Without evidence') }}{% endif %} <small class="muted">{{ t('{n} fact(s)', n=g.facts|length) }}</small></h2>
+  {% for f in g.facts %}
+  <article class="fact draft" id="{{ f.id }}">
+    <div class="fact-head">
+      <label><input type="checkbox" name="ids" value="{{ f.id }}" form="batch"> <code>{{ f.id }}</code></label>
+      <span class="muted">{{ f.role }}</span>
+      {% if f.metrics %}<span class="metrics">{% for k, v in f.metrics.items() %}<code>{{ k }}={{ v }}</code> {% endfor %}</span>{% endif %}
+    </div>
+    <div class="two">
+      <div>
+        <form method="post" action="{{ url_for('review.claim', user=user, fact_id=f.id) }}" class="stack">
+          <input type="hidden" name="next" value="{{ url_for('review.review', user=user) }}#{{ f.id }}">
+          <label>{{ t('The fact, in your words') }} <textarea name="claim" rows="3">{{ f.claim }}</textarea></label>
+          <button>{{ t('Save the wording') }}</button>
+        </form>
+      </div>
+      <div>
+        <p class="muted">{{ t('The passage it rests on') }}</p>
+        {% for q in f.quotes %}{% if q %}<blockquote>{{ q }}</blockquote>{% else %}<p class="bad">{{ t('no evidence') }}</p>{% endif %}{% endfor %}
+      </div>
+    </div>
+    <div class="actions">
+      <form method="post" action="{{ url_for('review.act', user=user, action='verify') }}"><input type="hidden" name="ids" value="{{ f.id }}"><button class="ok" {% if not f.evidence_ok %}disabled title="{{ t('verification needs evidence that exists') }}"{% endif %}>{{ t('Confirm') }}</button></form>
+      <form method="post" action="{{ url_for('review.act', user=user, action='reject') }}"><input type="hidden" name="ids" value="{{ f.id }}"><button class="danger">{{ t('Reject') }}</button></form>
+    </div>
+  </article>
+  {% endfor %}
+</section>
+{% endfor %}
+</form>
+<div class="actions sticky">
+  <form method="post" action="{{ url_for('review.act', user=user, action='verify') }}" onsubmit="return copySelected(this)"><button class="ok">{{ t('Confirm selected') }}</button></form>
+  <form method="post" action="{{ url_for('review.act', user=user, action='reject') }}" onsubmit="return copySelected(this)"><button class="danger">{{ t('Reject selected') }}</button></form>
+</div>
+<script>
+function copySelected(form) {
+  form.querySelectorAll('input[name=ids]').forEach(function (i) { i.remove(); });
+  document.querySelectorAll('#batch input[name=ids]:checked').forEach(function (c) {
+    var h = document.createElement('input'); h.type = 'hidden'; h.name = 'ids'; h.value = c.value; form.appendChild(h);
+  });
+  return true;
+}
+</script>
+{% else %}
+<p class="muted">{{ t('Nothing to review: every fact is confirmed or rejected. Upload a document or fill in the questionnaire to propose more.') }}</p>
+{% endif %}
+{% endblock %}

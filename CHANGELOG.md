@@ -13,6 +13,20 @@ Tags: `arch`, `perf`, `ui`, `test`, `docs`, `fix`, `cleanup`, `sec`.
 
 ## 2026-09-25
 
+### feat(ui): the guided path — start page, review, questionnaire form [ui]
+
+- Several documents at once; extraction chained to apply in one run (the
+  document archived under `sources/`); *Extract all* over the pending inbox.
+- *Review*: each draft fact next to its passage, confirm/reject singly or
+  selected, reword in place (`facts.set_claim`; a verified fact returns to
+  draft). *Start*: four independent doors with their state and what is
+  still missing.
+- The questionnaire as a form: sections, repeated positions and projects,
+  saved over several sittings, marked filled, extracted; the shipped
+  skeleton starts one without an engine. The file stays the stage's markdown.
+- Files: `src/cv_as_code/ui/{review,start,questionnaire}.py`, `facts.py`,
+  `apply.py`, templates, catalogs, `tests/test_guided.py`.
+
 ### feat(ui): four languages for the UI, a folder browser in the chooser [ui, arch]
 
 - The UI's chrome in English, French, German and Italian: selector in the

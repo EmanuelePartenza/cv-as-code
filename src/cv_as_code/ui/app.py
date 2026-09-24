@@ -35,7 +35,7 @@ from ..report import evidence_quote, profile_data
 from ..resolve import resolve
 from ..specs import approve
 from ..validate import discover_all, validate_files
-from . import data, jobs, runs, views
+from . import data, jobs, questionnaire, review, runs, start, views
 from .i18n import LANGUAGES, negotiate, t
 from .runs import RunManager
 from .state import (
@@ -277,6 +277,9 @@ def create_app(root: DataRoot | None = None) -> Flask:
     app.register_blueprint(runs.bp)
     app.register_blueprint(jobs.bp)
     app.register_blueprint(data.bp)
+    app.register_blueprint(questionnaire.bp)
+    app.register_blueprint(review.bp)
+    app.register_blueprint(start.bp)
     return app
 
 

@@ -1,7 +1,11 @@
 # UI chrome, German. Keys are the English strings (ADR-0016).
+'A master CV from your confirmed facts, then postings: match, tailored CV, letter, interview preparation, gap plan.': 'Ein Master-Lebenslauf aus Ihren bestätigten Fakten, dann Stellenanzeigen: Abgleich, zugeschnittener Lebenslauf, Anschreiben, Gesprächsvorbereitung, Lückenplan.'
 ? A posting enters verbatim as jobs/<id>/raw.txt; every step after that is a stage run by Claude and checked by the validator.
 : Eine Stellenanzeige kommt wörtlich nach jobs/<id>/raw.txt; jeder weitere Schritt ist eine Stufe, die Claude ausführt und der Validator prüft.
 Add a posting: Stellenanzeige hinzufügen
+Add another: 'Hinzufügen:'
+? Answer in your own words and language, as plainly as you like; "I do not know" is a valid answer. Save whenever you want and come back later. Nothing here reaches a CV before you have confirmed it, fact by fact.
+: Antworten Sie mit eigenen Worten und in Ihrer Sprache, so schlicht Sie wollen; „weiß ich nicht“ ist eine gültige Antwort. Speichern Sie, wann Sie wollen, und kommen Sie später zurück. Nichts hier gelangt in einen Lebenslauf, bevor Sie es Fakt für Fakt bestätigt haben.
 Apply to the profile (04): Ins Profil übernehmen (04)
 ? 'Applying a note is deterministic: its facts are appended to profile.yaml as draft, each pointing at its passage, and nothing else in the file moves; nothing becomes verified here.'
 : 'Das Übernehmen einer Notiz ist deterministisch: ihre Fakten werden als Entwurf an profile.yaml angehängt, jeder mit Verweis auf seine Textstelle, und sonst bewegt sich nichts in der Datei; nichts wird hier verifiziert.'
@@ -20,6 +24,9 @@ Claude is working in your data root; this page refreshes itself.: Claude arbeite
 'Claude writes it in your language; you fill it in at your own pace (edit it here), set status: filled, then extract it.': 'Claude schreibt ihn in Ihrer Sprache; Sie füllen ihn in Ihrem Tempo aus (hier bearbeiten), setzen status: filled und extrahieren ihn dann.'
 Company: Unternehmen
 Completeness: Vollständigkeit
+Confirm: Bestätigen
+Confirm selected: Auswahl bestätigen
+Continue the questionnaire: Fragebogen fortsetzen
 Country code (ISO, optional): Ländercode (ISO, optional)
 Cover letter: Anschreiben
 Cover letter (60): Anschreiben (60)
@@ -31,6 +38,8 @@ Data root: Datenordner
 Date: Datum
 Documents: Dokumente
 E-mail for applications: E-Mail für Bewerbungen
+? 'Each fact below was proposed from one of your documents or answers. Read it next to its passage: confirm it if the passage says what the fact says, reword it if the wording is off, reject it if it is not true or not yours. Rejected facts are kept, never deleted.'
+: 'Jeder Fakt unten wurde aus einem Ihrer Dokumente oder Ihrer Antworten vorgeschlagen. Lesen Sie ihn neben seiner Textstelle: bestätigen Sie ihn, wenn die Stelle sagt, was der Fakt sagt; formulieren Sie ihn um, wenn die Worte nicht passen; lehnen Sie ihn ab, wenn er nicht stimmt oder nicht Ihrer ist. Abgelehnte Fakten bleiben erhalten, sie werden nie gelöscht.'
 ? Each run is Claude Code in print mode inside your data root, with file tools only; the result counts only if it validates. Approval of the CV and the letter stays on their page.
 : Jeder Lauf ist Claude Code im Print-Modus in Ihrem Datenordner, nur mit Dateiwerkzeugen; das Ergebnis zählt nur, wenn es validiert. Die Freigabe von Lebenslauf und Anschreiben bleibt auf deren Seite.
 Education: Ausbildung
@@ -38,10 +47,18 @@ Error: Fehler
 Errors: Fehler
 Evidence notes: Belegnotizen
 Extract (03): Extrahieren (03)
+Extract all with Claude ({n} documents): Alles mit Claude extrahieren ({n} Dokumente)
+Extract my answers (03): Meine Antworten extrahieren (03)
+Extract with Claude (03): Mit Claude extrahieren (03)
+? Extraction proposes the facts and applies them to your profile as drafts; the document is then archived under sources/. You confirm each fact in the Review area.
+: Die Extraktion schlägt die Fakten vor und übernimmt sie als Entwürfe in Ihr Profil; das Dokument wird dann unter sources/ archiviert. Jeden Fakt bestätigen Sie im Bereich Prüfung.
 Facts: Fakten
 ? 'Facts enter the profile from documents: a filled questionnaire, an old CV, a review. Claude extracts them into an evidence note with the passage each fact rests on; they land as draft and you verify them on the profile.'
 : 'Fakten gelangen aus Dokumenten ins Profil: ein ausgefüllter Fragebogen, ein alter Lebenslauf, eine Beurteilung. Claude extrahiert sie in eine Belegnotiz mit der Textstelle, auf der jeder Fakt beruht; sie landen als Entwurf und Sie verifizieren sie im Profil.'
 Folder name: Ordnername
+? Four doors, in any order and at any time. Everything you enter stays in your data folder; nothing becomes part of a CV before you have confirmed it, fact by fact.
+: Vier Türen, in beliebiger Reihenfolge und zu jeder Zeit. Alles, was Sie eingeben, bleibt in Ihrem Datenordner; nichts wird Teil eines Lebenslaufs, bevor Sie es Fakt für Fakt bestätigt haben.
+From: Aus
 'Full event log:': 'Vollständiges Ereignisprotokoll:'
 Full name: Vollständiger Name
 Gap plan: Lückenplan
@@ -53,6 +70,7 @@ Inbox: Eingang
 Interview preparation: Vorbereitung auf das Gespräch
 Interview preparation (70): Vorbereitung auf das Gespräch (70)
 Jobs: Stellen
+Jobs and CVs: Stellen und Lebensläufe
 Language: Sprache
 Languages: Sprachen
 ? Local UI over the same library as the cvac command. Every verify and approve here is your act; nothing is committed to git by this page.
@@ -76,39 +94,58 @@ Not found: Nicht gefunden
 'Not saved: validation errors': 'Nicht gespeichert: Validierungsfehler'
 Nothing here yet.: Hier ist noch nichts.
 Nothing missing that the framework can see.: Es fehlt nichts, was das Framework sehen kann.
+'Nothing to review: every fact is confirmed or rejected. Upload a document or fill in the questionnaire to propose more.': 'Nichts zu prüfen: jeder Fakt ist bestätigt oder abgelehnt. Laden Sie ein Dokument hoch oder füllen Sie den Fragebogen aus, um weitere vorzuschlagen.'
 OK: OK
+Old CVs, performance reviews, project reports, certificates. Several files at once.: Alte Lebensläufe, Beurteilungen, Projektberichte, Zertifikate. Mehrere Dateien auf einmal.
+? 'Old CVs, performance reviews, project reports, certificates: drop them in, and Claude proposes the facts they support, each with the passage it rests on.'
+: 'Alte Lebensläufe, Beurteilungen, Projektberichte, Zertifikate: legen Sie sie ab, und Claude schlägt die Fakten vor, die sie belegen, jeden mit der Textstelle, auf der er beruht.'
 Open a data root: Datenordner öffnen
 Open this data root: Diesen Datenordner öffnen
 Pipeline: Pipeline
 Pivot language: Pivotsprache
+Position: Position
 Posting: Stellenanzeige
 Postings: Stellenanzeigen
 Profile: Profil
 Profile and facts: Profil und Fakten
+Project: Projekt
 Questionnaire: Fragebogen
 Recent: Zuletzt
 Reject: Ablehnen
+Reject selected: Auswahl ablehnen
 Render draft: Entwurf erzeugen
 Render final: Endfassung erzeugen
+Reopen for editing: Zum Bearbeiten wieder öffnen
+Review: Prüfung
+Review the facts: Fakten prüfen
 Role title: Stellenbezeichnung
 Run: Lauf
 Run with Claude: Mit Claude ausführen
 Runs: Läufe
 Same rules as cvac validate --all.: Dieselben Regeln wie cvac validate --all.
+Save: Speichern
+Save and mark as filled: Speichern und als ausgefüllt markieren
 Save the posting: Stellenanzeige speichern
+Save the wording: Formulierung speichern
 ? Saving runs the same rules as cvac validate; a file that does not validate is not written. The statuses verified and approved are set from their buttons, not here.
 : Beim Speichern gelten dieselben Regeln wie bei cvac validate; eine Datei, die nicht validiert, wird nicht geschrieben. Die Status verified und approved werden über ihre Schaltflächen gesetzt, nicht hier.
 Showing the {which} PDF.: 'Angezeigtes PDF: {which}.'
 Skills: Kompetenzen
 Slug (folder name, lowercase): Slug (Ordnername, Kleinbuchstaben)
 Sources (archived): Quellen (archiviert)
+Start: Start
+Start a questionnaire: Fragebogen beginnen
+Start from the standard questionnaire (English): Mit dem Standardfragebogen beginnen (Englisch)
 Tailor the CV (30): Lebenslauf zuschneiden (30)
 Target roles, comma-separated: Zielpositionen, durch Kommas getrennt
+The fact, in your words: Der Fakt, in Ihren Worten
+The passage it rests on: Die Textstelle, auf der er beruht
 The posting, pasted verbatim: Die Stellenanzeige, wörtlich eingefügt
 This folder: Dieser Ordner
 This folder is neither a data root nor empty. Enter one of its folders, or create a new folder below.: Dieser Ordner ist weder ein Datenordner noch leer. Wechseln Sie in einen seiner Ordner oder legen Sie unten einen neuen Ordner an.
 'This page never commits: review and commit from your terminal.': 'Diese Seite committet nie: prüfen und committen Sie im Terminal.'
 Upload a document: Dokument hochladen
+Upload and extract: Hochladen und extrahieren
 Upload to inbox: In den Eingang hochladen
 Users: Benutzer
 Validate: Validieren
@@ -117,8 +154,14 @@ Validation errors: Validierungsfehler
 Verify: Verifizieren
 Verify a fact only when its evidence says what the claim says. Rejected facts are kept, never deleted.: Verifizieren Sie einen Fakt nur, wenn sein Beleg sagt, was die Aussage sagt. Abgelehnte Fakten bleiben erhalten, sie werden nie gelöscht.
 Warnings: Warnungen
+? 'What documents do not say: your positions, your numbers, what you would rather leave out, what you are looking for. Fill it in over several sittings; extract it when it is done.'
+: 'Was Dokumente nicht sagen: Ihre Positionen, Ihre Zahlen, was Sie lieber weglassen, was Sie suchen. Füllen Sie ihn in mehreren Sitzungen aus; extrahieren Sie ihn, wenn er fertig ist.'
+What is still missing: Was noch fehlt
+? 'What was proposed from your documents and answers: read each fact next to its passage, confirm it, reword it or reject it. Only confirmed facts can reach a CV.'
+: 'Was aus Ihren Dokumenten und Antworten vorgeschlagen wurde: lesen Sie jeden Fakt neben seiner Textstelle, bestätigen Sie ihn, formulieren Sie ihn um oder lehnen Sie ihn ab. Nur bestätigte Fakten können in einen Lebenslauf gelangen.'
 Where is your data?: Wo sind Ihre Daten?
 Where you found it: Wo Sie sie gefunden haben
+Without evidence: Ohne Beleg
 ? 'Writes profile.yaml and search.yaml under users/<slug>/, empty but valid. Career facts never come from this form: they enter through a questionnaire or a document, and you verify them one by one.'
 : 'Schreibt profile.yaml und search.yaml unter users/<slug>/, leer, aber gültig. Karrierefakten kommen nie aus diesem Formular: sie kommen über einen Fragebogen oder ein Dokument, und Sie verifizieren sie einzeln.'
 Your language (the language of your facts and questionnaires): Ihre Sprache (die Sprache Ihrer Fakten und Fragebögen)
@@ -130,6 +173,7 @@ Your language (the language of your facts and questionnaires): Ihre Sprache (die
 '`{name}`: unsupported type (allowed: {types})': '`{name}`: nicht unterstützter Typ (erlaubt: {types})'
 ? 'a slug, your name, your e-mail and where you live: the profile starts empty and fills through a questionnaire and the documents you drop in.'
 : 'ein Slug, Ihr Name, Ihre E-Mail und Ihr Wohnort: das Profil beginnt leer und füllt sich über einen Fragebogen und die Dokumente, die Sie ablegen.'
+and {n} more on the profile page: und {n} weitere auf der Profilseite
 application: Bewerbung
 applications: Bewerbungen
 applied: übernommen
@@ -137,6 +181,7 @@ apply: bewerben
 approved: freigegeben
 approved on: freigegeben am
 approved on {date}; render the final when ready: freigegeben am {date}; erzeugen Sie die Endfassung, wenn Sie so weit sind
+as text: als Text
 born: geboren
 but invalid: aber ungültig
 careers page, LinkedIn, referral: Karriereseite, LinkedIn, Empfehlung
@@ -157,6 +202,7 @@ edited as text, validated before saving.: als Text bearbeitet, vor dem Speichern
 empty: leer
 'engine: {error}': 'Engine: {error}'
 evidence facts: Belegfakten
+extracted: extrahiert
 failed: fehlgeschlagen
 fill it in first: erst ausfüllen
 filled: ausgefüllt
@@ -165,7 +211,7 @@ full name: vollständiger Name
 gap plan: Lückenplan
 headline: Überschrift
 inbox/{name} already exists; rename the file: inbox/{name} existiert bereits; benennen Sie die Datei um
-inbox/{name} uploaded; extract it when ready (stage 03): inbox/{name} hochgeladen; extrahieren Sie sie, wenn Sie so weit sind (Stufe 03)
+interviews/{name}.md already exists: interviews/{name}.md existiert bereits
 invalid: ungültig
 invalid match file: ungültige Abgleichdatei
 job: Stelle
@@ -195,6 +241,7 @@ normalise first: zuerst normalisieren
 normalised: normalisiert
 not yet: noch nicht
 note name: Notizname
+'nothing to extract: every document in the inbox has its note': 'nichts zu extrahieren: jedes Dokument im Eingang hat schon seine Notiz'
 ok: ok
 'ok: {output} written and valid': 'ok: {output} geschrieben und gültig'
 open: öffnen
@@ -203,11 +250,15 @@ paste the posting's text: fügen Sie den Text der Stellenanzeige ein
 phone: Telefon
 prep: Gespräch
 proposed: vorgeschlagen
+questionnaire {name} created from the standard skeleton: Fragebogen {name} aus dem Standardgerüst angelegt
 rejected: abgelehnt
 'rendered {name}: {pages} page(s)': 'erzeugt {name}: {pages} Seite(n)'
+review its facts: seine Fakten prüfen
 role: Position
 running: läuft
 saved: gespeichert
+'saved: {answered} of {total} questions answered': 'gespeichert: {answered} von {total} Fragen beantwortet'
+select at least one fact: wählen Sie mindestens einen Fakt
 skill: Kompetenz
 skip: auslassen
 stage: Stufe
@@ -223,8 +274,22 @@ verification needs evidence that exists: Verifizieren braucht einen vorhandenen 
 verified: verifiziert
 written: geschrieben
 'yes': ja
+'{answered} of {total} questions answered': '{answered} von {total} Fragen beantwortet'
 '{count} file(s) checked': '{count} Datei(en) geprüft'
+'{id} reworded': '{id} umformuliert'
+'{id} reworded and back to draft: verify it again': '{id} umformuliert und wieder Entwurf: erneut verifizieren'
 '{name} saved and valid': '{name} gespeichert und gültig'
+'{n} confirmed': '{n} bestätigt'
+'{n} document(s) uploaded to inbox/; extract them when ready': '{n} Dokument(e) in inbox/ hochgeladen; extrahieren Sie sie, wenn Sie so weit sind'
 '{n} error(s)': '{n} Fehler'
+'{n} extracted': '{n} extrahiert'
+'{n} fact(s)': '{n} Fakt(en)'
+'{n} filled': '{n} ausgefüllt'
+'{n} in progress': '{n} in Arbeit'
+'{n} master CV(s)': '{n} Master-Lebenslauf/-läufe'
+'{n} posting(s)': '{n} Stellenanzeige(n)'
+'{n} rejected': '{n} abgelehnt'
+'{n} to extract': '{n} zu extrahieren'
+'{n} to review': '{n} zu prüfen'
 '{n} warning(s)': '{n} Warnung(en)'
 '{output} was not written': '{output} wurde nicht geschrieben'

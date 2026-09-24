@@ -41,8 +41,9 @@ The facts are appended under their parent as `draft`, pointing at the note
 (`evidence: notes/old-cv.md#<anchor>`), ids continue the parent's numbering,
 new parents are appended to their list, and every existing line of the
 profile stays as it was; a fact the profile already holds is skipped; a
-result that would not validate is not written. The note becomes `applied`;
-the document moves from `inbox/` to `sources/` by your hand.
+result that would not validate is not written. The note becomes `applied`
+and the document moves from `inbox/` to `sources/`, the note repointed at
+it (pass `archive=False` to `apply_note` to keep it where it is).
 
 ## 3. Verification (the human gate as a command)
 

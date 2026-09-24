@@ -12,6 +12,8 @@ from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 
+import yaml
+
 from .dataroot import DataRoot, load_yaml
 from .errors import CvacError
 from .validate import evidence_list
@@ -105,6 +107,40 @@ def set_status(
         )
     profile_path.write_text("\n".join(lines) + "\n", "utf-8")
     return changes
+
+
+def set_claim(root: DataRoot, user: str, fact_id: str, claim: str) -> FactChange:
+    """Reword a fact in place; a verified fact goes back to draft, since its words changed."""
+    claim = " ".join((claim or "").split())
+    if not claim:
+        raise CvacError("the claim cannot be empty")
+    profile_path = root.profile_path(user)
+    index = _fact_index(load_yaml(profile_path))
+    if not FACT_ID_RE.match(fact_id) or fact_id not in index:
+        raise CvacError(f"fact `{fact_id}` does not exist in {root.rel(profile_path)}")
+    old_status = str(index[fact_id].get("status"))
+    lines = profile_path.read_text("utf-8").splitlines()
+    start, end = _block_bounds(lines, fact_id)
+    claim_at = next((i for i in range(start + 1, end) if re.match(r"^\s*claim:", lines[i])), None)
+    if claim_at is None:
+        raise CvacError(f"fact `{fact_id}` has no `claim:` line")
+    indent = len(lines[claim_at]) - len(lines[claim_at].lstrip())
+    # a folded claim (`>-`) continues on deeper-indented lines: they go with it
+    scalar_end = claim_at + 1
+    while scalar_end < end and (
+        not lines[scalar_end].strip()
+        or len(lines[scalar_end]) - len(lines[scalar_end].lstrip()) > indent
+    ):
+        scalar_end += 1
+    rendered = yaml.safe_dump(claim, allow_unicode=True, width=10**6).split("\n...")[0].strip()
+    lines[claim_at:scalar_end] = [" " * indent + f"claim: {rendered}"]
+    new_status = "draft" if old_status == "verified" else old_status
+    if old_status == "verified":
+        start, end = _block_bounds(lines, fact_id)
+        _set_field(lines, start, end, "status", "draft")
+        _set_field(lines, start, end, "verified_on", "null")
+    profile_path.write_text("\n".join(lines) + "\n", "utf-8")
+    return FactChange(fact_id, old_status, new_status)
 
 
 def profile_of(root: DataRoot, user: str | None) -> tuple[str, Path]:

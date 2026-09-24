@@ -59,13 +59,39 @@ def listing(root: DataRoot, user: str) -> dict[str, Any]:
             )
         return out
 
+    notes = files("notes", {".md"})
+    sources_of_notes = {_source_of(udir / "notes" / n["name"], root) for n in notes}
+    inbox = files("inbox")
+    for f in inbox:
+        f["extracted"] = f["rel"] in sources_of_notes
     return {
-        "inbox": files("inbox"),
+        "inbox": inbox,
         "sources": files("sources"),
         "interviews": files("interviews", {".md"}),
-        "notes": files("notes", {".md"}),
+        "notes": notes,
         "growth": files("growth", {".md"}),
     }
+
+
+def _source_of(note: Path, root: DataRoot) -> str | None:
+    try:
+        doc = load_document(note, root.rel(note))
+    except CvacError:
+        return None
+    return str(doc.get("source")) if isinstance(doc, dict) and doc.get("source") else None
+
+
+def note_name_for(filename: str) -> str:
+    stem = re.sub(r"[^a-z0-9]+", "-", Path(filename).stem.lower()).strip("-")
+    return stem or "document"
+
+
+def extraction_steps(user: str, document: str, name: str) -> list[tuple[str, dict[str, str]]]:
+    """Extract, then apply: facts land as draft in one run; nothing becomes verified."""
+    return [
+        ("03_extract", {"user": user, "document": document, "name": name}),
+        ("04_apply", {"user": user, "name": name}),
+    ]
 
 
 def next_questionnaire_name(udir: Path) -> str:
@@ -92,28 +118,32 @@ def upload(user: str):
     root = current_root()
     udir = views.user_dir_of(root, user)
     back = url_for("data.documents", user=user)
-    file = request.files.get("file")
-    name = secure_filename(file.filename or "") if file else ""
-    if not file or not name:
+    files = [f for f in request.files.getlist("file") if f and f.filename]
+    if not files:
         flash(t("choose a file to upload"), "error")
         return redirect(back)
-    if Path(name).suffix.lower() not in UPLOAD_SUFFIXES:
-        flash(
-            t(
-                "`{name}`: unsupported type (allowed: {types})",
-                name=name,
-                types=", ".join(sorted(UPLOAD_SUFFIXES)),
-            ),
-            "error",
-        )
-        return redirect(back)
-    target = udir / "inbox" / name
-    if target.exists():
-        flash(t("inbox/{name} already exists; rename the file", name=name), "error")
-        return redirect(back)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    file.save(target)
-    flash(t("inbox/{name} uploaded; extract it when ready (stage 03)", name=name), "ok")
+    saved: list[str] = []
+    for file in files:
+        name = secure_filename(file.filename or "")
+        if not name or Path(name).suffix.lower() not in UPLOAD_SUFFIXES:
+            flash(
+                t(
+                    "`{name}`: unsupported type (allowed: {types})",
+                    name=name or file.filename,
+                    types=", ".join(sorted(UPLOAD_SUFFIXES)),
+                ),
+                "error",
+            )
+            continue
+        target = udir / "inbox" / name
+        if target.exists():
+            flash(t("inbox/{name} already exists; rename the file", name=name), "error")
+            continue
+        target.parent.mkdir(parents=True, exist_ok=True)
+        file.save(target)
+        saved.append(name)
+    if saved:
+        flash(t("{n} document(s) uploaded to inbox/; extract them when ready", n=len(saved)), "ok")
     return redirect(back)
 
 
@@ -140,9 +170,36 @@ def extract(user: str):
         )
         return redirect(back)
     try:
-        r = state().runs.start(
-            root, "03_extract", {"user": user, "document": document, "name": name}, back
-        )
+        r = state().runs.start_steps(root, extraction_steps(user, document, name), back)
+    except CvacError as e:
+        flash(str(e), "error")
+        return redirect(back)
+    return redirect(url_for("runs.run", run_id=r.id))
+
+
+@bp.post("/u/<user>/documents/extract-all")
+def extract_all(user: str):
+    """Every document in the inbox without a note yet, one run: extract and apply each in turn."""
+    root = current_root()
+    back = url_for("data.documents", user=user)
+    pending = [f for f in listing(root, user)["inbox"] if not f["extracted"]]
+    if not pending:
+        flash(t("nothing to extract: every document in the inbox has its note"), "error")
+        return redirect(back)
+    steps: list[tuple[str, dict[str, str]]] = []
+    taken: set[str] = set()
+    for f in pending:
+        name = note_name_for(f["name"])
+        while name in taken or (root.user_dir(user) / "notes" / f"{name}.md").exists():
+            name = (
+                name + "-2"
+                if not re.search(r"-\d+$", name)
+                else re.sub(r"-(\d+)$", lambda m: f"-{int(m.group(1)) + 1}", name)
+            )
+        taken.add(name)
+        steps += extraction_steps(user, f["rel"], name)
+    try:
+        r = state().runs.start_steps(root, steps, back)
     except CvacError as e:
         flash(str(e), "error")
         return redirect(back)
@@ -239,5 +296,5 @@ def new_user():
             ),
             "ok",
         )
-        return redirect(url_for("data.documents", user=form["slug"]))
+        return redirect(url_for("start.start", user=form["slug"]))
     return render_template("new_user.html", form=form)
