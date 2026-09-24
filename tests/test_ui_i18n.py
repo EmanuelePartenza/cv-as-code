@@ -28,6 +28,9 @@ STATUS_WORDS = {
     "context",
     "duplicate",
     "irrelevant",
+    "year",
+    "month",
+    "day",
 }  # fmt: skip
 
 
@@ -66,18 +69,18 @@ def test_language_is_negotiated_then_chosen_and_remembered(
     data_root: DataRoot, ui_env: Path
 ) -> None:
     c = client(data_root)
-    assert ">Profile<" in c.get("/").get_data(as_text=True)
+    assert ">Documents<" in c.get("/").get_data(as_text=True)
     body = c.get("/", headers={"Accept-Language": "de-DE,de;q=0.9"}).get_data(as_text=True)
-    assert ">Profil<" in body and 'lang="de"' in body
+    assert ">Dokumente<" in body and 'lang="de"' in body
     r = c.post("/language", data={"lang": "it", "next": "/u/test"})
     assert r.status_code == 302 and r.headers["Location"].endswith("/u/test")
     body = c.get("/", headers={"Accept-Language": "de"}).get_data(as_text=True)
-    assert ">Profilo<" in body and 'lang="it"' in body
+    assert ">Documenti<" in body and 'lang="it"' in body
     assert (
         yaml.safe_load((ui_env / "cfg" / "cvac" / "ui.yaml").read_text("utf-8"))["language"] == "it"
     )
     c.post("/language", data={"lang": "xx", "next": "//evil"})
-    assert ">Profilo<" in c.get("/").get_data(as_text=True)
+    assert ">Documenti<" in c.get("/").get_data(as_text=True)
     assert (
         c.post("/language", data={"lang": "fr", "next": "//evil"}).headers["Location"].endswith("/")
     )

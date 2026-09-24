@@ -58,7 +58,12 @@ def act(user: str, action: str):
     if action not in ("verify", "reject"):
         raise views.NotFound(f"no action `{action}`")
     ids = [i for i in request.form.getlist("ids") if i]
-    back = redirect(url_for("review.review", user=user))
+    nxt = request.form.get("next") or ""
+    back = redirect(
+        nxt
+        if nxt.startswith("/") and not nxt.startswith("//")
+        else url_for("review.review", user=user)
+    )
     if not ids:
         flash(t("select at least one fact"), "error")
         return back

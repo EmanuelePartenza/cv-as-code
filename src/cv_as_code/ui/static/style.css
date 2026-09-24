@@ -70,3 +70,8 @@ a.button { display: inline-block; padding: 5px 12px; border: 1px solid var(--acc
 .actions.sticky { position: sticky; bottom: 0; background: var(--bg); padding: 8px 0; border-top: 1px solid var(--line); }
 .badge.evidence { background: #d1fae5; color: #065f46; } .badge.context { background: #dbeafe; color: #1e3a8a; } .badge.duplicate { background: #ede9fe; color: #5b21b6; } .badge.irrelevant { background: #e5e7eb; color: #374151; }
 ul.docs li { margin: 6px 0; }
+ul.hints, p.hints { background: #fffbeb; border-left: 3px solid var(--warn); padding: 6px 12px 6px 28px; margin: 6px 0; } p.hints { padding-left: 12px; }
+details.add { margin: 8px 0 18px; } details.add summary { cursor: pointer; color: var(--accent); }
+form.add-fact { border-top: 1px dashed var(--line); padding-top: 8px; margin-top: 8px; }
+fieldset.facts-pick { border: 1px solid var(--line); border-radius: 4px; max-height: 30vh; overflow: auto; } label.pick { display: block; font-size: 13px; }
+nav.toc { font-size: 14px; margin: 8px 0 16px; }

@@ -289,4 +289,4 @@ def test_start_page_shows_the_four_doors_and_their_state(data_root: DataRoot, ui
     assert "skill `skill-unproven` has no evidence facts" in body
     post(c, "/u/test/questionnaire/new", name="01-onboarding")
     assert "Continue the questionnaire" in page(c, "/u/test/start")
-    assert ">Start<" in page(c, "/") and ">Review<" in page(c, "/")
+    assert ">Start<" in page(c, "/") and ">Curriculum<" in page(c, "/")

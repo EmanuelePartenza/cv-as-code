@@ -13,6 +13,19 @@ Tags: `arch`, `perf`, `ui`, `test`, `docs`, `fix`, `cleanup`, `sec`.
 
 ## 2026-09-25
 
+### feat(ui): the curriculum — profile.yaml edited in place, own words as evidence [arch, ui]
+
+- One page for everything about the person: identity, languages,
+  positions and projects with dates, education, skills, search; facts from
+  documents to confirm, facts typed by the person appended with
+  `notes/own-words.md` as evidence (draft, or verified when confirmed in the
+  same act); prompts inline where an entry lacks facts, numbers or dates.
+  ADR-0017.
+- `profile_edit.py` (shared editor) and `curriculum.py` (the writes);
+  `review` actions return to the page they came from.
+- Files: `src/cv_as_code/{profile_edit,curriculum}.py`, `ui/curriculum.py`,
+  `templates/curriculum.html`, `tests/test_curriculum.py`.
+
 ### feat(stages): 02_triage — documents read together [arch]
 
 - Stage `02_triage`: the whole inbox, with what is archived and the profile,

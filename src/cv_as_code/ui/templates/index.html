@@ -11,7 +11,7 @@
   <li class="card">
     <strong>{{ u.full_name }}</strong> <code>{{ u.slug }}</code><br>
     <a href="{{ url_for('start.start', user=u.slug) }}"><strong>{{ t('Start') }}</strong></a> ·
-    <a href="{{ url_for('profile', user=u.slug) }}">{{ t('Profile and facts') }}</a> ·
+    <a href="{{ url_for('curriculum.page', user=u.slug) }}">{{ t('Curriculum') }}</a> ·
     <a href="{{ url_for('data.documents', user=u.slug) }}">{{ t('Documents') }}</a> ·
     <a href="{{ url_for('jobs.listing', user=u.slug) }}">{{ t('Jobs') }}</a> ·
     <a href="{{ url_for('cvs', user=u.slug) }}">{{ t('CVs and applications') }}</a>

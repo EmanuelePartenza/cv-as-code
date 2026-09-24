@@ -30,14 +30,14 @@
     {% endif %}
   </div>
   <div class="door">
-    <h2>3 · {{ t('Review') }}</h2>
-    <p>{{ t('What was proposed from your documents and answers: read each fact next to its passage, confirm it, reword it or reject it. Only confirmed facts can reach a CV.') }}</p>
+    <h2>3 · {{ t('Curriculum') }}</h2>
+    <p>{{ t('Everything about you in one place: positions, projects, education, skills, what you are looking for. What the documents proposed is already there, to confirm; what they do not say, you add in your own words, guided by questions where something is missing.') }}</p>
     <p class="state">
       {% if o.facts.draft %}<span class="badge draft">{{ t('{n} to review', n=o.facts.draft) }}</span>{% endif %}
       <span class="badge verified">{{ t('{n} confirmed', n=o.facts.verified) }}</span>
       {% if o.facts.rejected %}<span class="badge rejected">{{ t('{n} rejected', n=o.facts.rejected) }}</span>{% endif %}
     </p>
-    <a class="button" href="{{ url_for('review.review', user=o.user) }}">{{ t('Review the facts') }}</a>
+    <a class="button" href="{{ url_for('curriculum.page', user=o.user) }}">{{ t('Open the curriculum') }}</a>
   </div>
   <div class="door">
     <h2>4 · {{ t('Jobs and CVs') }}</h2>

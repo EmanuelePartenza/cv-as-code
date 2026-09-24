@@ -46,7 +46,9 @@ src/cv_as_code/
 ├── scaffold.py     `cvac init` and a new user's first files (profile, search), never overwriting
 ├── skills.py       the Claude Code adapter: `cvac skills install` copies skills/ into a data root
 ├── report.py       `cvac profile report`: a generated Markdown view with a completeness checklist
-├── facts.py        `cvac fact verify|reject`: the human gate on facts, layout-preserving
+├── facts.py        `cvac fact verify|reject`: the human gate on facts, layout-preserving; reword
+├── profile_edit.py layout-preserving edits of profile.yaml, shared by apply and the curriculum
+├── curriculum.py   the curriculum form's writes: entries, education, skills, identity, own facts, search
 ├── specs.py        approval of a cv-spec or a letter, refused through the validator
 ├── ui/             `cvac ui`: the local web UI, a Flask adapter over the modules above (extra `ui`)
 ├── documents.py    YAML and markdown-with-frontmatter documents; dates normalised to strings
@@ -233,6 +235,15 @@ projects repeat; the shipped skeleton starts one without an engine), the
 singly or selected; rewording a verified fact returns it to draft), jobs and
 CVs. Every act is still a library call and nothing becomes verified except
 by the person's click.
+
+The curriculum (ADR-0017): one page that *is* `profile.yaml`, edited in
+place through the shared editor — identity, languages, positions and
+projects with their dates, education, skills, what the person is looking for
+(`search.yaml`, top-level keys replaced). Facts a document proposed sit
+under their entry with their passage, to confirm, reword or reject; facts
+the person types are appended with the own-words note as evidence, draft
+unless confirmed in the same act. Where an entry lacks facts, numbers or a
+start date the page asks the questionnaire's question inline.
 
 ## 6. Templates and rendering
 

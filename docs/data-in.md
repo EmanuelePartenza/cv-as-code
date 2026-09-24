@@ -63,6 +63,16 @@ result that would not validate is not written. The note becomes `applied`
 and the document moves from `inbox/` to `sources/`, the note repointed at
 it (pass `archive=False` to `apply_note` to keep it where it is).
 
+## 2b. Your own words (the curriculum form)
+
+What no document says, you add on the curriculum page under the position or
+project it belongs to: one fact, one thing that happened, with real numbers
+if any. It enters `profile.yaml` like an extracted fact, with its evidence:
+`notes/own-words.md#own-NNN`, a note that quotes your words and dates them
+(ADR-0017). It is `draft` unless you add it with *confirm*, which is your
+explicit act; a confirmed fact whose words you later change goes back to
+draft.
+
 ## 3. Verification (the human gate as a command)
 
 ```bash

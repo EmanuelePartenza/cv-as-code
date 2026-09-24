@@ -25,7 +25,9 @@ call; nothing verifies or approves without the person's click. The UI speaks
 English, French, German or Italian (ADR-0016); German CV labels ship. The
 guided path (Start, Documents with many uploads and chained extraction,
 Review with passages, the questionnaire as a form) is the UI's centre; stage
-`02_triage` reads the documents together (context, duplicates, irrelevant).
+`02_triage` reads the documents together (context, duplicates, irrelevant);
+the curriculum page edits `profile.yaml` in place, own words as evidence
+(ADR-0017).
 
 The example user exercises stages 03, 40 and 70 through the real engine and
 04 through its code (two more documents extracted and applied; the gap plan
@@ -67,9 +69,9 @@ Details in [DEVLOG.md](DEVLOG.md), which is the source of truth.
 <!-- AUTO:COMMITS -->
 | Hash | Date | Message |
 |---|---|---|
+| `ece18bd` | 2026-09-24 | feat(example): Robin's inbox triaged by the real engine and archived |
 | `5b16855` | 2026-09-24 | feat(stages): 02_triage, the documents read together |
 | `c67a605` | 2026-09-24 | feat(ui): the guided path — start page, review, questionnaire as a form |
 | `9bc9562` | 2026-09-24 | feat(ui): four languages for the UI, a folder browser in the chooser |
 | `be5d403` | 2026-09-24 | feat(apply): stage 04 deterministic, a note into the profile by code |
-| `82565d9` | 2026-09-24 | feat(stages): 04_apply, an evidence note into the profile as a contract |
 <!-- /AUTO:COMMITS -->

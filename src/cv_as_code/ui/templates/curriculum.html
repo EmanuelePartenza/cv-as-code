@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% block title %}{{ t('Curriculum') }} · {{ p.user }}{% endblock %}
+{% macro fact_card(f, entry) -%}
+<article class="fact {{ f.status }}" id="{{ f.id }}">
+  <div class="fact-head">
+    <code>{{ f.id }}</code> <span class="badge {{ f.status }}">{{ t(f.status) }}</span>
+    {% if f.verified_on %}<small class="muted">{{ f.verified_on }}</small>{% endif %}
+    {% if f.metrics %}<span class="metrics">{% for k, v in f.metrics.items() %}<code>{{ k }}={{ v }}</code> {% endfor %}</span>{% endif %}
+  </div>
+  {% if f.status == 'draft' %}
+  <div class="two">
+    <form method="post" action="{{ url_for('review.claim', user=p.user, fact_id=f.id) }}" class="stack">
+      <input type="hidden" name="next" value="{{ url_for('curriculum.page', user=p.user) }}#{{ f.id }}">
+      <label>{{ t('The fact, in your words') }} <textarea name="claim" rows="2">{{ f.claim }}</textarea></label>
+      <button>{{ t('Save the wording') }}</button>
+    </form>
+    <div>
+      <p class="muted">{{ t('The passage it rests on') }}</p>
+      {% for ev in f.evidence %}{% if ev.quote %}<blockquote>{{ ev.quote }}</blockquote>{% else %}<p class="muted"><code>{{ ev.ref }}</code>{% if not ev.exists %} — {{ t('missing') }}{% endif %}</p>{% endif %}{% else %}<p class="bad">{{ t('no evidence') }}</p>{% endfor %}
+      <div class="actions">
+        <form method="post" action="{{ url_for('review.act', user=p.user, action='verify') }}"><input type="hidden" name="ids" value="{{ f.id }}"><input type="hidden" name="next" value="{{ url_for('curriculum.page', user=p.user) }}#{{ entry.id }}"><button class="ok" {% if not f.evidence_ok %}disabled title="{{ t('verification needs evidence that exists') }}"{% endif %}>{{ t('Confirm') }}</button></form>
+        <form method="post" action="{{ url_for('review.act', user=p.user, action='reject') }}"><input type="hidden" name="ids" value="{{ f.id }}"><input type="hidden" name="next" value="{{ url_for('curriculum.page', user=p.user) }}#{{ entry.id }}"><button class="danger">{{ t('Reject') }}</button></form>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <p class="claim">{{ f.claim }}</p>
+  <details class="evidence"><summary>{{ t('evidence') }}</summary>
+    {% for ev in f.evidence %}{% if ev.quote %}<blockquote>{{ ev.quote }}</blockquote>{% else %}<p class="muted"><code>{{ ev.ref }}</code></p>{% endif %}{% else %}<p class="bad">{{ t('no evidence') }}</p>{% endfor %}
+    <form method="post" action="{{ url_for('review.claim', user=p.user, fact_id=f.id) }}" class="stack">
+      <input type="hidden" name="next" value="{{ url_for('curriculum.page', user=p.user) }}#{{ f.id }}">
+      <label>{{ t('Reword (a confirmed fact goes back to draft)') }} <textarea name="claim" rows="2">{{ f.claim }}</textarea></label>
+      <div class="actions"><button>{{ t('Save the wording') }}</button>
+      {% if f.status == 'verified' %}<form method="post" action="{{ url_for('review.act', user=p.user, action='reject') }}"></form>{% endif %}</div>
+    </form>
+    {% if f.status == 'verified' %}<form method="post" action="{{ url_for('review.act', user=p.user, action='reject') }}" class="inline"><input type="hidden" name="ids" value="{{ f.id }}"><input type="hidden" name="next" value="{{ url_for('curriculum.page', user=p.user) }}#{{ entry.id }}"><button class="danger">{{ t('Reject') }}</button></form>{% endif %}
+  </details>
+  {% endif %}
+</article>
+{%- endmacro %}
+{% macro entry_block(e) -%}
+<section class="entry" id="{{ e.id }}">
+  <h3><code>{{ e.id }}</code> — {{ e.role }}{% if e.company_name %}, {{ e.company_name }}{% endif %} <small class="muted">{{ e.dates }}</small></h3>
+  {% if e.hints %}<ul class="hints">{% for h in e.hints %}<li>{{ h }}</li>{% endfor %}</ul>{% endif %}
+  <details>
+    <summary>{{ t('Role, organisation, dates') }}</summary>
+    <form method="post" action="{{ url_for('curriculum.entry_update', user=p.user, entry_id=e.id) }}" class="stack">
+      <div class="row">
+        <label>{{ t('Role title') }} <input name="role" value="{{ e.role or '' }}" required></label>
+        <label>{{ t('Organisation') }} <input name="company" value="{{ e.company_name or '' }}"></label>
+        <label>{{ t('Where') }} <input name="location" value="{{ e.location or '' }}"></label>
+      </div>
+      <div class="row">
+        <label>{{ t('Sector') }} <input name="industry" value="{{ e.industry or '' }}"></label>
+        <label>{{ t('From (YYYY-MM)') }} <input name="start" value="{{ e.start or '' }}" size="8"></label>
+        <label>{{ t('To (YYYY-MM, empty if ongoing)') }} <input name="end" value="{{ e.end or '' }}" size="8"></label>
+      </div>
+      <button>{{ t('Save') }}</button>
+    </form>
+  </details>
+  {% for f in e.facts %}{% if f.status != 'rejected' %}{{ fact_card(f, e) }}{% endif %}{% endfor %}
+  {% set rejected = e.facts|selectattr('status', 'equalto', 'rejected')|list %}
+  {% if rejected %}<details class="muted"><summary>{{ t('{n} rejected fact(s)', n=rejected|length) }}</summary>{% for f in rejected %}<p class="muted"><code>{{ f.id }}</code> {{ f.claim }}</p>{% endfor %}</details>{% endif %}
+  <form method="post" action="{{ url_for('curriculum.fact_new', user=p.user, entry_id=e.id) }}" class="stack add-fact">
+    <label>{{ t('Add something you did here, in your own words (one fact: one thing that happened)') }} <textarea name="claim" rows="2" required placeholder="{{ t('e.g. Migrated 120 tables to the new warehouse in six months') }}"></textarea></label>
+    <div class="row">
+      <label>{{ t('Numbers (key=value, comma-separated; only real ones)') }} <input name="metrics" placeholder="tables=120, months=6"></label>
+      <label>{{ t('Tags (comma-separated)') }} <input name="tags" placeholder="migration, warehouse"></label>
+    </div>
+    <div class="actions">
+      <button name="action" value="draft">{{ t('Add as draft') }}</button>
+      <button name="action" value="confirm" class="ok">{{ t('Add and confirm: this is true and mine') }}</button>
+    </div>
+  </form>
+</section>
+{%- endmacro %}
+{% block content %}
+<h1>{{ t('Curriculum') }} — {{ p.full_name }} <code>{{ p.user }}</code></h1>
+<p class="muted">{{ t('Everything about you in one place: what your documents proposed (to confirm) and what you add yourself. Only confirmed facts reach a CV; the AI drafts CVs and letters from this page and nothing else.') }}</p>
+<p><span class="badge verified">{{ t('{n} confirmed', n=p.counts.verified) }}</span> <span class="badge draft">{{ t('{n} to review', n=p.counts.draft) }}</span> <span class="badge rejected">{{ t('{n} rejected', n=p.counts.rejected) }}</span>
+  · <a href="{{ url_for('review.review', user=p.user) }}">{{ t('only what awaits a decision') }}</a> · <a href="{{ url_for('data.documents', user=p.user) }}">{{ t('Documents') }}</a> · <a href="{{ url_for('profile', user=p.user) }}">{{ t('read-only view') }}</a></p>
+<nav class="toc"><a href="#identity">{{ t('Identity') }}</a> · <a href="#experiences">{{ t('Experiences') }}</a> · <a href="#projects">{{ t('Projects') }}</a> · <a href="#education">{{ t('Education') }}</a> · <a href="#skills">{{ t('Skills') }}</a> · <a href="#languages">{{ t('Languages') }}</a> · <a href="#search">{{ t('What you are looking for') }}</a></nav>
+
+<h2 id="identity">{{ t('Identity') }}</h2>
+<form method="post" action="{{ url_for('curriculum.identity', user=p.user) }}" class="stack">
+  <div class="row">
+    <label>{{ t('Full name') }} <input name="full_name" value="{{ p.identity.get('full_name', '') }}" required></label>
+    <label>{{ t('E-mail for applications') }} <input name="email" type="email" value="{{ p.identity.get('email', '') }}" required></label>
+    <label>{{ t('Phone (optional)') }} <input name="phone" value="{{ p.identity.get('phone') or '' }}"></label>
+  </div>
+  <div class="row">
+    <label>{{ t('City') }} <input name="city" value="{{ (p.identity.get('location') or {}).get('city', '') }}" required></label>
+    <label>{{ t('Country code (ISO, optional)') }} <input name="country" value="{{ (p.identity.get('location') or {}).get('country') or '' }}" size="4"></label>
+    <label>{{ t('Date of birth (YYYY-MM-DD, only if your markets expect it)') }} <input name="born" value="{{ p.identity.get('born') or '' }}" size="10"></label>
+  </div>
+  <label>{{ t('Links, one per line: label | url') }} <textarea name="links" rows="2">{% for l in p.identity.get('links') or [] %}{{ l.label }} | {{ l.url }}
+{% endfor %}</textarea></label>
+  <button>{{ t('Save') }}</button>
+</form>
+
+<h2 id="experiences">{{ t('Experiences') }}</h2>
+{% if not p.experiences %}<p class="hints">{{ t('Add your positions, most recent first: role, organisation, dates. The facts come after.') }}</p>{% endif %}
+{% for e in p.experiences %}{{ entry_block(e) }}{% endfor %}
+<details class="add">
+  <summary>{{ t('Add a position') }}</summary>
+  <form method="post" action="{{ url_for('curriculum.entry_new', user=p.user) }}" class="stack">
+    <input type="hidden" name="kind" value="exp">
+    <div class="row">
+      <label>{{ t('Role title') }} <input name="role" required></label>
+      <label>{{ t('Organisation') }} <input name="company"></label>
+      <label>{{ t('Where') }} <input name="location"></label>
+    </div>
+    <div class="row">
+      <label>{{ t('Sector') }} <input name="industry"></label>
+      <label>{{ t('From (YYYY-MM)') }} <input name="start" size="8"></label>
+      <label>{{ t('To (YYYY-MM, empty if ongoing)') }} <input name="end" size="8"></label>
+    </div>
+    <button class="ok">{{ t('Add') }}</button>
+  </form>
+</details>
+
+<h2 id="projects">{{ t('Projects') }}</h2>
+{% for e in p.projects %}{{ entry_block(e) }}{% else %}<p class="muted">{{ t('Personal, open-source, volunteer or academic projects outside a position.') }}</p>{% endfor %}
+<details class="add">
+  <summary>{{ t('Add a project') }}</summary>
+  <form method="post" action="{{ url_for('curriculum.entry_new', user=p.user) }}" class="stack">
+    <input type="hidden" name="kind" value="prj">
+    <div class="row">
+      <label>{{ t('Your part (e.g. Author, Maintainer)') }} <input name="role" required></label>
+      <label>{{ t('Project name') }} <input name="company"></label>
+    </div>
+    <div class="row">
+      <label>{{ t('From (YYYY-MM)') }} <input name="start" size="8"></label>
+      <label>{{ t('To (YYYY-MM, empty if ongoing)') }} <input name="end" size="8"></label>
+    </div>
+    <button class="ok">{{ t('Add') }}</button>
+  </form>
+</details>
+
+<h2 id="education">{{ t('Education') }}</h2>
+<ul>{% for ed in p.education %}<li>{{ ed.degree }} — {{ ed.institution }} <small class="muted">{{ ed.dates }}</small></li>{% else %}<li class="muted">{{ t('none yet') }}</li>{% endfor %}</ul>
+<details class="add">
+  <summary>{{ t('Add a degree or certification') }}</summary>
+  <form method="post" action="{{ url_for('curriculum.education', user=p.user) }}" class="stack">
+    <div class="row">
+      <label>{{ t('Degree or title') }} <input name="degree" required></label>
+      <label>{{ t('Institution') }} <input name="institution" required></label>
+      <label>{{ t('Where') }} <input name="location"></label>
+    </div>
+    <div class="row">
+      <label>{{ t('From (YYYY-MM)') }} <input name="start" size="8"></label>
+      <label>{{ t('To (YYYY-MM, empty if ongoing)') }} <input name="end" size="8"></label>
+    </div>
+    <button class="ok">{{ t('Add') }}</button>
+  </form>
+</details>
+
+<h2 id="skills">{{ t('Skills') }}</h2>
+<table>
+  <thead><tr><th>{{ t('skill') }}</th><th>{{ t('category') }}</th><th>{{ t('evidence facts') }}</th></tr></thead>
+  <tbody>{% for s in p.skills %}<tr><td>{{ s.name }}</td><td>{{ s.category }}</td><td>{% for x in s.evidence_facts %}<a href="#{{ x }}"><code>{{ x }}</code></a> {% else %}<span class="bad">{{ t('none') }}</span>{% endfor %}</td></tr>{% endfor %}</tbody>
+</table>
+<details class="add">
+  <summary>{{ t('Add a skill (pointing at the facts that prove it)') }}</summary>
+  <form method="post" action="{{ url_for('curriculum.skill', user=p.user) }}" class="stack">
+    <div class="row">
+      <label>{{ t('Skill') }} <input name="name" required></label>
+      <label>{{ t('Category (free: language, tool, method, domain…)') }} <input name="category" required></label>
+    </div>
+    <fieldset class="facts-pick"><legend>{{ t('Facts where you used it') }}</legend>
+      {% for f in p.all_facts %}<label class="pick"><input type="checkbox" name="evidence_facts" value="{{ f.id }}"> <code>{{ f.id }}</code> {{ f.claim[:90] }}</label>{% else %}<span class="muted">{{ t('no facts yet: add or confirm some first') }}</span>{% endfor %}
+    </fieldset>
+    <button class="ok">{{ t('Add') }}</button>
+  </form>
+</details>
+
+<h2 id="languages">{{ t('Languages') }}</h2>
+<ul>{% for lg in p.languages %}<li><code>{{ lg.code }}</code> {{ lg.level }}{% if lg.note %} — {{ lg.note }}{% endif %}</li>{% endfor %}</ul>
+<form method="post" action="{{ url_for('curriculum.language', user=p.user) }}" class="inline">
+  <label>{{ t('Code') }} <input name="code" size="3" placeholder="en" required></label>
+  <label>{{ t('Level (native or CEFR, e.g. B2)') }} <input name="level" size="8" required></label>
+  <label>{{ t('Note') }} <input name="note" size="24"></label>
+  <button>{{ t('Add') }}</button>
+</form>
+
+<h2 id="search">{{ t('What you are looking for') }}</h2>
+<form method="post" action="{{ url_for('curriculum.search', user=p.user) }}" class="stack">
+  <div class="row">
+    <label>{{ t('Target roles, comma-separated') }} <input name="target_roles" value="{{ (p.search.get('target_roles') or [])|join(', ') }}" required></label>
+    <label>{{ t('Adjacent roles you would consider') }} <input name="adjacent_roles" value="{{ (p.search.get('adjacent_roles') or [])|join(', ') }}"></label>
+  </div>
+  <label>{{ t('Markets, one per line: area | country code | modes (onsite, hybrid, remote)') }} <textarea name="markets" rows="3">{% for m in p.search.get('markets') or [] %}{{ m.area }} | {{ m.country or '' }} | {{ (m.modes or [])|join(', ') }}
+{% endfor %}</textarea></label>
+  <div class="row">
+    <label>{{ t('CV languages (codes)') }} <input name="cv_languages" value="{{ (p.search.get('cv_languages') or [])|join(', ') }}" required></label>
+    <label>{{ t('Salary floor') }} <input name="salary_min" value="{{ (p.search.get('salary') or {}).get('min') or '' }}" size="8"></label>
+    <label>{{ t('Currency') }} <input name="currency" value="{{ (p.search.get('salary') or {}).get('currency') or 'EUR' }}" size="4"></label>
+    <label>{{ t('Period') }} <select name="period">{% for per in ('year', 'month', 'day') %}<option value="{{ per }}"{% if (p.search.get('salary') or {}).get('period', 'year') == per %} selected{% endif %}>{{ t(per) }}</option>{% endfor %}</select></label>
+  </div>
+  <label>{{ t('Red flags, comma-separated (what would make you decline)') }} <input name="red_flags" value="{{ (p.search.get('red_flags') or [])|join(', ') }}"></label>
+  <label><input type="checkbox" name="confidential"{% if p.search.get('confidential') %} checked{% endif %}> {{ t('My search is confidential with respect to my current employer') }}</label>
+  <button>{{ t('Save') }}</button>
+</form>
+{% endblock %}
