@@ -160,6 +160,9 @@ def test_entries_are_added_updated_and_get_own_facts(
     entry = next(e for e in prof(root, user)["experiences"] if e["id"] == eid)
     assert entry["role"] == "Senior Keeper" and entry["end"] == "2021-06"
     assert entry["company"]["location"] == "Milan" and entry["company"]["industry"] is None
+    note_path = root.user_dir(user) / "notes" / "own-words.md"
+    already = len(lib.own_note_quotes(root, user)) if note_path.is_file() else 0
+    a1, a2 = f"own-{already + 1:03d}", f"own-{already + 2:03d}"
     f1 = lib.add_own_fact(
         root,
         user,
@@ -179,20 +182,16 @@ def test_entries_are_added_updated_and_get_own_facts(
         "tags": ["migration"],
         "status": "draft",
         "verified_on": None,
-        "evidence": "notes/own-words.md#own-001",
+        "evidence": f"notes/own-words.md#{a1}",
     }
-    assert (
-        facts[1]["status"] == "verified"
-        and facts[1]["verified_on"]
-        and facts[1]["evidence"] == "notes/own-words.md#own-002"
-    )
-    note = (root.user_dir(user) / "notes" / "own-words.md").read_text("utf-8")
-    assert "## own-001\n\nLed the migration of the data platform\n\n_stated on" in note
+    assert facts[1]["status"] == "verified" and facts[1]["verified_on"]
+    assert facts[1]["evidence"] == f"notes/own-words.md#{a2}"
+    note = note_path.read_text("utf-8")
+    assert f"## {a1}\n\nLed the migration of the data platform\n\n_stated on" in note
     assert "quote: Trained 3 juniors" in note and "source: the person's own words" in note
-    assert lib.own_note_quotes(root, user) == {
-        "own-001": "Led the migration of the data platform",
-        "own-002": "Trained 3 juniors",
-    }
+    quotes = lib.own_note_quotes(root, user)
+    assert quotes[a1] == "Led the migration of the data platform"
+    assert quotes[a2] == "Trained 3 juniors"
     pid = lib.add_entry(root, user, "prj", role="Author")
     assert pid == "prj-author" and lib.add_entry(root, user, "prj", role="Author") == "prj-author-2"
     clean(root)
