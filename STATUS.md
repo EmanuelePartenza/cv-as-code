@@ -69,9 +69,9 @@ Details in [DEVLOG.md](DEVLOG.md), which is the source of truth.
 <!-- AUTO:COMMITS -->
 | Hash | Date | Message |
 |---|---|---|
+| `f6d806d` | 2026-09-24 | feat(ui): the curriculum, profile.yaml edited in place |
 | `ece18bd` | 2026-09-24 | feat(example): Robin's inbox triaged by the real engine and archived |
 | `5b16855` | 2026-09-24 | feat(stages): 02_triage, the documents read together |
 | `c67a605` | 2026-09-24 | feat(ui): the guided path — start page, review, questionnaire as a form |
 | `9bc9562` | 2026-09-24 | feat(ui): four languages for the UI, a folder browser in the chooser |
-| `be5d403` | 2026-09-24 | feat(apply): stage 04 deterministic, a note into the profile by code |
 <!-- /AUTO:COMMITS -->

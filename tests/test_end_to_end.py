@@ -136,6 +136,21 @@ def test_example_carries_the_triage_verdicts_and_an_empty_inbox(example: DataRoo
     assert [p.name for p in inbox.iterdir()] == ["README.md"]
 
 
+def test_example_carries_a_fact_in_robins_own_words(example: DataRoot) -> None:
+    """Added through the curriculum form's library call, confirmed by Robin (ADR-0017)."""
+    from cv_as_code.documents import load_document
+
+    profile = load_document(example.profile_path("robin"))
+    skerra = next(e for e in profile["experiences"] if e["id"] == "exp-skerra")
+    own = [
+        f for f in skerra["facts"] if str(f.get("evidence", "")).startswith("notes/own-words.md#")
+    ]
+    assert own and own[0]["status"] == "verified" and own[0]["metrics"]["hives"] == 4
+    note = load_document(example.path / "users" / "robin" / "notes" / "own-words.md")
+    assert note["source"].startswith("the person's own words") and note["status"] == "applied"
+    assert note["facts"][0]["quote"] == own[0]["claim"]
+
+
 def test_the_gates_refuse_a_draft_fact_in_an_approved_spec(example: DataRoot) -> None:
     spec = example.path / MASTERS[0] / "cv-spec.yaml"
     spec.write_text(

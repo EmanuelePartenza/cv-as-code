@@ -188,6 +188,13 @@ experiences:
         status: draft
         verified_on: null
         evidence: notes/04-met-office-letter.md#only-unbroken-station
+      - id: exp-skerra.f20
+        claim: Keeps four beehives on the station's lee side since 2020; the honey goes to the relief keepers
+        metrics: {hives: 4, since: '2020'}
+        tags: [station-life]
+        status: verified
+        verified_on: '2026-09-24'
+        evidence: notes/own-words.md#own-001
 
   - id: exp-fairhaven
     role: Deckhand, then bosun's mate
