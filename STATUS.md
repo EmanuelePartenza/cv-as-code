@@ -63,9 +63,9 @@ Details in [DEVLOG.md](DEVLOG.md), which is the source of truth.
 <!-- AUTO:COMMITS -->
 | Hash | Date | Message |
 |---|---|---|
+| `6bb159d` | 2026-09-24 | feat(example): Robin's gap plan and interview prep from the real engine |
+| `ae199c8` | 2026-09-24 | feat(example): Robin's gap plan and interview prep from the real engine |
 | `6b8d96e` | 2026-09-24 | feat(ui): the data-root chooser, jobs, documents, editor, runs |
 | `9951353` | 2026-09-24 | feat(runner): cvac stage run over Claude Code, stages 40 and 70 |
 | `d2a6498` | 2026-09-23 | docs(ui): same-origin rule, one assertion tightened, STATUS |
-| `833dae2` | 2026-09-23 | feat(ui): a local web UI for the gates and views, cvac ui |
-| `67cef24` | 2026-09-22 | docs(decide): D-06, a user interface for the tool |
 <!-- /AUTO:COMMITS -->
