@@ -13,7 +13,7 @@ test enforces that on the whole repository.
 | `test_render.py` | draft watermark and suffix, final without watermark, byte-for-byte reproducibility, the page budget (warn in draft, fail in final), the transient build directory, template overrides, the footer, the date of birth printed only when shown |
 | `test_letter.py` | frontmatter gate, language-aware date from the labels' months, paragraph collapsing, the header follows the labels' identity fields |
 | `test_dataroot.py` | flag > env > discovery, error messages, display paths, asset lookup order |
-| `test_stages.py` | every `io.yaml` validates and names a shipped schema; placeholders resolve; `pack` carries instructions, inputs, attachments and the output language; missing inputs and params are named |
+| `test_stages.py` | every `io.yaml` validates and names a shipped schema; placeholders resolve; `pack` carries instructions, inputs, attachments and the output language; missing inputs and params are named; `04_apply` targets the profile |
 | `test_skills.py` | the seven domain skills ship with frontmatter, install into a data root, and the repository's copies equal the sources |
 | `test_runner.py` | `cvac stage run` with a fake `claude` executable: the prompt is the pack plus the engine note, the command confines the engine, success only when the output exists and validates, engine errors and exit codes surface, the executable is found or the message says how to install it |
 | `test_scaffold.py` | a new data root and a new user: valid from the first file, default user set once, never overwriting |

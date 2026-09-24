@@ -13,6 +13,17 @@ Tags: `arch`, `perf`, `ui`, `test`, `docs`, `fix`, `cleanup`, `sec`.
 
 ## 2026-09-24
 
+### feat(stages): 04_apply — an evidence note into the profile, as a contract [arch]
+
+- Stage `04_apply` (note + profile → profile edited in place, facts as
+  `draft` with the note as evidence, note marked `applied`); the UI's
+  documents page offers it on every `proposed` note; `/onboard` points at
+  it. Exercised on Robin: a third document (2024 appraisal) extracted and
+  applied through the real engine.
+- Decision D-07 answered (A) and closed; the engine note lets a stage name
+  the files it may touch.
+- Files: `src/cv_as_code/pipeline/04_apply/`, `ui/data.py`, `example/`, tests.
+
 ### feat(ui): the UI as the bridge to a person's data (D-07) [ui, arch]
 
 - First open asks for the data folder (recent roots in the user's config

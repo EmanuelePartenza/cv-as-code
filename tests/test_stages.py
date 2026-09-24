@@ -11,9 +11,10 @@ from cv_as_code.errors import CvacError
 from cv_as_code.stages import describe, fill, list_stages, load_stage, pack, resolve_stage
 
 
-def test_the_eight_stages_ship() -> None:
+def test_the_nine_stages_ship() -> None:
     assert list_stages() == [
         "03_extract",
+        "04_apply",
         "05_interview",
         "10_normalize",
         "20_match",
@@ -131,3 +132,20 @@ def test_extract_pack_needs_document_and_name(data_root: DataRoot) -> None:
     text = pack(data_root, rs)
     assert "## Input users/test/inbox/old-cv.md" in text and "I built widgets." in text
     assert rs.output == data_root.path / "users" / "test" / "notes" / "old-cv.md"
+
+
+def test_apply_resolves_the_note_and_targets_the_profile(data_root: DataRoot) -> None:
+    note = data_root.path / "users" / "test" / "notes" / "old-cv.md"
+    note.parent.mkdir(parents=True, exist_ok=True)
+    note.write_text("---\nkind: evidence\n---\n\n## built\n\nI built widgets.\n", "utf-8")
+    rs = resolve_stage(data_root, "04_apply", {"name": "old-cv"})
+    assert rs.output == data_root.profile_path("test")
+    assert [rel for rel, _, _ in rs.inputs] == [
+        "users/{user}/notes/{name}.md",
+        "users/{user}/profile.yaml",
+    ]
+    text = pack(data_root, rs)
+    assert "## Input users/test/notes/old-cv.md" in text and "I built widgets." in text
+    assert "`cvac validate users/test/profile.yaml`" in text
+    with pytest.raises(CvacError, match="needs --name"):
+        resolve_stage(data_root, "04_apply", {})

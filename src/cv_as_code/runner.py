@@ -40,9 +40,9 @@ You are running non-interactively inside the data root `{root}`, which is your
 working directory. The inputs above are also on disk; read more of the data root
 with your tools if the instructions need it. Write the output to `{output}` with
 your file tools, then run `cvac validate {output}` and fix the document until it
-passes. Do not modify any other file. Never set `status: approved` or a fact to
-`verified`: those are the person's acts. When the output validates, end with one
-line: `DONE {output}`.
+passes. Do not modify any file the instructions do not name.
+Never set `status: approved` or a fact to `verified`: those are the person's
+acts. When the output validates, end with one line: `DONE {output}`.
 """
 
 

@@ -1,0 +1,13 @@
+stage: 04_apply
+version: 1
+engine: llm
+gate: none
+output_language: pivot
+params: [user, name]
+inputs:
+  - path: users/{user}/notes/{name}.md
+  - path: users/{user}/profile.yaml
+output:
+  path: users/{user}/profile.yaml
+  format: yaml
+  schema: profile.schema.json

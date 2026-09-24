@@ -18,8 +18,27 @@
 | D-04 | 2026-09-21 | Fresh public history with a mechanical publication boundary | [0009](adr/0009-publication-boundary.md) |
 | D-05 | 2026-09-21 | Typst from PyPI, vendored fonts, reproducible PDFs | [0012](adr/0012-rendering-reproducibility.md) |
 | D-06 | 2026-09-23 | A local, server-rendered web UI inside the package, a thin adapter over the library | [0014](adr/0014-local-ui-thin-adapter.md) |
+| D-07 | 2026-09-24 | The UI as the bridge to a person's data: chooser, documents, jobs, stages run by Claude Code, an apply stage | [0015](adr/0015-claude-code-headless-engine.md) |
 
 ---
+
+### D-07 — The UI as the bridge to a person's data — 2026-09-24
+
+The maintainer described the UI he wanted: it asks where the data lives,
+lets him configure and edit his data, drop documents from which Claude
+compiles facts, and load postings from which Claude produces CVs, letters,
+interview preparation and gap plans — "asking Claude" from the UI. Options:
+(A) build it in slices, every screen a button over an existing stage
+contract, with Claude Code's print mode as the engine (ADR-0015); (B) a chat
+panel inside the UI. Chosen (A), answered "A" on 2026-09-24 with the
+recommendation's defaults: the executable found on PATH or in the VS Code
+extension's bundle, no spend cap, the account's model, and applying an
+extraction note through the engine until a deterministic engine exists.
+Built: `cvac stage run`, the chooser, the new-user form, the documents area
+(upload, extract, apply, questionnaire), the jobs area with one button per
+stage, the validating editor, stages `40_gap_plan`, `70_interview_prep` and
+`04_apply` with their schemas and rules, all exercised on Robin. Left to the
+roadmap: a deterministic engine for `04_apply`, a form-based editor.
 
 ### D-06 — A user interface for the tool — 2026-09-23
 

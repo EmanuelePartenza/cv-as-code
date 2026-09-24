@@ -484,3 +484,33 @@ def test_a_missing_engine_is_an_immediate_message_not_a_thread(
     body = post(c, "/u/test/jobs/20260101-acme-widget/run/20_match")
     assert "is not a file" in body
     assert c.application.extensions["cvac"].runs.listing() == []
+
+
+def test_apply_button_runs_stage_04_on_a_proposed_note_only(
+    data_root: DataRoot, ui_env: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import stat
+
+    from test_runner import FAKE
+
+    fake = ui_env / "fake-claude"
+    fake.write_text(FAKE, "utf-8")
+    fake.chmod(fake.stat().st_mode | stat.S_IXUSR)
+    monkeypatch.setenv("CVAC_CLAUDE_BIN", str(fake))
+    notes = data_root.path / "users" / "test" / "notes"
+    notes.mkdir(parents=True, exist_ok=True)
+    fm = "---\nschema_version: 1\nkind: evidence\nuser: test\nsource: inbox/x.md\n"
+    fm += "extracted_on: '2026-01-05'\nstatus: {status}\nfacts: []\n---\n\n# note\n"
+    (notes / "fresh.md").write_text(fm.format(status="proposed"), "utf-8")
+    (notes / "done.md").write_text(fm.format(status="applied"), "utf-8")
+    app = create_app(data_root)
+    app.config["TESTING"] = True
+    c = app.test_client()
+    body = page(c, "/u/test/documents")
+    assert body.count("Apply to the profile with Claude (04)") == 1
+    r = c.post("/u/test/documents/apply", data={"name": "fresh"})
+    assert r.status_code == 302 and "/runs/" in r.headers["Location"]
+    run = app.extensions["cvac"].runs.wait(r.headers["Location"].rsplit("/", 1)[1])
+    assert run.stage == "04_apply" and run.params == {"user": "test", "name": "fresh"}
+    assert "is not an evidence note" in post(c, "/u/test/documents/apply", name="ghost")
+    assert "is not an evidence note" in post(c, "/u/test/documents/apply", name="../profile")

@@ -27,7 +27,7 @@ FAKE = '''#!/usr/bin/env python3
 """A stand-in for `claude -p`: echoes events, writes what FAKE_OUTPUT says, exits FAKE_EXIT."""
 import json, os, re, sys
 prompt = sys.stdin.read()
-m = re.search(r"end with one\\nline: `DONE (.+?)`", prompt)
+m = re.search(r"`DONE (.+?)`", prompt)
 out = m.group(1) if m else None
 print(json.dumps({"type": "system", "subtype": "init", "session_id": "s-1"}))
 print(json.dumps({"type": "assistant", "message": {"content": [

@@ -45,7 +45,7 @@ cvac init ~/my-cv --user <slug>       # a data root: cvac.yaml, users/<slug>/, j
 cd ~/my-cv
 ```
 
-Data enters through a questionnaire in your language, not through a chat: stage `05_interview` writes it, you fill it at your own pace, stage `03_extract` turns it (or an old CV, a review, any document) into an evidence note with proposed facts, each carrying the verbatim passage it rests on. Facts enter your profile as `draft`; you verify them one by one (`cvac fact verify`) and see what you have and what is missing with `cvac profile report`. Then a master CV, then postings, matches, tailored CVs and letters. The `/onboard` skill is that procedure written down.
+Data enters through a questionnaire in your language, not through a chat: stage `05_interview` writes it, you fill it at your own pace, stage `03_extract` turns it (or an old CV, a review, any document) into an evidence note with proposed facts, each carrying the verbatim passage it rests on, and stage `04_apply` carries them into your profile. Facts enter as `draft`; you verify them one by one (`cvac fact verify`) and see what you have and what is missing with `cvac profile report`. Then a master CV, then postings, matches, tailored CVs and letters. The `/onboard` skill is that procedure written down.
 
 ## Three ways to run a stage
 
@@ -89,7 +89,7 @@ The framework's surface — code, messages, docs, stage instructions — is Engl
 
 ## Status
 
-`v0.2` — the CLI, eight stage contracts, the skills, the example, the profile report and the fact gate, a local web UI (`cvac ui`), a stage runner over Claude Code (`cvac stage run`), the tests and CI exist. Roadmap (designed, not built): an API runner for people without Claude Code, market conventions beyond language, connectors for posting APIs, application tracking, a deterministic apply of an evidence note into the profile. See docs/ARCHITECTURE.md §10 and the ADRs.
+`v0.2` — the CLI, nine stage contracts, the skills, the example, the profile report and the fact gate, a local web UI (`cvac ui`), a stage runner over Claude Code (`cvac stage run`), the tests and CI exist. Roadmap (designed, not built): an API runner for people without Claude Code, market conventions beyond language, connectors for posting APIs, application tracking, a deterministic engine for applying an evidence note. See docs/ARCHITECTURE.md §10 and the ADRs.
 
 Nothing personal is in this repository, by construction: [CONTRIBUTING.md](CONTRIBUTING.md) explains the publication boundary.
 

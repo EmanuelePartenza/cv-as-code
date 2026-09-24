@@ -119,6 +119,61 @@ experiences:
         status: draft
         verified_on: null
         evidence: notes/02-logbook-excerpt.md#outage-2025
+      - id: exp-skerra.f11
+        claim: >-
+          Ran the district's relief-keeper induction at Skerra Head in April
+          2024 for two new keepers, five days each, using the station handbook
+          as the syllabus
+        metrics: {date: "2024-04", keepers_inducted: 2, days_per_keeper: 5}
+        tags: [training, documentation]
+        status: draft
+        verified_on: null
+        evidence: notes/03-appraisal-2024.md#induction-2024
+      - id: exp-skerra.f12
+        claim: Both keepers inducted in April 2024 were signed off for solo relief duty by the end of 2024
+        metrics: {keepers_signed_off: 2}
+        tags: [training]
+        status: draft
+        verified_on: null
+        evidence: notes/03-appraisal-2024.md#signed-off-2024
+      - id: exp-skerra.f13
+        claim: Planned and hosted the contractor's three-day overhaul of the lens drive in September 2024
+        metrics: {date: "2024-09", overhaul_days: 3}
+        tags: [maintenance, planning, contractor-management]
+        status: draft
+        verified_on: null
+        evidence: notes/03-appraisal-2024.md#overhaul-2024
+      - id: exp-skerra.f14
+        claim: >-
+          Scheduled the September 2024 lens-drive overhaul in daylight hours so
+          that the light was exhibited every night of the contractor's visit;
+          no outage was recorded
+        metrics: {outages: 0}
+        tags: [maintenance, planning, reliability]
+        status: draft
+        verified_on: null
+        evidence: notes/03-appraisal-2024.md#overhaul-no-outage
+      - id: exp-skerra.f15
+        claim: The 2024 district appraisal recorded another year without a defect on the light
+        metrics: {year: 2024, defects: 0}
+        tags: [reliability, aids-to-navigation, appraisal]
+        status: draft
+        verified_on: null
+        evidence: notes/03-appraisal-2024.md#no-defect-2024
+      - id: exp-skerra.f16
+        claim: First-aid-at-work certificate renewed in March 2024, valid to March 2027
+        metrics: {renewed: "2024-03", valid_to: "2027-03"}
+        tags: [certification, safety]
+        status: draft
+        verified_on: null
+        evidence: notes/03-appraisal-2024.md#first-aid-2024
+      - id: exp-skerra.f17
+        claim: Completed the Northern Isles Lights Board's fire-safety refresher in March 2024
+        metrics: {date: "2024-03"}
+        tags: [certification, safety]
+        status: draft
+        verified_on: null
+        evidence: notes/03-appraisal-2024.md#fire-safety-2024
 
   - id: exp-fairhaven
     role: Deckhand, then bosun's mate

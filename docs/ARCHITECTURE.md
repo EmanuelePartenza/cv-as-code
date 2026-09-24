@@ -51,9 +51,9 @@ src/cv_as_code/
 ├── errors.py       CvacError > ValidationError, RenderError
 ├── schemas/        profile · search · cv-spec · cv-resolved · labels · data-root · job · match ·
 │                   cover-letter · evidence · questionnaire · gap-plan · interview-prep · stage-io
-├── pipeline/       03_extract · 05_interview · 10_normalize · 20_match · 30_tailor · 40_gap_plan ·
-│                   60_letter · 70_interview_prep (INSTRUCTIONS.md + io.yaml each; 05 also ships
-│                   the questionnaire skeleton)
+├── pipeline/       03_extract · 04_apply · 05_interview · 10_normalize · 20_match · 30_tailor ·
+│                   40_gap_plan · 60_letter · 70_interview_prep (INSTRUCTIONS.md + io.yaml each;
+│                   05 also ships the questionnaire skeleton)
 ├── skills/         cv-master · job-ingest · cv-tailor · cover-letter · gap-plan · interview-prep · onboard
 ├── i18n/           labels.it.yaml · labels.fr.yaml · labels.en.yaml
 └── templates/      classic/{template,letter}.typ · lib/common.typ · fonts/ (Lato, OFL)
@@ -122,10 +122,11 @@ posting (text)
   ╰ [40 gap plan]   LLM, from a match's gaps → growth/<job_id>.md, internal; candidate facts never enter the profile
 ```
 
-Upstream of the profile, two more stages bring data *in*: `03_extract` (a
-document or a filled questionnaire → draft facts + an evidence note) and
-`05_interview` (profile + search → a questionnaire in the user's language, only
-the missing items in update mode). Facts always enter as `draft`; `cvac fact
+Upstream of the profile, three more stages bring data *in*: `03_extract` (a
+document or a filled questionnaire → an evidence note with proposed facts),
+`04_apply` (the note's facts into `profile.yaml` as `draft`, in place, the note
+marked `applied`) and `05_interview` (profile + search → a questionnaire in the
+user's language, only the missing items in update mode). Facts always enter as `draft`; `cvac fact
 verify|reject` is the gate and `cvac profile report` the view
 ([data-in.md](data-in.md), [ADR-0013](adr/0013-data-in.md)).
 
@@ -146,6 +147,7 @@ print the contracts resolved against a data root.
 | Stage | Gate | Status |
 |---|---|---|
 | `03_extract` | none (facts land as draft) | built; exercised by the example |
+| `04_apply` | none (facts land as draft) | built; exercised by the example |
 | `05_interview` | none | built; exercised by the example |
 | `10_normalize` | none | built |
 | `20_match` | none | built |
@@ -260,8 +262,9 @@ README.
 - Application tracking (`application.yaml`, a generated index).
 - `i18n/markets/` — market conventions beyond language (photo, address shape);
   today only `identity_fields` per language and per spec exists.
-- A deterministic `apply` of an evidence note into the profile (needs a
-  format-preserving YAML writer); a photo asset for markets that expect one.
+- A deterministic engine for `04_apply` (needs a layout-preserving YAML
+  writer), so applying a note no longer spends a model run; a photo asset for
+  markets that expect one.
 - In the UI: a form-based editor once a layout-preserving YAML writer
   exists; the manual stage path (pack, paste the answer) for people without
   Claude Code.

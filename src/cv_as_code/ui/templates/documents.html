@@ -41,8 +41,11 @@
 
 <h2>Evidence notes</h2>
 <ul>
-  {% for f in d.notes %}<li><a href="{{ url_for('data.edit', user=user, rel=f.rel) }}">{{ f.name }}</a> {% if f.status %}<span class="badge {{ f.status }}">{{ f.status }}</span>{% endif %}</li>{% else %}<li class="muted">none yet</li>{% endfor %}
+  {% for f in d.notes %}<li><a href="{{ url_for('data.edit', user=user, rel=f.rel) }}">{{ f.name }}</a> {% if f.status %}<span class="badge {{ f.status }}">{{ f.status }}</span>{% endif %}
+    {% if f.status == 'proposed' %}<form method="post" action="{{ url_for('data.apply_note', user=user) }}" class="inline"><input type="hidden" name="name" value="{{ f.name[:-3] }}"><button>Apply to the profile with Claude (04)</button></form>{% endif %}
+  </li>{% else %}<li class="muted">none yet</li>{% endfor %}
 </ul>
+<p class="muted">Applying a note adds its facts to <code>profile.yaml</code> as <em>draft</em>, each pointing at its passage; nothing becomes verified here.</p>
 
 <h2>Data files</h2>
 <p><a href="{{ url_for('data.edit', user=user, rel='profile.yaml') }}">profile.yaml</a> · <a href="{{ url_for('data.edit', user=user, rel='search.yaml') }}">search.yaml</a> — edited as text, validated before saving.</p>

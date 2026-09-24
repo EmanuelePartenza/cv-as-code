@@ -153,6 +153,23 @@ def extract(user: str):
     return redirect(url_for("runs.run", run_id=r.id))
 
 
+@bp.post("/u/<user>/documents/apply")
+def apply_note(user: str):
+    root = current_root()
+    udir = views.user_dir_of(root, user)
+    back = url_for("data.documents", user=user)
+    name = request.form.get("name", "").strip()
+    if not NAME_RE.match(name) or not (udir / "notes" / f"{name}.md").is_file():
+        flash(f"`{name}` is not an evidence note under notes/", "error")
+        return redirect(back)
+    try:
+        r = state().runs.start(root, "04_apply", {"user": user, "name": name}, back)
+    except CvacError as e:
+        flash(str(e), "error")
+        return redirect(back)
+    return redirect(url_for("runs.run", run_id=r.id))
+
+
 @bp.post("/u/<user>/documents/questionnaire")
 def questionnaire(user: str):
     root = current_root()

@@ -30,6 +30,7 @@ PDFs are never committed; CI builds them as artefacts on every push.
 | `users/robin/masters/port-operations-fr/` | `30_tailor`, `based_on` the English master | the same facts in a French CV: labels, dates and degree names from `labels.fr.yaml`; the pivot language stays English |
 | `jobs/20260915-…/raw.txt` → `job.yaml` | `10_normalize` | a posting quoted, never paraphrased |
 | `users/robin/matches/20260915-….yaml` | `20_match` | a `stretch` verdict: strengths citing facts, the port-management-system gap named, the confidential-search flag raised |
+| `users/robin/sources/2024-appraisal-district-superintendent.md` → `notes/03-appraisal-2024.md` | `03_extract` then `04_apply`, both run by `cvac stage run` (Claude Code) | a third document: seven proposed facts with their passages, applied to the profile as `draft` in place — verify them on the profile screen or with `cvac fact verify` |
 | `users/robin/growth/20260915-….md` | `40_gap_plan`, run by `cvac stage run` (Claude Code) | one section per declared gap: adjacent facts cited, a path whose steps name their artefact, candidate facts labelled as future claims — never in the profile |
 | `users/robin/applications/20260915-…/interview-prep.md` | `70_interview_prep`, run by `cvac stage run` | STAR stories citing `source_facts`, an honest script per gap, questions to ask; internal, never sent |
 | `users/robin/applications/20260915-…/cv-spec.yaml` | `30_tailor` | the master re-ordered for the posting; `ats_coverage` honest about what is missing |

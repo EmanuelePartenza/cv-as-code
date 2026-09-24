@@ -26,9 +26,10 @@ Argument received: `$ARGUMENTS`
 3. **Extraction.** When the questionnaire is `filled`: `cvac stage show
    03_extract --user <slug> --document interviews/01-onboarding.md --name
    01-onboarding`; follow the stage's `INSTRUCTIONS.md` and write the evidence
-   note; validate it; then apply its facts to `profile.yaml` as `draft` with
-   the note as evidence (and `new_parents` as experiences/projects), write
-   `search.yaml` from section G, set the note's `status: applied`, and
+   note; validate it; then `cvac stage show 04_apply --user <slug> --name
+   01-onboarding` and follow that stage's `INSTRUCTIONS.md`: the facts enter
+   `profile.yaml` as `draft` with the note as evidence, the note becomes
+   `applied`; write `search.yaml` from section G yourself, then
    `cvac validate --all`.
 4. **Verification.** List every `draft` fact with its quote and ask the user to
    confirm, correct or reject each one. Only on their word set `verified` and
