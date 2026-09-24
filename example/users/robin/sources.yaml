@@ -1,0 +1,75 @@
+schema_version: 1
+kind: sources
+user: robin
+updated: "2026-09-24"
+
+documents:
+  - path: sources/ferry-timetable-winter-2025.md
+    kind: irrelevant
+    language: en
+    title: Marrow Sound Ferries — winter timetable 2025/26
+    about: >-
+      A ferry timetable kept for the relief crossings; sailing times and a
+      wind limit, nothing about the person or their work.
+
+  - path: sources/lettre-service-meteo-2025.md
+    kind: duplicate
+    language: fr
+    title: Lettre — Service météorologique national, Réseau d'observation
+    about: >-
+      French translation of the National Weather Service letter of 3 March
+      2025; same content point for point (unbroken series since April 2018,
+      one-minute logging project, two published reports), nothing the English
+      original lacks. The English copy is the primary: fuller provenance, in
+      the pivot language, and already extracted.
+    duplicate_of: sources/2025-met-office-letter.md
+
+  - path: sources/role-description-principal-keeper.md
+    kind: context
+    language: en
+    title: Northern Isles Lights Board — role description, Principal Keeper
+    about: >-
+      The Board's generic role description for a Principal Keeper at a crewed
+      station (March 2017): purpose, six duties, grade, reporting line and the
+      named systems and standards (LBMS maintenance log, SYNOP format, KCS-2016
+      competence standard). About the post, not about what Robin did; it names
+      the role, the team and the systems precisely while the appraisal and the
+      logbook are extracted.
+    context_for:
+      - exp-skerra
+      - sources/2024-appraisal-district-superintendent.md
+      - sources/skerra-logbook-2025-excerpt.md
+
+  - path: sources/2024-appraisal-district-superintendent.md
+    kind: evidence
+    language: en
+    title: Annual appraisal — Skerra Head station, 2024
+    about: >-
+      The District Superintendent's appraisal of Robin for 2024 (meeting of
+      14 January 2025): induction run for two keepers, the lens-drive overhaul,
+      recertifications and a development request. Archived by an earlier
+      round and already extracted.
+    note: 03-appraisal-2024
+
+  - path: sources/2025-met-office-letter.md
+    kind: evidence
+    language: en
+    title: Letter — National Weather Service, Observations Network
+    about: >-
+      Letter of 3 March 2025 from the Observations Network Manager to Robin:
+      the station's unbroken synoptic series since April 2018 and the
+      volunteer one-minute logging project used in two published reports.
+      Archived by an earlier round and already extracted; primary for the
+      French translation in the inbox.
+    note: 04-met-office-letter
+
+  - path: sources/skerra-logbook-2025-excerpt.md
+    kind: evidence
+    language: en
+    title: Skerra Head Lighthouse — station logbook, excerpt
+    about: >-
+      Five logbook entries (2021–2025) copied by Robin: generator test-cycle
+      change and diesel figures, the kayaker incident of 7 October 2023, a
+      weather observation, the drive-belt outage of 11 February 2025.
+      Archived by an earlier round and already extracted.
+    note: 02-logbook-excerpt

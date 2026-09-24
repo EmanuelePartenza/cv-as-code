@@ -296,11 +296,22 @@ def _rewrite_index_paths(index_path: Path, moves: dict[str, str], notes: dict[st
                 else:
                     lines.insert(block_end, " " * indent + f"note: {note}")
                 break
+    in_context = False
     for i, line in enumerate(lines):
         m = re.match(r"^(\s*-\s+)?(\s*)context_for:\s*\[(.*)\]\s*$", line)
         if m:
             items = [moves.get(x.strip(), x.strip()) for x in m.group(3).split(",") if x.strip()]
             lines[i] = f"{(m.group(1) or '') + m.group(2)}context_for: [{', '.join(items)}]"
+            in_context = False
+            continue
+        if re.match(r"^\s*context_for:\s*$", line):
+            in_context = True
+            continue
+        item = re.match(r"^(\s*-\s+)(\S+)\s*$", line)
+        if in_context and item and item.group(2) in moves:
+            lines[i] = f"{item.group(1)}{moves[item.group(2)]}"
+        elif in_context and not item:
+            in_context = False
     index_path.write_text("\n".join(lines) + "\n", "utf-8")
 
 

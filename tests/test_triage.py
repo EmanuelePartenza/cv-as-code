@@ -35,7 +35,9 @@ documents:
   - path: inbox/role.md
     kind: context
     about: The company's description of the role; not about the person
-    context_for: [inbox/cv-en.md, exp-acme]
+    context_for:
+      - inbox/cv-en.md
+      - exp-acme
   - path: inbox/timetable.md
     kind: irrelevant
     about: A ferry timetable

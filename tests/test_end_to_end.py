@@ -116,6 +116,26 @@ def test_example_carries_a_note_applied_by_the_deterministic_stage(example: Data
     assert all(f["evidence"].startswith("notes/04-met-office-letter.md#") for f in logger["facts"])
 
 
+def test_example_carries_the_triage_verdicts_and_an_empty_inbox(example: DataRoot) -> None:
+    """Stage 02 ran on Robin's inbox with the real engine; the batch was then archived."""
+    from cv_as_code.documents import load_document
+
+    index = load_document(example.path / "users" / "robin" / "sources.yaml")
+    by_path = {d["path"]: d for d in index["documents"]}
+    assert by_path["sources/role-description-principal-keeper.md"]["kind"] == "context"
+    assert "exp-skerra" in by_path["sources/role-description-principal-keeper.md"]["context_for"]
+    letter = by_path["sources/lettre-service-meteo-2025.md"]
+    assert (
+        letter["kind"] == "duplicate"
+        and letter["duplicate_of"] == "sources/2025-met-office-letter.md"
+    )
+    assert by_path["sources/ferry-timetable-winter-2025.md"]["kind"] == "irrelevant"
+    assert by_path["sources/2025-met-office-letter.md"]["note"] == "04-met-office-letter"
+    assert all(p.startswith("sources/") for p in by_path)
+    inbox = example.path / "users" / "robin" / "inbox"
+    assert [p.name for p in inbox.iterdir()] == ["README.md"]
+
+
 def test_the_gates_refuse_a_draft_fact_in_an_approved_spec(example: DataRoot) -> None:
     spec = example.path / MASTERS[0] / "cv-spec.yaml"
     spec.write_text(
