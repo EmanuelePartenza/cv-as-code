@@ -29,6 +29,7 @@ not in three places. The four containers split the work like this:
 | commit body | the extended why - the source of truth | - |
 | [CHANGELOG.md](../../../CHANGELOG.md) | one slim entry per session, **at the top** | the extended why |
 | [STATUS.md](../../../STATUS.md) | only "In progress" and "Blockers"; overwritten | history |
+| [STATO.md](../../../STATO.md) | the same in a few lines, for the maintainer's dashboard | the details of STATUS |
 | [DEVLOG.md](../../../DEVLOG.md) | problems found and **not** fixed | what you already fixed |
 
 - **CHANGELOG.md**: Conventional title + 3-5 bullets on what changes and where +
@@ -39,6 +40,9 @@ not in three places. The four containers split the work like this:
   `AUTO:COMMITS` block (the hook regenerates it).
 - **DEVLOG.md**: `grep` first; if the problem exists, update it instead of
   duplicating. Keep the index at the top current.
+- **STATO.md**: rewrite "In breve" and "Prossimi passi" in a few lines from
+  STATUS, and set `aggiornato` to today. The section titles stay in Italian
+  (ADR-0018); nothing personal, as everywhere in this repository.
 - A decision taken **and** implemented moves from
   [docs/05](../../../docs/05-decisions-open.md) to
   [docs/06](../../../docs/06-decisions-taken.md).

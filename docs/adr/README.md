@@ -43,6 +43,7 @@ maintainer, the decision is opened first, then — once taken — formalised in 
 | [0015](0015-claude-code-headless-engine.md) | Claude Code in print mode as the first engine that runs a stage | accepted |
 | [0016](0016-ui-in-the-persons-language.md) | The UI's chrome speaks the person's language; the library stays English (amends 0007) | accepted |
 | [0017](0017-own-words-are-evidence.md) | The curriculum is the profile edited in place; the person's own words are evidence | accepted |
+| [0018](0018-agents-md-and-the-project-files.md) | `AGENTS.md` is the navigator; the maintainer's project files sit at the root (amends 0007, 0010) | accepted |
 
 Numbers 0001–0005 were first recorded in the maintainer's private working
 repository, from which this framework was extracted; they are re-authored here

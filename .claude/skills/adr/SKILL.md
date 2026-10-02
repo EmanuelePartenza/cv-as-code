@@ -46,7 +46,7 @@ formalised here.
 6. If the ADR changes a binding rule, update in the same commit
    [docs/02-engineering-conventions.md](../../../docs/02-engineering-conventions.md)
    or [docs/03-development-process.md](../../../docs/03-development-process.md), and -
-   if it changes a non-negotiable rule - [CLAUDE.md](../../../CLAUDE.md).
+   if it changes a non-negotiable rule - [AGENTS.md](../../../AGENTS.md).
 7. Commit `docs: ADR-NNNN <title>`, asking for confirmation before running it.
 
 Report in two lines what you recorded and which files you touched besides the ADR.

@@ -11,6 +11,19 @@ Tags: `arch`, `perf`, `ui`, `test`, `docs`, `fix`, `cleanup`, `sec`.
 
 ---
 
+## 2026-10-02
+
+### docs: AGENTS.md is the navigator; the maintainer's project files [docs]
+
+- The navigator moves from `CLAUDE.md` to `AGENTS.md`, unchanged in role and content;
+  `CLAUDE.md` now contains only `@AGENTS.md`. ADR-0018 (amends 0007 and 0010).
+- `progetto.yaml` and `STATO.md` at the root, for the maintainer's project contract: the
+  only Italian in the repository; `STATO.md` summarises STATUS and `/wrap` updates it.
+- Links to the navigator follow it: `CONTRIBUTING.md`, the `/adr` skill.
+- Files: `AGENTS.md`, `CLAUDE.md`, `progetto.yaml`, `STATO.md`,
+  `docs/adr/0018-agents-md-and-the-project-files.md`, `docs/adr/README.md`,
+  `CONTRIBUTING.md`, `.claude/skills/{adr,wrap}/SKILL.md`.
+
 ## 2026-09-25
 
 ### feat(ui): the curriculum — profile.yaml edited in place, own words as evidence [arch, ui]

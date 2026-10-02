@@ -33,7 +33,7 @@ make lint && make test                # or: bash .claude/scripts/verify.sh
 
 The working method (interview before implementing, tests for every new part,
 ADRs for non-obvious decisions, Conventional Commits) is in
-[CLAUDE.md](CLAUDE.md) and [docs/03-development-process.md](docs/03-development-process.md).
+[AGENTS.md](AGENTS.md) and [docs/03-development-process.md](docs/03-development-process.md).
 
 ## Adding a language
 

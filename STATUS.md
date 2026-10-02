@@ -10,9 +10,9 @@
 
 ## In progress
 
-v0.1.0 is public and tagged; CI is green on both Python versions. v0.2, not yet
-tagged, adds: the data-in commands (`cvac profile report`, `cvac fact
-verify|reject`); `identity_fields` per language and per spec; the local web UI
+v0.1.0 and v0.2.0 are public and tagged. v0.2.0 tags the data-in commands
+(`cvac profile report`, `cvac fact verify|reject`). After it, on main and not
+yet tagged: `identity_fields` per language and per spec; the local web UI
 `cvac ui` (ADR-0014); `cvac stage run`, a stage executed by Claude Code in
 print mode as a confined subprocess (ADR-0015); stages `40_gap_plan` and
 `70_interview_prep` with schemas, validator rules and skills.
@@ -42,7 +42,8 @@ under `example/users/robin/growth/`; the preparation in the application).
 1. Maintainer: try `cvac ui` on the personal data root end to end (a document
    → 03 → 04 → verify; a posting → 10 → 20 → 30); install Claude Code's CLI so
    the engine no longer depends on the VS Code extension's bundle.
-2. Maintainer: review v0.2, `git push`, `git tag -a v0.2.0`.
+2. Maintainer: tag the work pushed on 2026-10-02 once it has been tried end to
+   end; `v0.2.0` points to `a303794`, the data-in commands only.
 3. Form-based editing of the profile (the layout-preserving insertions of
    `apply.py` are the seed of the writer it needs).
 
@@ -69,9 +70,9 @@ Details in [DEVLOG.md](DEVLOG.md), which is the source of truth.
 <!-- AUTO:COMMITS -->
 | Hash | Date | Message |
 |---|---|---|
+| `515ef3c` | 2026-09-24 | test(curriculum): own-words anchors relative to the note's content |
 | `fe3aa22` | 2026-09-24 | feat(example): a fact in Robin's own words, through the curriculum form |
 | `f6d806d` | 2026-09-24 | feat(ui): the curriculum, profile.yaml edited in place |
 | `ece18bd` | 2026-09-24 | feat(example): Robin's inbox triaged by the real engine and archived |
 | `5b16855` | 2026-09-24 | feat(stages): 02_triage, the documents read together |
-| `c67a605` | 2026-09-24 | feat(ui): the guided path — start page, review, questionnaire as a form |
 <!-- /AUTO:COMMITS -->
