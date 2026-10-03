@@ -5,7 +5,7 @@
 > [DEVLOG.md](DEVLOG.md). First file to read at session start, last to update at
 > session end.
 
-**Updated:** 2026-09-24
+**Updated:** 2026-10-02
 **Phase:** v0.1.0 published (2026-09-22); v0.2 in progress
 
 ## In progress
@@ -70,9 +70,9 @@ Details in [DEVLOG.md](DEVLOG.md), which is the source of truth.
 <!-- AUTO:COMMITS -->
 | Hash | Date | Message |
 |---|---|---|
+| `25f2e67` | 2026-10-02 | docs: ADR-0018, AGENTS.md as navigator and the project files |
 | `515ef3c` | 2026-09-24 | test(curriculum): own-words anchors relative to the note's content |
 | `fe3aa22` | 2026-09-24 | feat(example): a fact in Robin's own words, through the curriculum form |
 | `f6d806d` | 2026-09-24 | feat(ui): the curriculum, profile.yaml edited in place |
 | `ece18bd` | 2026-09-24 | feat(example): Robin's inbox triaged by the real engine and archived |
-| `5b16855` | 2026-09-24 | feat(stages): 02_triage, the documents read together |
 <!-- /AUTO:COMMITS -->

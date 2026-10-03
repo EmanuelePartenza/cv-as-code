@@ -24,6 +24,7 @@ Horizon: multi-year. Stack: Python 3.10+, Typst from PyPI, pytest, ruff.
 | How code is written (**binding**) | [docs/02-engineering-conventions.md](docs/02-engineering-conventions.md) |
 | How we work, Definition of Done (**binding**) | [docs/03-development-process.md](docs/03-development-process.md) |
 | Decisions that belong to the maintainer, open queue | [docs/05-decisions-open.md](docs/05-decisions-open.md) |
+| Decisions opened from the maintainer's project dashboard, one file each (`decisioni/aperte/`, `decisioni/prese/`; empty until one arrives) | ADR-0018 |
 | Decisions taken, archive | [docs/06-decisions-taken.md](docs/06-decisions-taken.md) |
 | The why of a choice | [docs/adr/](docs/adr/) |
 | What is in progress, blockers | [STATUS.md](STATUS.md) |
